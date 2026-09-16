@@ -1,0 +1,1891 @@
+[
+  {
+    "id": 209,
+    "name": "Beige taza polli",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/Beige_taza_polli.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.250Z",
+    "updatedAt": "2026-06-25T13:46:46.689Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 210,
+    "name": "Beige taza bouchardé",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/Beige_taza_bouchardé.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.268Z",
+    "updatedAt": "2026-06-25T13:46:38.726Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 211,
+    "name": "Beige taza vieille",
+    "regularPrice": 180,
+    "images": "/images/Marbre local/images/Beige_taza_vieille.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.287Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 212,
+    "name": "Beige taza brut",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/Beige_taza_brut.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.306Z",
+    "updatedAt": "2026-06-25T13:46:41.948Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 213,
+    "name": "Beige taza veinage",
+    "regularPrice": 180,
+    "images": "/images/Marbre local/images/Beige_taza_veinage.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.325Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 214,
+    "name": "Beige taza strié",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/Beige_taza_strié.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.345Z",
+    "updatedAt": "2026-06-25T13:46:55.344Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 215,
+    "name": "Gris taza polli",
+    "regularPrice": 240,
+    "images": "/images/Marbre local/images/Gris_taza_polli.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.364Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 216,
+    "name": "Gris taza bouchardé",
+    "regularPrice": 240,
+    "images": "/images/Marbre local/images/Gris_taza_bouchardé.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.383Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 217,
+    "name": "Gris taza vieille",
+    "regularPrice": 240,
+    "images": "/images/Marbre local/images/Gris_taza_vieille.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.402Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 218,
+    "name": "Gris taza brut",
+    "regularPrice": 210,
+    "images": "/images/Marbre local/images/Gris_taza_brut.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.421Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 219,
+    "name": "Gris taza veinage",
+    "regularPrice": 240,
+    "images": "/images/Marbre local/images/Gris_taza_veinage.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.440Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 220,
+    "name": "Gris taza strié",
+    "regularPrice": 280,
+    "images": "/images/Marbre local/images/Gris_taza_strié.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.458Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 221,
+    "name": "Gris taza sablé",
+    "regularPrice": 240,
+    "images": "/images/Marbre local/images/Gris_taza_sablé.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.479Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 222,
+    "name": "Beige taza sablé",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/Beige_taza_sablé.webp",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.498Z",
+    "updatedAt": "2026-06-25T13:46:50.625Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 223,
+    "name": "Zola vieille",
+    "regularPrice": 200,
+    "images": "/images/Marbre local/images/Zola_vieille.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.516Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 224,
+    "name": "Pierre volcanique",
+    "regularPrice": 280,
+    "images": "/images/Marbre local/images/Pierre_volcanique.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.534Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 225,
+    "name": "Volubilis",
+    "regularPrice": 400,
+    "images": "/images/Marbre local/images/Volubilis.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.555Z",
+    "updatedAt": "2026-06-24T13:10:08.437Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 226,
+    "name": "Noir khenifra",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/Noir_khenifra.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.573Z",
+    "updatedAt": "2026-06-25T14:35:40.349Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    },
+    "applicationImages": [
+      "/images/Marbre local/images/Noir_khenifra_application_1782398088289.webp"
+    ]
+  },
+  {
+    "id": 228,
+    "name": "Gris tiflet",
+    "regularPrice": 320,
+    "images": "/images/Marbre local/images/Gris_tiflet.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.615Z",
+    "updatedAt": "2026-06-24T12:31:15.582Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": [
+      "/images/Marbre local/images/Gris_tiflet_application_1.webp"
+    ]
+  },
+  {
+    "id": 229,
+    "name": "Gris benslimane",
+    "regularPrice": 300,
+    "images": "/images/Marbre local/images/Gris_benslimane_1784276539693.webp",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.634Z",
+    "updatedAt": "2026-07-17T08:22:22.471Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 230,
+    "name": "Noir azilal",
+    "regularPrice": 400,
+    "images": "/images/Marbre local/images/Noir_azilal.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.655Z",
+    "updatedAt": "2026-06-24T12:31:15.671Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": [
+      "/images/Marbre local/images/Noir_azilal_application_1.jpg"
+    ]
+  },
+  {
+    "id": 231,
+    "name": "Jaune bejaad",
+    "regularPrice": 320,
+    "images": "/images/Marbre local/images/Jaune_bejaad.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.678Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 232,
+    "name": "Rouge agadir",
+    "regularPrice": 380,
+    "images": "/images/Marbre local/images/Rouge_agadir.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.695Z",
+    "updatedAt": "2026-06-24T12:31:16.454Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": [
+      "/images/Marbre local/images/Rouge_agadir_application_1.webp"
+    ]
+  },
+  {
+    "id": 233,
+    "name": "Bir jdid",
+    "regularPrice": 350,
+    "images": "/images/Marbre local/images/Bir_jdid.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.715Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 235,
+    "name": "Eclaté beige taza",
+    "regularPrice": 120,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Eclate_beige_taza_1782484060825.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.757Z",
+    "updatedAt": "2026-06-26T14:27:51.815Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2,
+      "local": true
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 236,
+    "name": "Éclaté gris taza",
+    "regularPrice": 130,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Éclaté_gris_taza.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.776Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 237,
+    "name": "Éclaté Noir khenifra",
+    "regularPrice": 180,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Éclaté_Noir_khenifra.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.794Z",
+    "updatedAt": "2026-06-24T12:31:16.995Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": [
+      "/images/Pierre Naturelle&Tahejart/images/Eclate_Noir_khenifra_application_1.jpg",
+      "/images/Pierre Naturelle&Tahejart/images/Eclate_Noir_khenifra_application_2.jpg",
+      "/images/Pierre Naturelle&Tahejart/images/Eclate_Noir_khenifra_application_3.jpg",
+      "/images/Pierre Naturelle&Tahejart/images/Eclate_Noir_khenifra_application_4.jpg"
+    ]
+  },
+  {
+    "id": 238,
+    "name": "Éclaté noir azilal",
+    "regularPrice": 180,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Éclaté_noir_azilal.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.813Z",
+    "updatedAt": "2026-06-24T12:31:17.119Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": [
+      "/images/Pierre Naturelle&Tahejart/images/Eclate_noir_azilal_application_1.jpg"
+    ]
+  },
+  {
+    "id": 239,
+    "name": "Éclaté volubilis",
+    "regularPrice": 180,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Éclaté_volubilis.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.832Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 240,
+    "name": "Éclaté rouge rosé",
+    "regularPrice": 220,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Éclaté_rouge_rosé.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.851Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 241,
+    "name": "Crazy Beige Taza",
+    "regularPrice": null,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Crazy_Beige_Taza_1782394799523.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.869Z",
+    "updatedAt": "2026-06-25T13:40:00.987Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2,
+      "local": true
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 242,
+    "name": "Ardoise verdatre",
+    "regularPrice": 130,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Ardoise_verdatre.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.891Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 243,
+    "name": "Ardoise violet foncé",
+    "regularPrice": 160,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Ardoise_violet_foncé.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.909Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 244,
+    "name": "Ardoise",
+    "regularPrice": 130,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Ardoise.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.929Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 245,
+    "name": "Ardoise",
+    "regularPrice": 120,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Ardoise2.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.950Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 246,
+    "name": "Ardoise",
+    "regularPrice": 140,
+    "images": "/images/Pierre Naturelle&Tahejart/images/Ardoise3.jpg",
+    "categoryId": 70,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-02-26T22:55:26.978Z",
+    "updatedAt": "2026-06-24T13:10:08.438Z",
+    "category": {
+      "id": 70,
+      "name": "Pierre Naturelle&Tahejart",
+      "order": 2
+    },
+    "applicationImages": []
+  },
+  {
+    "id": 5000,
+    "name": "NEW CALACATA GRIS",
+    "regularPrice": null,
+    "images": "/images/Quartz/images/NEW_CALACATA_GRIS.jpg",
+    "applicationImages": [
+      "/images/Quartz/images/NEW_CALACATA_GRIS_application_1782425043524.jpg"
+    ],
+    "categoryId": 86,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:05.593Z",
+    "updatedAt": "2026-06-25T22:04:05.041Z",
+    "category": {
+      "id": 86,
+      "name": "Quartz",
+      "order": 6
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5001,
+    "name": "NEW CALACATA DORE",
+    "regularPrice": null,
+    "images": "/images/Quartz/images/NEW_CALACATA_DORE.jpg",
+    "applicationImages": [
+      "/images/Quartz/images/NEW_CALACATA_DORE_application_1.jpg"
+    ],
+    "categoryId": 86,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:07.218Z",
+    "updatedAt": "2026-06-24T12:31:17.479Z",
+    "category": {
+      "id": 86,
+      "name": "Quartz",
+      "order": 6
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5002,
+    "name": "Rose Porino",
+    "regularPrice": null,
+    "images": "/images/Granit/images/Rose_Porino.jpg",
+    "applicationImages": [
+      "/images/Granit/images/Rose_Porino_application_1782483933701.jpg"
+    ],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:08.326Z",
+    "updatedAt": "2026-06-26T14:25:36.148Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5003,
+    "name": "Rose Avel",
+    "regularPrice": null,
+    "images": "/images/Granit/images/Rose_Avel.jpg",
+    "applicationImages": [],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:09.190Z",
+    "updatedAt": "2026-06-24T11:39:09.190Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5004,
+    "name": "Patagonia",
+    "regularPrice": null,
+    "images": "/images/Granit/images/Patagonia_1782408285809.jpg",
+    "applicationImages": [],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:10.350Z",
+    "updatedAt": "2026-06-25T17:24:50.033Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5005,
+    "name": "Noir Galaxy",
+    "regularPrice": null,
+    "images": "/images/Granit/images/Noir_Galaxy.jpg",
+    "applicationImages": [
+      "/images/Granit/images/Noir_Galaxy_application_1782408266232.jpg"
+    ],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:12.498Z",
+    "updatedAt": "2026-06-25T17:24:27.263Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5006,
+    "name": "Noir Absolu",
+    "regularPrice": null,
+    "images": "/images/Granit/images/Noir_Absolu_1782570217868.jpg",
+    "applicationImages": [
+      "/images/Granit/images/Noir_Absolu_application_1782570221908.jpg",
+      "/images/Granit/images/Noir_Absolu_application_1782570223759.jpg"
+    ],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:14.241Z",
+    "updatedAt": "2026-06-27T14:23:45.179Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5007,
+    "name": "New Halayeb",
+    "regularPrice": null,
+    "images": "/images/Granit/images/New_Halayeb_1782393850510.jpg",
+    "applicationImages": [
+      "/images/Granit/images/New_Halayeb_application_1782393857625.jpg"
+    ],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:16.142Z",
+    "updatedAt": "2026-06-25T13:24:19.157Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5008,
+    "name": "Matrix Titanium",
+    "regularPrice": null,
+    "images": "/images/Granit/images/Matrix_Noir.jpg",
+    "applicationImages": [
+      "/images/Granit/images/Matrix_Titanium_application_1782408250212.webp"
+    ],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:18.196Z",
+    "updatedAt": "2026-06-25T17:24:11.971Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5009,
+    "name": "Labrador Noir",
+    "regularPrice": null,
+    "images": "/images/Granit/images/Labrador_Noir.jpg",
+    "applicationImages": [
+      "/images/Granit/images/Labrador_Noir_application_1782393363363.jpg"
+    ],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:19.198Z",
+    "updatedAt": "2026-06-25T13:16:05.440Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5010,
+    "name": "Labrador Bleu",
+    "regularPrice": null,
+    "images": "/images/Granit/images/Labrador_Bleu.jpg",
+    "applicationImages": [
+      "/images/Granit/images/Labrador_Bleu_application_1.jpg"
+    ],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:20.275Z",
+    "updatedAt": "2026-06-24T12:31:19.043Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5011,
+    "name": "Blanc Perle",
+    "regularPrice": null,
+    "images": "/images/Granit/images/Blanc_Perle.jpg",
+    "applicationImages": [
+      "/images/Granit/images/Blanc_Perle_application_1782408305891.jpg"
+    ],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:21.078Z",
+    "updatedAt": "2026-06-25T17:25:06.769Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5012,
+    "name": "BALTIC BROWN",
+    "regularPrice": null,
+    "images": "/images/Granit/images/BALTIC_BROWN.jpg",
+    "applicationImages": [
+      "/images/Granit/images/BALTIC_BROWN_application_1782398309436.jpg"
+    ],
+    "categoryId": 1,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:22.223Z",
+    "updatedAt": "2026-06-25T14:38:30.829Z",
+    "category": {
+      "id": 1,
+      "name": "Granit",
+      "order": 3
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5014,
+    "name": "Onyx rose",
+    "regularPrice": null,
+    "images": "/images/Onyx/images/Onyx_rose.webp",
+    "applicationImages": [
+      "/images/Onyx/images/Onyx_rose_application_1782424399635.webp"
+    ],
+    "categoryId": 85,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:24.330Z",
+    "updatedAt": "2026-06-25T21:53:23.913Z",
+    "category": {
+      "id": 85,
+      "name": "Onyx",
+      "order": 5
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5015,
+    "name": "Onyx orange",
+    "regularPrice": null,
+    "images": "/images/Onyx/images/Onyx_orange.jpg",
+    "applicationImages": [
+      "/images/Onyx/images/Onyx_orange_application_1.jpg"
+    ],
+    "categoryId": 85,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:25.713Z",
+    "updatedAt": "2026-06-24T12:31:19.620Z",
+    "category": {
+      "id": 85,
+      "name": "Onyx",
+      "order": 5
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5016,
+    "name": "Onyx marron",
+    "regularPrice": null,
+    "images": "/images/Onyx/images/Onyx_marron.jpg",
+    "applicationImages": [
+      "/images/Onyx/images/Onyx_marron_application_1782424620151.webp"
+    ],
+    "categoryId": 85,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:27.229Z",
+    "updatedAt": "2026-06-25T21:57:02.600Z",
+    "category": {
+      "id": 85,
+      "name": "Onyx",
+      "order": 5
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5017,
+    "name": "Onyx  Blue",
+    "regularPrice": null,
+    "images": "/images/Onyx/images/Onyx_Blue.jpg",
+    "applicationImages": [
+      "/images/Onyx/images/Onyx_Blue_application_1.jpg",
+      "/images/Onyx/images/Onyx_Blue_application_1782395020971.jpg"
+    ],
+    "categoryId": 85,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:28.330Z",
+    "updatedAt": "2026-06-25T13:43:44.793Z",
+    "category": {
+      "id": 85,
+      "name": "Onyx",
+      "order": 5
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5018,
+    "name": "Onyx blanc",
+    "regularPrice": null,
+    "images": "/images/Onyx/images/Onyx_blanc.jpg",
+    "applicationImages": [
+      "/images/Onyx/images/Onyx_blanc_application_1782395071086.jpg"
+    ],
+    "categoryId": 85,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:29.617Z",
+    "updatedAt": "2026-06-25T13:44:37.270Z",
+    "category": {
+      "id": 85,
+      "name": "Onyx",
+      "order": 5
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5019,
+    "name": "VERT GUATEMALA",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/VERT_GUATEMALA.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/VERT_GUATEMALA_application_1782483974503.jpg",
+      "/images/Marbre/images/VERT_GUATEMALA_application_1782484000912.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:30.669Z",
+    "updatedAt": "2026-06-26T14:26:41.760Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5020,
+    "name": "VERT DES ALPES",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/VERT_DES_ALPES.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/VERT_DES_ALPES_application_1782421579983.webp"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:31.618Z",
+    "updatedAt": "2026-06-25T21:06:27.359Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5021,
+    "name": "TUNDRA GRIS",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/TUNDRA_GRIS.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/TUNDRA_GRIS_application_1.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:32.772Z",
+    "updatedAt": "2026-06-24T12:31:20.805Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5024,
+    "name": "ROUGE ALICANTE",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/ROUGE_ALICANTE.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/ROUGE_ALICANTE_application_1782426490531.webp"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:35.672Z",
+    "updatedAt": "2026-06-25T22:28:12.791Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5025,
+    "name": "PIERRE DE BALI",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/PIERRE_DE_BALI.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/PIERRE_DE_BALI_application_1.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:36.756Z",
+    "updatedAt": "2026-06-24T12:31:21.653Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5026,
+    "name": "PERLATINO",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/PERLATINO.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/PERLATINO_application_1.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:37.653Z",
+    "updatedAt": "2026-06-24T12:31:21.769Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5027,
+    "name": "PANDA WHITE",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/PANDA_WHITE.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/PANDA_WHITE_application_1782421777270.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:40.407Z",
+    "updatedAt": "2026-06-25T21:09:38.276Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5028,
+    "name": "NOIR PORTORO",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/NOIR_PORTORO_1782421843345.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/NOIR_PORTORO_application_1782422343307.webp"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:42.878Z",
+    "updatedAt": "2026-06-25T21:21:47.709Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5029,
+    "name": "NOIR FLOWER",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/NOIR_FLOWER.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/NOIR_FLOWER_application_1782422936169.webp"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:43.603Z",
+    "updatedAt": "2026-06-25T21:28:59.095Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5030,
+    "name": "NOIR AZIZA",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/NOIR_AZIZA.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/NOIR_AZIZA_application_1.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:44.531Z",
+    "updatedAt": "2026-06-25T21:31:56.511Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5031,
+    "name": "Marron Imperial clair",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/Beige_IMPERIAL.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/Marron_Imperial_clair_application_1782423616064.webp"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:45.856Z",
+    "updatedAt": "2026-06-25T21:40:16.831Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5032,
+    "name": "MARRON IMPERIAL",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/MARRON_IMPERIAL.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/MARRON_IMPERIAL_application_1.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:48.435Z",
+    "updatedAt": "2026-06-24T12:31:22.507Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5033,
+    "name": "MARMARA WHITE",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/MARMARA_WHITE.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/MARMARA_WHITE_application_1.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:53.781Z",
+    "updatedAt": "2026-06-24T12:31:22.993Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5034,
+    "name": "GRIS ARMANI",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/GRIS_ARMANI.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/GRIS_ARMANI_application_1782423833068.webp"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:55.036Z",
+    "updatedAt": "2026-06-25T21:43:54.876Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5035,
+    "name": "FOREST VERT",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/FOREST_VERT_1782411993824.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/FOREST_VERT_application_1782412011712.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:39:56.926Z",
+    "updatedAt": "2026-06-25T18:56:20.698Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5036,
+    "name": "EMOTION GREY",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/EMOTION_GREY.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/EMOTION_GREY_application_1.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:00.959Z",
+    "updatedAt": "2026-06-24T12:31:23.905Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5037,
+    "name": "DEEP BLUE",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/DEEP_BLUE.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/DEEP_BLUE_application_1782424002937.webp"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:02.615Z",
+    "updatedAt": "2026-06-25T21:46:44.693Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5038,
+    "name": "CREMA SOFITA",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/CREMA_SOFITA.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/CREMA_SOFITA_application_1782424215657.webp"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:03.863Z",
+    "updatedAt": "2026-06-25T21:50:17.232Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5039,
+    "name": "CREMA ROYAL",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/CREMA_ROYAL.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/CREMA_ROYAL_application_1782411719890.jpg",
+      "/images/Marbre/images/CREMA_ROYAL_application_1782411897332.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:04.814Z",
+    "updatedAt": "2026-06-25T18:24:58.569Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5040,
+    "name": "CREMA MARFIL",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/CREMA_MARFIL.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/CREMA_MARFIL_application_1782411558884.jpg",
+      "/images/Marbre/images/CREMA_MARFIL_application_1782411564209.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:06.708Z",
+    "updatedAt": "2026-06-25T18:19:25.469Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5041,
+    "name": "CREMA GALALA",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/CREMA_GALALA.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/CREMA_GALALA_application_1782411414174.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:07.718Z",
+    "updatedAt": "2026-06-25T18:17:41.463Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5042,
+    "name": "Calacatta violia",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/CALACATA_VIOLIA.webp",
+    "applicationImages": [
+      "/images/Marbre/images/Calacatta_violia_application_1782411383299.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:10.278Z",
+    "updatedAt": "2026-06-25T18:16:24.330Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5043,
+    "name": "BLANC THASSOS",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/BLANC_THASSOS_1782393575606.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/BLANC_THASSOS_application_1782393818572.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:12.199Z",
+    "updatedAt": "2026-06-25T13:23:39.985Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5044,
+    "name": "BLANC POLARIS",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/BLANC_POLARIS_1782408540722.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/BLANC_POLARIS_application_1782408547201.jpg",
+      "/images/Marbre/images/BLANC_POLARIS_application_1782408650858.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:12.926Z",
+    "updatedAt": "2026-06-25T17:33:35.388Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5045,
+    "name": "BLANC IBIZA",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/BLANC_IBIZA_1782410324582.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/BLANC_IBIZA_application_1782410634677.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:14.165Z",
+    "updatedAt": "2026-06-25T18:03:55.635Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5046,
+    "name": "BALNC SAFIR",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/BALNC_SAFIR.webp",
+    "applicationImages": [],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:15.694Z",
+    "updatedAt": "2026-06-25T17:45:09.779Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5047,
+    "name": "Blanc CARRARE",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/BALNC_CARRARA.webp",
+    "applicationImages": [
+      "/images/Marbre/images/Blanc_CARRARA_application_1782409884826.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:16.953Z",
+    "updatedAt": "2026-06-25T17:51:29.878Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5048,
+    "name": "Volakas",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/Volakas_1782408585410.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/Volakas_application_1782408596535.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:20.439Z",
+    "updatedAt": "2026-06-25T17:29:57.828Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5049,
+    "name": "Arabiscato Orobico Rosso",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/Arabiscato_Orobico_Rosso_1782408435643.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/Arabiscato_Orobico_Rosso_application_1782408438893.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:23.301Z",
+    "updatedAt": "2026-06-25T17:27:24.232Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5050,
+    "name": "Arabiscato Orobico",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/Arabiscato_Orobico_1782408389089.jpg",
+    "applicationImages": [
+      "/images/Marbre/images/Arabiscato_Orobico_application_1782408405434.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:40:27.080Z",
+    "updatedAt": "2026-06-25T17:26:46.436Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5051,
+    "name": "ARABISCATO BLANC",
+    "regularPrice": null,
+    "images": "/images/Marbre/images/ARABISCATO_BLANC.webp",
+    "applicationImages": [
+      "/images/Marbre/images/ARABISCATO_BLANC_application_1782408332451.jpg",
+      "/images/Marbre/images/ARABISCATO_BLANC_application_1782408346174.jpg"
+    ],
+    "categoryId": 18,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:41:35.566Z",
+    "updatedAt": "2026-06-25T17:25:48.282Z",
+    "category": {
+      "id": 18,
+      "name": "Marbre",
+      "order": 4
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5054,
+    "name": "Onyx Vert",
+    "regularPrice": null,
+    "images": "/images/Onyx/images/Onyx_Vert.webp",
+    "applicationImages": [
+      "/images/Onyx/images/Onyx_Vert_application_1.jpg"
+    ],
+    "categoryId": 85,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-24T11:41:40.246Z",
+    "updatedAt": "2026-06-24T12:31:36.347Z",
+    "category": {
+      "id": 85,
+      "name": "Onyx",
+      "order": 5
+    },
+    "source": "saharamarbre.com"
+  },
+  {
+    "id": 5055,
+    "name": "Gris Khenifra",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/Gris_Khenifra_1782570016609.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-27T14:20:17.816Z",
+    "updatedAt": "2026-06-27T14:20:17.816Z",
+    "applicationImages": [],
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    }
+  },
+  {
+    "id": 5056,
+    "name": "Gris Msoun",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/Gris_Msoun_1782570053278.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-27T14:20:54.711Z",
+    "updatedAt": "2026-06-27T14:22:14.157Z",
+    "applicationImages": [],
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    }
+  },
+  {
+    "id": 5057,
+    "name": "Volubilis Foncé",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/product_1782570138666.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-27T14:22:29.101Z",
+    "updatedAt": "2026-06-27T14:22:29.101Z",
+    "applicationImages": [],
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    }
+  },
+  {
+    "id": 5058,
+    "name": "Blanc Zayane",
+    "regularPrice": null,
+    "images": "/images/Marbre local/images/Blanc_Zayane_1782644937295.jpg",
+    "categoryId": 45,
+    "type": "simple",
+    "published": true,
+    "visibility": "visible",
+    "inStock": true,
+    "createdAt": "2026-06-28T11:09:01.586Z",
+    "updatedAt": "2026-06-28T11:09:01.586Z",
+    "applicationImages": [],
+    "category": {
+      "id": 45,
+      "name": "Marbre local",
+      "order": 1,
+      "local": true
+    }
+  }
+]

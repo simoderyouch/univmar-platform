@@ -1,0 +1,8 @@
+node_modules
+.next
+.env.local
+.git
+public
+private-assets
+*.log
+tsconfig.tsbuildinfo

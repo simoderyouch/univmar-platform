@@ -1,0 +1,1 @@
+package com.univmar.rfq.domain; import java.util.List; import org.springframework.data.jpa.repository.JpaRepository; public interface QuoteRequestItemRepository extends JpaRepository<QuoteRequestItem,Long>{List<QuoteRequestItem> findByRequestId(Long requestId);}

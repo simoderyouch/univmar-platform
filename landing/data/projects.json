@@ -1,0 +1,1003 @@
+[
+  {
+    "id": 86,
+    "title": "Vasque de salle de bain en pierre naturelle",
+    "image": "/projects-images/085db2af-1f38-4dd2-ac2c-d40eb432d9f4.jpg",
+    "published": false,
+    "categoryId": 15,
+    "createdAt": "2026-02-22T22:07:57.895Z",
+    "updatedAt": "2026-02-23T01:30:26.283Z",
+    "category": {
+      "id": 15,
+      "name": "Salles de Bain"
+    }
+  },
+  {
+    "id": 87,
+    "title": "Salle de bain en marbre rouge",
+    "image": "/projects-images/159c385d-df91-4575-8270-aef52a84d8af.jpg",
+    "published": false,
+    "categoryId": 15,
+    "createdAt": "2026-02-22T22:07:57.913Z",
+    "updatedAt": "2026-02-23T01:30:26.292Z",
+    "category": {
+      "id": 15,
+      "name": "Salles de Bain"
+    }
+  },
+  {
+    "id": 88,
+    "title": "Escalier en Marbre Moderne avec Éclairage LED",
+    "image": "/projects-images/1b870460-e3cf-42f5-bfdc-a8e1d7e31ec7.jpg",
+    "published": true,
+    "categoryId": 16,
+    "createdAt": "2026-02-22T22:07:57.941Z",
+    "updatedAt": "2026-02-23T01:30:26.304Z",
+    "category": {
+      "id": 16,
+      "name": "Escaliers"
+    }
+  },
+  {
+    "id": 89,
+    "title": "Vasque de salle de bain en pierre naturelle brute",
+    "image": "/projects-images/2cff50b4-6b22-42da-ad07-fb137201902d.jpg",
+    "published": true,
+    "categoryId": 15,
+    "createdAt": "2026-02-22T22:07:57.959Z",
+    "updatedAt": "2026-02-23T01:30:26.316Z",
+    "category": {
+      "id": 15,
+      "name": "Salles de Bain"
+    }
+  },
+  {
+    "id": 90,
+    "title": "Dallage de patio en pierre naturelle",
+    "image": "/projects-images/42d4fa62-5c2a-4128-92d5-61159096b083.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:57.987Z",
+    "updatedAt": "2026-02-26T22:59:35.621Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 91,
+    "title": "Double vasque minimaliste en travertin",
+    "image": "/projects-images/4c4a6bcb-9fdc-4cad-b714-f4e5f3b46b1b.jpg",
+    "published": true,
+    "categoryId": 15,
+    "createdAt": "2026-02-22T22:07:57.997Z",
+    "updatedAt": "2026-02-23T01:30:26.337Z",
+    "category": {
+      "id": 15,
+      "name": "Salles de Bain"
+    }
+  },
+  {
+    "id": 92,
+    "title": "Cuisine moderne avec plans de travail en granit noir",
+    "image": "/projects-images/506bd22d-d345-434c-8257-4e5397bea60c.jpg",
+    "published": true,
+    "categoryId": 18,
+    "createdAt": "2026-02-22T22:07:58.025Z",
+    "updatedAt": "2026-02-23T01:30:26.349Z",
+    "category": {
+      "id": 18,
+      "name": "Cuisines"
+    }
+  },
+  {
+    "id": 93,
+    "title": "Façade moderne en pierre naturelle grise",
+    "image": "/projects-images/5c55c9fd-c951-4d16-9ec9-90e109fda6ff.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.049Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 94,
+    "title": "Revêtement extérieur en pierre beige striée",
+    "image": "/projects-images/606aa8dc-9b24-420c-8dec-c00d56b1a8b9.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.058Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 95,
+    "title": "Allée en Ardoise Naturelle",
+    "image": "/projects-images/629ae575-15e0-4837-a2c7-4c8d62444d3b.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.068Z",
+    "updatedAt": "2026-02-26T22:59:35.621Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 96,
+    "title": "Cheminée moderne en travertin flûté",
+    "image": "/projects-images/73c6fc61-b38a-4b61-8f58-bd5f3578879c.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.088Z",
+    "updatedAt": "2026-02-26T22:59:35.660Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 97,
+    "title": "Mur d'accent en pierre naturelle sèche",
+    "image": "/projects-images/769ca286-fafe-4c19-aa97-43ada4c83261.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.106Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 98,
+    "title": "Vasque en pierre naturelle sculptée pour salle de bain",
+    "image": "/projects-images/78a77537-7eff-4375-8405-b74ecc4cdf95.jpg",
+    "published": true,
+    "categoryId": 15,
+    "createdAt": "2026-02-22T22:07:58.118Z",
+    "updatedAt": "2026-02-23T01:30:26.413Z",
+    "category": {
+      "id": 15,
+      "name": "Salles de Bain"
+    }
+  },
+  {
+    "id": 99,
+    "title": "Cheminée en Pierre Naturelle Murale",
+    "image": "/projects-images/7b8a971b-fd8a-49df-af99-8f2b225fd1d3.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.129Z",
+    "updatedAt": "2026-02-26T22:59:35.660Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 100,
+    "title": "Piscine en Pierre Naturelle avec Murs en Ardoise",
+    "image": "/projects-images/888267ec-149c-43d4-8ec1-a73efa41ae1d.jpg",
+    "published": true,
+    "categoryId": 22,
+    "createdAt": "2026-02-22T22:07:58.149Z",
+    "updatedAt": "2026-02-23T01:30:26.431Z",
+    "category": {
+      "id": 22,
+      "name": "Piscines"
+    }
+  },
+  {
+    "id": 101,
+    "title": "Mur en Pierre Naturelle Irrégulière",
+    "image": "/projects-images/99c5757a-08c6-4b48-ab6c-3f9bf0838c64.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.158Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 102,
+    "title": "Mur d'accent en pierre naturelle",
+    "image": "/projects-images/9a76aedc-cea5-43f7-833c-197c83383b1a.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.172Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 103,
+    "title": "Façade en pierre naturelle et marbre travertin",
+    "image": "/projects-images/9e8d3f4d-af4e-4cbc-b255-601ff6bf7380.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.185Z",
+    "updatedAt": "2026-02-23T01:30:26.458Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 104,
+    "title": "Façade et Balustrades en Calcaire Beige",
+    "image": "/projects-images/Fichier_032.png",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.196Z",
+    "updatedAt": "2026-02-26T22:59:35.621Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 105,
+    "title": "Mur de revêtement en pierre naturelle grise",
+    "image": "/projects-images/Fichier_033.png",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.217Z",
+    "updatedAt": "2026-02-26T22:59:35.700Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 106,
+    "title": "Revêtement Mural en Pierre Naturelle Grise",
+    "image": "/projects-images/Fichier_034.png",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.227Z",
+    "updatedAt": "2026-02-26T22:59:35.700Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 107,
+    "title": "Revêtement mural extérieur en pierre claire",
+    "image": "/projects-images/IMG_0020.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.235Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 108,
+    "title": "Façade en Travertin Clair avec Encadrement Sculpté",
+    "image": "/projects-images/IMG_0066.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.245Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 109,
+    "title": "Revêtement mural en pierre naturelle bicolore",
+    "image": "/projects-images/IMG_0207.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.257Z",
+    "updatedAt": "2026-02-23T01:30:26.513Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 110,
+    "title": "Façade en Pierre Naturelle Clivée",
+    "image": "/projects-images/IMG_0290.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.268Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 111,
+    "title": "Mur d'entrée en marbre noir veiné",
+    "image": "/projects-images/IMG_0293.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.279Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 112,
+    "title": "Cheminée en pierre naturelle avec manteau en bois",
+    "image": "/projects-images/IMG_0635.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.288Z",
+    "updatedAt": "2026-02-26T22:59:35.660Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 113,
+    "title": "Façade extérieure en travertin lisse",
+    "image": "/projects-images/IMG_1216.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.300Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 114,
+    "title": "Encadrement de porte en pierre brute",
+    "image": "/projects-images/IMG_1225.jpg",
+    "published": false,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.310Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 115,
+    "title": "Façade et Allée en Calcaire Moderne",
+    "image": "/projects-images/IMG_1258.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.320Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 116,
+    "title": "Mur en Pierre Naturelle à Parement Fendu",
+    "image": "/projects-images/IMG_1268.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.330Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 117,
+    "title": "Pillier en pierre grise grand format",
+    "image": "/projects-images/IMG_1297.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.339Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 118,
+    "title": "Plage de piscine en travertin",
+    "image": "/projects-images/IMG_1320.jpg",
+    "published": true,
+    "categoryId": 22,
+    "createdAt": "2026-02-22T22:07:58.349Z",
+    "updatedAt": "2026-02-23T01:30:26.596Z",
+    "category": {
+      "id": 22,
+      "name": "Piscines"
+    }
+  },
+  {
+    "id": 119,
+    "title": "Revêtement mural en pierre naturelle gris foncé",
+    "image": "/projects-images/IMG_1356.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.362Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 120,
+    "title": "Escalier en Marbre Noir avec Contremarches",
+    "image": "/projects-images/IMG_1587.jpg",
+    "published": true,
+    "categoryId": 16,
+    "createdAt": "2026-02-22T22:07:58.372Z",
+    "updatedAt": "2026-02-23T01:30:26.614Z",
+    "category": {
+      "id": 16,
+      "name": "Escaliers"
+    }
+  },
+  {
+    "id": 121,
+    "title": "Encadrement d'ascenseur en pierre grise",
+    "image": "/projects-images/IMG_1807.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.382Z",
+    "updatedAt": "2026-02-26T22:59:35.700Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 122,
+    "title": "Margelles de piscine en pierre grise",
+    "image": "/projects-images/IMG_2764.jpg",
+    "published": true,
+    "categoryId": 22,
+    "createdAt": "2026-02-22T22:07:58.394Z",
+    "updatedAt": "2026-02-23T01:30:26.632Z",
+    "category": {
+      "id": 22,
+      "name": "Piscines"
+    }
+  },
+  {
+    "id": 123,
+    "title": "Dallage Gris en Opus Romain",
+    "image": "/projects-images/IMG_3420.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.405Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 124,
+    "title": "Mur d'accent en pierre naturelle multi-tons",
+    "image": "/projects-images/IMG_3952.jpg",
+    "published": true,
+    "categoryId": 16,
+    "createdAt": "2026-02-22T22:07:58.415Z",
+    "updatedAt": "2026-02-23T01:30:26.651Z",
+    "category": {
+      "id": 16,
+      "name": "Escaliers"
+    }
+  },
+  {
+    "id": 125,
+    "title": "Façade en Pierre Naturelle Empilée",
+    "image": "/projects-images/IMG_4348.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.425Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 126,
+    "title": "Encadrements de fenêtre sculptés en pierre naturelle",
+    "image": "/projects-images/IMG_4896.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.437Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 127,
+    "title": "Table Basse Cannelée en Travertin",
+    "image": "/projects-images/IMG_4935.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.446Z",
+    "updatedAt": "2026-02-26T22:59:35.700Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 128,
+    "title": "Table Basse Ovale en Travertin",
+    "image": "/projects-images/IMG_5047.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.455Z",
+    "updatedAt": "2026-02-26T22:59:35.700Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 129,
+    "title": "Terrasse en Pierre Naturelle à Motif Irrégulier",
+    "image": "/projects-images/IMG_5049.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.464Z",
+    "updatedAt": "2026-02-26T22:59:35.660Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 130,
+    "title": "Carrelage Gris Clair Motif Opus Romain",
+    "image": "/projects-images/IMG_5050.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.474Z",
+    "updatedAt": "2026-02-26T22:59:35.621Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 131,
+    "title": "Dallage en Pierre Naturelle Beige Motif Français",
+    "image": "/projects-images/IMG_5052.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.485Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 132,
+    "title": "Dallage et escalier en pierre naturelle claire",
+    "image": "/projects-images/IMG_5053.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.494Z",
+    "updatedAt": "2026-02-26T22:59:35.621Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 133,
+    "title": "Revêtement mural extérieur en pierre naturelle brute",
+    "image": "/projects-images/IMG_5139.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.503Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 134,
+    "title": "Revêtement mural en pierre naturelle",
+    "image": "/projects-images/IMG_5155.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.513Z",
+    "updatedAt": "2026-02-26T22:59:35.700Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 135,
+    "title": "Mur en pierre naturelle beige clair",
+    "image": "/projects-images/IMG_5156.jpg",
+    "published": false,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.525Z",
+    "updatedAt": "2026-02-26T22:59:35.700Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 136,
+    "title": "Revêtement Mural et Sol en Calcaire Beige",
+    "image": "/projects-images/IMG_5179.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.534Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 137,
+    "title": "Façade en Pierre Naturelle Grise",
+    "image": "/projects-images/IMG_5181.jpg",
+    "published": false,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.549Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 138,
+    "title": "Escalier en Travertin Crème",
+    "image": "/projects-images/IMG_5378.jpg",
+    "published": true,
+    "categoryId": 16,
+    "createdAt": "2026-02-22T22:07:58.561Z",
+    "updatedAt": "2026-02-26T22:59:35.660Z",
+    "category": {
+      "id": 16,
+      "name": "Escaliers"
+    }
+  },
+  {
+    "id": 139,
+    "title": "Mur de clôture en pierre naturelle texturée",
+    "image": "/projects-images/IMG_6525.jpg",
+    "published": false,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.571Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 140,
+    "title": "Mur en pierre naturelle multi-tons",
+    "image": "/projects-images/IMG_6526.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.581Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 141,
+    "title": "Douche en Calcaire Gris",
+    "image": "/projects-images/IMG_7182.jpg",
+    "published": true,
+    "categoryId": 15,
+    "createdAt": "2026-02-22T22:07:58.592Z",
+    "updatedAt": "2026-02-26T22:59:35.621Z",
+    "category": {
+      "id": 15,
+      "name": "Salles de Bain"
+    }
+  },
+  {
+    "id": 142,
+    "title": "Façade en Travertin Texturé",
+    "image": "/projects-images/IMG_7780.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.603Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 143,
+    "title": "Mur en Pierre Naturelle et Escalier en Marbre Noir",
+    "image": "/projects-images/IMG_7951.jpg",
+    "published": true,
+    "categoryId": 16,
+    "createdAt": "2026-02-22T22:07:58.616Z",
+    "updatedAt": "2026-02-23T01:30:26.835Z",
+    "category": {
+      "id": 16,
+      "name": "Escaliers"
+    }
+  },
+  {
+    "id": 144,
+    "title": "Façade en Pierre Naturelle Gris Claire",
+    "image": "/projects-images/IMG_8448.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.626Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 145,
+    "title": "Façade en Grès Beige et Parement Mural",
+    "image": "/projects-images/IMG_8490.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.637Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 146,
+    "title": "Dallage beige grand format pour piscine",
+    "image": "/projects-images/IMG_8551.jpg",
+    "published": true,
+    "categoryId": 22,
+    "createdAt": "2026-02-22T22:07:58.648Z",
+    "updatedAt": "2026-02-23T01:30:26.864Z",
+    "category": {
+      "id": 22,
+      "name": "Piscines"
+    }
+  },
+  {
+    "id": 147,
+    "title": "Mur d'accent en marbre gris foncé",
+    "image": "/projects-images/IMG_9049.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.660Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 148,
+    "title": "Mur en Pierre Naturelle Blanche Brute",
+    "image": "/projects-images/IMG_9064.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.673Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 149,
+    "title": "Dallage de piscine en pierre naturelle beige",
+    "image": "/projects-images/a8ce5600-e47a-45f0-9a8c-0612b3901495.jpg",
+    "published": true,
+    "categoryId": 22,
+    "createdAt": "2026-02-22T22:07:58.687Z",
+    "updatedAt": "2026-02-26T22:59:35.621Z",
+    "category": {
+      "id": 22,
+      "name": "Piscines"
+    }
+  },
+  {
+    "id": 150,
+    "title": "Sol en Marbre Gris Clair Poli",
+    "image": "/projects-images/a93292e7-27ad-4fa3-81c8-a61b2e2efab8.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.698Z",
+    "updatedAt": "2026-02-26T22:59:35.678Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 151,
+    "title": "Salle de Bain Moderne en Travertin Beige",
+    "image": "/projects-images/baf4ce0b-ba91-4f1f-8224-dd9813a5f1c1.jpg",
+    "published": true,
+    "categoryId": 15,
+    "createdAt": "2026-02-22T22:07:58.707Z",
+    "updatedAt": "2026-02-23T01:30:26.911Z",
+    "category": {
+      "id": 15,
+      "name": "Salles de Bain"
+    }
+  },
+  {
+    "id": 152,
+    "title": "Mur d'enceinte en pierre beige",
+    "image": "/projects-images/c088dc05-534e-41e3-8049-74a57fc74c39.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.717Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 153,
+    "title": "Mur Courbe en Pierre Naturelle Texturée",
+    "image": "/projects-images/c33635fa-2e76-4197-b5c9-34c91cd33b36.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.726Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 154,
+    "title": "Escalier en Marbre Noir avec Rampe Métallique",
+    "image": "/projects-images/d0044f30-a6af-4843-9afc-d7eb87a1f6c8.jpg",
+    "published": true,
+    "categoryId": 16,
+    "createdAt": "2026-02-22T22:07:58.736Z",
+    "updatedAt": "2026-02-23T01:30:26.938Z",
+    "category": {
+      "id": 16,
+      "name": "Escaliers"
+    }
+  },
+  {
+    "id": 155,
+    "title": "Vasque de salle de bain en pierre rustique",
+    "image": "/projects-images/d675d9ed-db27-492f-ab51-0f52be352e65.jpg",
+    "published": true,
+    "categoryId": 15,
+    "createdAt": "2026-02-22T22:07:58.745Z",
+    "updatedAt": "2026-02-23T01:30:26.947Z",
+    "category": {
+      "id": 15,
+      "name": "Salles de Bain"
+    }
+  },
+  {
+    "id": 156,
+    "title": "Revêtement mural en pierre naturelle multicolore",
+    "image": "/projects-images/dc5022fe-42d0-4fcd-8a23-b446182dbc5f.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.756Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 157,
+    "title": "Façade en Ardoise Multicolore",
+    "image": "/projects-images/f0e7da3d-b88a-4899-9c6c-d4bd58e3974e.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.767Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 158,
+    "title": "Mur en pierre naturelle irrégulière bleu-gris",
+    "image": "/projects-images/f3587911-633a-46f1-a6a3-bc22717328f8.jpg",
+    "published": true,
+    "categoryId": 24,
+    "createdAt": "2026-02-22T22:07:58.780Z",
+    "updatedAt": "2026-02-26T22:59:35.641Z",
+    "category": {
+      "id": 24,
+      "name": "Extérieur"
+    }
+  },
+  {
+    "id": 159,
+    "title": "Sol en Travertin Beige Vieilli",
+    "image": "/projects-images/fa69d3aa-faa1-49e2-a89f-19f85610b2e6.jpg",
+    "published": true,
+    "categoryId": 25,
+    "createdAt": "2026-02-22T22:07:58.790Z",
+    "updatedAt": "2026-02-26T22:59:35.621Z",
+    "category": {
+      "id": 25,
+      "name": "Intérieurs"
+    }
+  },
+  {
+    "id": 160,
+    "title": "Cuisine moderne avec plan de travail en pierre noire",
+    "image": "/projects-images/WhatsApp Image 2026-02-25 at 21.20.21.jpeg",
+    "published": true,
+    "categoryId": 18,
+    "createdAt": "2026-02-26T23:08:16.757Z",
+    "updatedAt": "2026-02-26T23:08:16.757Z",
+    "category": {
+      "id": 18,
+      "name": "Cuisines"
+    }
+  },
+  {
+    "id": 161,
+    "title": "Cuisine Moderne avec Plan de Travail en Granit",
+    "image": "/projects-images/WhatsApp Image 2026-02-25 at 21.20.22 (1).jpeg",
+    "published": true,
+    "categoryId": 18,
+    "createdAt": "2026-02-26T23:08:16.771Z",
+    "updatedAt": "2026-02-26T23:08:16.771Z",
+    "category": {
+      "id": 18,
+      "name": "Cuisines"
+    }
+  },
+  {
+    "id": 162,
+    "title": "Cuisine Moderne avec Plans de Travail en Granit Noir",
+    "image": "/projects-images/WhatsApp Image 2026-02-25 at 21.20.22.jpeg",
+    "published": true,
+    "categoryId": 18,
+    "createdAt": "2026-02-26T23:08:16.786Z",
+    "updatedAt": "2026-02-26T23:08:16.786Z",
+    "category": {
+      "id": 18,
+      "name": "Cuisines"
+    }
+  }
+]

@@ -1,0 +1,1 @@
+package com.univmar.order.domain; import java.util.List; import org.springframework.data.jpa.repository.JpaRepository; public interface InventoryReservationRepository extends JpaRepository<InventoryReservation,Long>{List<InventoryReservation> findByOrderItem_Order_IdAndStatus(Long orderId, ReservationStatus status);}

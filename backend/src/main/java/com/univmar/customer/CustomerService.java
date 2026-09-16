@@ -1,0 +1,23 @@
+package com.univmar.customer;
+import com.univmar.customer.api.CustomerDtos;
+import com.univmar.customer.domain.*;
+import com.univmar.shared.api.ApiException; import com.univmar.shared.api.ErrorCode;
+import com.univmar.user.domain.User;
+import com.univmar.user.domain.UserRepository;
+import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+@Service public class CustomerService {
+    private final UserRepository users; private final CustomerProfileRepository profiles; private final CustomerAddressRepository addresses; private final CustomerProjectRepository projects;
+    public CustomerService(UserRepository users, CustomerProfileRepository profiles, CustomerAddressRepository addresses, CustomerProjectRepository projects) { this.users=users;this.profiles=profiles;this.addresses=addresses;this.projects=projects; }
+    @Transactional(readOnly=true) public CustomerDtos.ProfileResponse profile(Long userId) { var p=profileEntity(userId); return profileResponse(p); }
+    @Transactional public CustomerDtos.ProfileResponse updateProfile(Long userId, CustomerDtos.Profile input) { var p=profileEntity(userId); try { p.update(input.type(), input.firstName().trim(), input.lastName().trim(), blank(input.companyName()), blank(input.phone()), blank(input.taxId())); } catch (IllegalArgumentException e) { throw ApiException.badRequest(ErrorCode.VALIDATION_ERROR, e.getMessage()); } return profileResponse(p); }
+    @Transactional(readOnly=true) public List<CustomerDtos.AddressResponse> addresses(Long userId) { return addresses.findByCustomerIdOrderByCreatedAtDesc(userId).stream().map(this::addressResponse).toList(); }
+    @Transactional public CustomerDtos.AddressResponse addAddress(Long userId, CustomerDtos.Address input) { clearDefault(userId,input.defaultDelivery()); var a=addresses.save(new CustomerAddress(user(userId),input.label(),input.recipientName(),blank(input.phone()),input.line1(),blank(input.line2()),input.city(),blank(input.region()),blank(input.postalCode()),input.country(),input.defaultDelivery())); return addressResponse(a); }
+    @Transactional public CustomerDtos.AddressResponse updateAddress(Long userId,Long id,CustomerDtos.Address input) { clearDefault(userId,input.defaultDelivery()); var a=addresses.findByIdAndCustomerId(id,userId).orElseThrow(ApiException::forbidden);a.update(input.label(),input.recipientName(),blank(input.phone()),input.line1(),blank(input.line2()),input.city(),blank(input.region()),blank(input.postalCode()),input.country(),input.defaultDelivery());return addressResponse(a); }
+    @Transactional(readOnly=true) public List<CustomerDtos.ProjectResponse> projects(Long userId) { return projects.findByCustomerIdOrderByUpdatedAtDesc(userId).stream().map(this::projectResponse).toList(); }
+    @Transactional public CustomerDtos.ProjectResponse addProject(Long userId,CustomerDtos.Project input) { return projectResponse(projects.save(new CustomerProject(user(userId),input.name(),blank(input.projectType()),blank(input.siteCity()),blank(input.siteAddress()),blank(input.notes())))); }
+    @Transactional public CustomerDtos.ProjectResponse updateProject(Long userId,Long id,CustomerDtos.Project input) { var p=projects.findByIdAndCustomerId(id,userId).orElseThrow(ApiException::forbidden);p.update(input.name(),blank(input.projectType()),blank(input.siteCity()),blank(input.siteAddress()),blank(input.notes()));return projectResponse(p); }
+    private void clearDefault(Long userId,boolean wantsDefault){if(wantsDefault)addresses.findByCustomerIdAndDefaultDeliveryTrue(userId).forEach(CustomerAddress::clearDefaultDelivery);} private User user(Long id){return users.findById(id).orElseThrow(()->ApiException.notFound("Customer"));} private CustomerProfile profileEntity(Long id){return profiles.findByUserId(id).orElseThrow(()->ApiException.notFound("Customer profile"));} private String blank(String s){return s==null||s.isBlank()?null:s.trim();}
+    private CustomerDtos.ProfileResponse profileResponse(CustomerProfile p){return new CustomerDtos.ProfileResponse(p.getUser().getEmail(),p.getType(),p.getFirstName(),p.getLastName(),p.getCompanyName(),p.getPhone(),p.getTaxId());} private CustomerDtos.AddressResponse addressResponse(CustomerAddress a){return new CustomerDtos.AddressResponse(a.getId(),a.getLabel(),a.getRecipientName(),a.getPhone(),a.getLine1(),a.getLine2(),a.getCity(),a.getRegion(),a.getPostalCode(),a.getCountry(),a.isDefaultDelivery());} private CustomerDtos.ProjectResponse projectResponse(CustomerProject p){return new CustomerDtos.ProjectResponse(p.getId(),p.getName(),p.getProjectType(),p.getSiteCity(),p.getSiteAddress(),p.getNotes());}
+}

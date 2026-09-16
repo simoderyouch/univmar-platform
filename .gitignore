@@ -1,0 +1,35 @@
+# Editor and operating-system files
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# Local agent metadata
+.agents/
+.codex/
+
+# Secrets and machine-specific configuration
+.env
+.env.*
+!.env.example
+**/.env.local
+*.pem
+*.key
+
+# Build output, dependencies, and reports
+**/node_modules/
+**/.next/
+**/dist/
+**/target/
+**/coverage/
+*.tsbuildinfo
+*.log
+
+# Deliberately excluded from this source-only repository
+docs/
+*.txt
+*.pdf
+
+# Private landing media: supplied at runtime, never committed or baked into an image
+landing/public/
+landing/private-assets/

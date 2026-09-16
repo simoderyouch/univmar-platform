@@ -1,0 +1,1 @@
+package com.univmar.quotation.domain; import java.util.List; import org.springframework.data.jpa.repository.JpaRepository; public interface QuotationItemRepository extends JpaRepository<QuotationItem,Long>{List<QuotationItem> findByQuotationId(Long quotationId);}
