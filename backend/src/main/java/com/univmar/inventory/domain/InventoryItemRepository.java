@@ -15,5 +15,6 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     @Lock(LockModeType.OPTIMISTIC)
     @Query("select item from InventoryItem item join fetch item.variant where item.variant.id = :variantId")
     Optional<InventoryItem> findForReservationByVariantId(@Param("variantId") Long variantId);
-    @Query("select item from InventoryItem item where item.onHandM2 - item.reservedM2 <= item.minStockM2") Page<InventoryItem> findLowStock(Pageable pageable);
+    @Query("select item from InventoryItem item where item.active = true and item.onHandM2 - item.reservedM2 <= item.minStockM2") Page<InventoryItem> findLowStock(Pageable pageable);
+    Page<InventoryItem> findByActiveTrue(Pageable pageable);
 }

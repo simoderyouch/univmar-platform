@@ -18,4 +18,5 @@ public class User extends BaseEntity {
     public String getEmail() { return email; } public String getPasswordHash() { return passwordHash; }
     public Role getRole() { return role; } public AccountStatus getStatus() { return status; }
     public void disable() { status = AccountStatus.DISABLED; } public void enable(){status=AccountStatus.ACTIVE;} public void changeRole(Role role){this.role=role;}
+    public void changePassword(String passwordHash) { this.passwordHash = passwordHash; }
 }

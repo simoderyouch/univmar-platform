@@ -37,6 +37,17 @@ public class CatalogService {
  @Transactional(readOnly = true) public CatalogDtos.MaterialResponse bySlug(String slug) { return response(materials.findBySlugAndActiveTrue(slug).orElseThrow(() -> ApiException.notFound("Material"))); }
  @Transactional(readOnly = true) public Page<CatalogDtos.MaterialResponse> adminList(Pageable pageable) { return materials.findAll(pageable).map(this::response); }
  @Transactional(readOnly = true) public List<CatalogDtos.CategoryResponse> categories() { return categories.findByActiveTrueOrderByDisplayOrderAsc().stream().map(x -> new CatalogDtos.CategoryResponse(x.getId(), x.getSourceCategoryId(), x.getSlug(), x.getName(), x.getDisplayOrder(), x.isLocalMaterial())).toList(); }
+ @Transactional(readOnly = true) public List<CatalogDtos.AdminCategoryResponse> adminCategories() { return categories.findAllByOrderByDisplayOrderAsc().stream().map(this::categoryResponse).toList(); }
+ @Transactional public CatalogDtos.AdminCategoryResponse createCategory(CatalogDtos.CategoryRequest request) {
+   String slug = request.slug().trim().toLowerCase(); String name = request.name().trim();
+   if (categories.findByNameIgnoreCase(name).isPresent() || categories.existsBySlugAndIdNot(slug, -1L)) throw ApiException.conflict("DUPLICATE_CATEGORY", "A category already uses this name or slug");
+   return categoryResponse(categories.save(new com.univmar.catalog.domain.CatalogCategory(slug, name, request.displayOrder(), Boolean.TRUE.equals(request.localMaterial()))));
+ }
+ @Transactional public CatalogDtos.AdminCategoryResponse updateCategory(Long id, CatalogDtos.CategoryRequest request) {
+   var category = categories.findById(id).orElseThrow(() -> ApiException.notFound("Category")); String slug = request.slug().trim().toLowerCase(); String name = request.name().trim();
+   if (categories.existsBySlugAndIdNot(slug, id) || categories.existsByNameIgnoreCaseAndIdNot(name, id)) throw ApiException.conflict("DUPLICATE_CATEGORY", "A category already uses this name or slug");
+   category.update(slug, name, request.displayOrder(), Boolean.TRUE.equals(request.localMaterial()), request.active() == null || request.active()); return categoryResponse(category);
+ }
  @Transactional public CatalogDtos.MaterialResponse create(CatalogDtos.MaterialRequest request) {
    if (materials.existsBySlug(request.slug())) throw ApiException.conflict("DUPLICATE_SLUG", "A material already uses this slug");
    StoneMaterial material = materials.save(new StoneMaterial(request.name().trim(), request.slug().trim().toLowerCase(), request.category().trim(), request.originCountry(), request.primaryColor(), request.description(), request.applications()));
@@ -51,6 +62,8 @@ public class CatalogService {
    StoneMaterial material = materials.findById(materialId).orElseThrow(() -> ApiException.notFound("Material"));
    return variantResponse(variants.save(new StoneVariant(material, request.finish().trim(), request.thicknessMm(), request.grade(), request.indicativePrice())));
  }
+ @Transactional public CatalogDtos.VariantResponse updateVariant(Long materialId, Long variantId, CatalogDtos.VariantRequest request) { StoneVariant variant = variants.findById(variantId).filter(x -> x.getMaterial().getId().equals(materialId)).orElseThrow(() -> ApiException.notFound("Variant")); variant.update(request.finish().trim(), request.thicknessMm(), blank(request.grade()), request.indicativePrice(), request.active() == null || request.active()); return variantResponse(variant); }
+ @Transactional public void deactivateVariant(Long materialId, Long variantId) { StoneVariant variant = variants.findById(variantId).filter(x -> x.getMaterial().getId().equals(materialId)).orElseThrow(() -> ApiException.notFound("Variant")); variant.update(variant.getFinish(), variant.getThicknessMm(), variant.getGrade(), variant.getIndicativePrice(), false); }
  @Transactional public CatalogDtos.ImageResponse uploadImage(Long materialId, MultipartFile file, String altText) {
    StoneMaterial material = materials.findById(materialId).orElseThrow(() -> ApiException.notFound("Material")); validateImage(file);
    String key = "catalogue/" + UUID.randomUUID() + extension(file.getOriginalFilename(), file.getContentType());
@@ -84,6 +97,7 @@ public class CatalogService {
  }
  private String blank(String value) { return value == null || value.isBlank() ? null : value.trim(); }
  private CatalogDtos.MaterialResponse response(StoneMaterial material) { return new CatalogDtos.MaterialResponse(material.getId(), material.getSourceProductId(), material.getName(), material.getSlug(), material.getCategory(), material.getOriginCountry(), material.getPrimaryColor(), material.getDescription(), material.getApplications(), material.isActive(), images.findByMaterialIdOrderByDisplayOrderAsc(material.getId()).stream().map(this::imageResponse).toList(), variants.findByMaterialIdAndActiveTrue(material.getId()).stream().map(this::variantResponse).toList()); }
+ private CatalogDtos.AdminCategoryResponse categoryResponse(com.univmar.catalog.domain.CatalogCategory category) { return new CatalogDtos.AdminCategoryResponse(category.getId(), category.getSourceCategoryId(), category.getSlug(), category.getName(), category.getDisplayOrder(), category.isLocalMaterial(), category.isActive()); }
  private CatalogDtos.ImageResponse imageResponse(StoneMaterialImage image) { return new CatalogDtos.ImageResponse(image.getId(), image.getStorageKey() == null ? image.getImageUrl() : mediaUrl(image.getId()), image.getAltText(), image.getDisplayOrder(), image.isPrimaryImage()); }
  private Path mediaRoot() { return Path.of(storageRoot).toAbsolutePath().normalize(); }
  private String mediaUrl(Long imageId) { return publicApiUrl.replaceAll("/$", "") + "/public/material-images/" + imageId; }
