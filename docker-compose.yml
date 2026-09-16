@@ -35,6 +35,10 @@ services:
     build: ./frontend
     ports:
       - "5173:80"
+    volumes:
+      # Shared brand asset only. Product and project media remain private to
+      # the landing service and are never copied into the dashboard image.
+      - ./landing/private-assets/site/brand:/usr/share/nginx/html/brand:ro
     depends_on:
       - api
   landing:

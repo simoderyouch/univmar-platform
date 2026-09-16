@@ -11,6 +11,8 @@ public final class CatalogDtos {
  public record ImageRequest(@NotBlank @Size(max=1000) String url, @Size(max=300) String altText) { }
  public record ImageResponse(Long id, String url, String altText, int displayOrder, boolean primary) { }
  public record CategoryResponse(Long id, Integer sourceCategoryId, String slug, String name, int displayOrder, boolean localMaterial) { }
+ public record AdminCategoryResponse(Long id, Integer sourceCategoryId, String slug, String name, int displayOrder, boolean localMaterial, boolean active) { }
+ public record CategoryRequest(@NotBlank @Size(max=120) String slug, @NotBlank @Size(max=100) String name, @NotNull Integer displayOrder, Boolean localMaterial, Boolean active) { }
  public record MaterialRequest(@NotBlank String name, @NotBlank String slug, @NotBlank String category, String originCountry, String primaryColor, String description, String applications, Boolean active, List<@Valid ImageRequest> images) { }
  public record VariantRequest(@NotBlank String finish, @NotNull @DecimalMin("0.01") BigDecimal thicknessMm, String grade, @DecimalMin("0.00") BigDecimal indicativePrice, Boolean active) { }
  public record VariantResponse(Long id, String finish, BigDecimal thicknessMm, String grade, BigDecimal indicativePrice, String availability) { }

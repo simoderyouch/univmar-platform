@@ -16,6 +16,7 @@ public class CatalogCategory extends BaseEntity {
     @Column(nullable = false) private boolean active = true;
 
     protected CatalogCategory() { }
+    public CatalogCategory(String slug, String name, int displayOrder, boolean localMaterial) { this.slug = slug; this.name = name; this.displayOrder = displayOrder; this.localMaterial = localMaterial; }
 
     public Integer getSourceCategoryId() { return sourceCategoryId; }
     public String getSlug() { return slug; }
@@ -23,4 +24,5 @@ public class CatalogCategory extends BaseEntity {
     public int getDisplayOrder() { return displayOrder; }
     public boolean isLocalMaterial() { return localMaterial; }
     public boolean isActive() { return active; }
+    public void update(String slug, String name, int displayOrder, boolean localMaterial, boolean active) { this.slug = slug; this.name = name; this.displayOrder = displayOrder; this.localMaterial = localMaterial; this.active = active; }
 }
