@@ -38,8 +38,12 @@ public class RfqService {
     public RfqDtos.Response create(Long customerId, RfqDtos.Create input) {
         CustomerProject project = input.projectId() == null ? null : projects.findByIdAndCustomerId(input.projectId(), customerId).orElseThrow(ApiException::forbidden);
         QuoteRequest request = requests.save(new QuoteRequest(users.findById(customerId).orElseThrow(() -> ApiException.notFound("Customer")), project, input.notes(), input.desiredDate()));
-        for (var item : input.items())
-            items.save(new QuoteRequestItem(request, variants.findById(item.variantId()).orElseThrow(() -> ApiException.notFound("Variant")), item.quantityM2(), item.note()));
+        for (var item : input.items()) {
+            var variant = item.variantId() == null ? null : variants.findById(item.variantId()).orElseThrow(() -> ApiException.notFound("Variant"));
+            if (variant == null && (item.description() == null || item.description().isBlank()))
+                throw ApiException.conflict("VALIDATION_ERROR", "An RFQ item needs a material variant or description");
+            items.save(new QuoteRequestItem(request, variant, blank(item.description()), item.quantityM2(), item.note()));
+        }
         return new RfqDtos.Response(request.getId(), request.getStatus().name(), request.getReference());
     }
 
@@ -123,7 +127,11 @@ public class RfqService {
     }
 
     private RfqDtos.Detail detail(QuoteRequest r) {
-        var lines = items.findByRequestId(r.getId()).stream().map(i -> new RfqDtos.ItemDetail(i.getId(), i.getVariant().getId(), i.getVariant().getMaterial().getName(), i.getVariant().getFinish(), i.getQuantityM2(), i.getNote())).toList();
+        var lines = items.findByRequestId(r.getId()).stream().map(i -> new RfqDtos.ItemDetail(i.getId(), i.getVariant() == null ? null : i.getVariant().getId(), i.getVariant() == null ? null : i.getVariant().getMaterial().getName(), i.getVariant() == null ? null : i.getVariant().getFinish(), i.getDescription(), i.getQuantityM2(), i.getNote())).toList();
         return new RfqDtos.Detail(r.getId(), r.getStatus().name(), r.getReference(), r.getCustomer().getId(), r.getProject() == null ? null : r.getProject().getId(), r.getProject() == null ? null : r.getProject().getName(), r.getNotes(), r.getDesiredDate(), r.getSubmittedAt(), r.getAssigneeId(), lines);
+    }
+
+    private String blank(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 }

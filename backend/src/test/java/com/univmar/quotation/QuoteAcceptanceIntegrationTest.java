@@ -6,16 +6,19 @@ import com.univmar.catalog.domain.StoneVariant;
 import com.univmar.catalog.domain.StoneVariantRepository;
 import com.univmar.customer.domain.CustomerAddress;
 import com.univmar.customer.domain.CustomerAddressRepository;
+import com.univmar.customer.domain.AddressType;
 import com.univmar.inventory.domain.InventoryItem;
 import com.univmar.inventory.domain.InventoryItemRepository;
 import com.univmar.inventory.domain.MovementType;
 import com.univmar.inventory.domain.StockMovementRepository;
 import com.univmar.order.OrderService;
 import com.univmar.order.domain.OrderRepository;
+import com.univmar.order.domain.OrderAddressRepository;
 import com.univmar.order.domain.OrderStatus;
 import com.univmar.quotation.domain.*;
 import com.univmar.rfq.domain.QuoteRequest;
 import com.univmar.rfq.domain.QuoteRequestRepository;
+import com.univmar.rfq.domain.RfqStatus;
 import com.univmar.shared.api.ApiException;
 import com.univmar.shared.api.ErrorCode;
 import com.univmar.user.domain.Role;
@@ -55,6 +58,8 @@ class QuoteAcceptanceIntegrationTest {
     @Autowired
     private OrderRepository orders;
     @Autowired
+    private OrderAddressRepository orderAddresses;
+    @Autowired
     private StockMovementRepository movements;
     @Autowired
     private OrderService orderService;
@@ -71,8 +76,11 @@ class QuoteAcceptanceIntegrationTest {
         assertThat(reloaded.getOnHandM2()).isEqualByComparingTo("100.00");
         assertThat(reloaded.getReservedM2()).isEqualByComparingTo("80.00");
         assertThat(reloaded.availableM2()).isEqualByComparingTo("20.00");
+        assertThat(requests.findById(fixture.quotation().getRequest().getId()).orElseThrow().getStatus())
+                .isEqualTo(RfqStatus.CLOSED);
         assertThat(movements.findTop50ByInventoryItemIdOrderByCreatedAtDesc(reloaded.getId()))
-                .anyMatch(movement -> movement.getType() == MovementType.RESERVATION);
+                .anyMatch(movement -> movement.getType() == MovementType.RESERVATION
+                        && movement.getSourceOrderItem() != null);
     }
 
     @Test
@@ -136,6 +144,19 @@ class QuoteAcceptanceIntegrationTest {
         assertThat(orders.existsByQuotationId(fixture.quotation().getId())).isFalse();
     }
 
+    @Test
+    void acceptingAQuotationCopiesAnOptionalBillingAddressSnapshot() {
+        Fixture fixture = fixture("100.00", "80.00");
+        addresses.save(new CustomerAddress(fixture.customer(), AddressType.BILLING, "Billing", "Accounts Team",
+                null, "2 Finance Square", null, "Casablanca", null, "20000", "Morocco", "MA", false, true));
+
+        var order = service.accept(fixture.quotation().getId(), fixture.customer().getId());
+
+        assertThat(orderAddresses.findByOrderId(order.getId()))
+                .extracting(address -> address.getType())
+                .containsExactlyInAnyOrder(AddressType.DELIVERY, AddressType.BILLING);
+    }
+
     private Fixture fixture(String onHand, String requested) {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         User customer = users.save(new User("customer-" + suffix + "@example.com", "hash", Role.CUSTOMER));
@@ -150,6 +171,7 @@ class QuoteAcceptanceIntegrationTest {
         request.review(customer.getId());
         Quotation quotation = quotations.save(new Quotation(request, "QUO-TEST-" + suffix, LocalDate.now().plusDays(5), new BigDecimal(requested), BigDecimal.ZERO, BigDecimal.ZERO, new BigDecimal(requested)));
         quotation.send();
+        requests.save(request);
         quotation = quotations.save(quotation);
         quotationItems.save(new QuotationItem(quotation, CommercialLineType.MATERIAL, variant, "Acceptance Stone / Poli / 20 mm", new BigDecimal(requested), UnitType.M2, BigDecimal.ONE, 0));
         return new Fixture(customer, quotation, item);

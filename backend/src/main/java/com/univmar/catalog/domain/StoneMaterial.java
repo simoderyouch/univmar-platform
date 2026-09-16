@@ -47,6 +47,10 @@ public class StoneMaterial extends BaseEntity {
         this.applications = applications;
     }
 
+    private static MaterialOriginType defaultOriginType(String country) {
+        return country != null && country.toLowerCase(java.util.Locale.ROOT).contains("maroc") ? MaterialOriginType.LOCAL : MaterialOriginType.IMPORTED;
+    }
+
     public Long getSourceProductId() {
         return sourceProductId;
     }
@@ -101,9 +105,5 @@ public class StoneMaterial extends BaseEntity {
         this.description = description;
         this.applications = applications;
         this.active = active;
-    }
-
-    private static MaterialOriginType defaultOriginType(String country) {
-        return country != null && country.toLowerCase(java.util.Locale.ROOT).contains("maroc") ? MaterialOriginType.LOCAL : MaterialOriginType.IMPORTED;
     }
 }

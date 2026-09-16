@@ -33,11 +33,13 @@ public final class CatalogDtos {
     }
 
     public record MaterialRequest(@NotBlank String name, @NotBlank String slug, @NotBlank String category,
-                                  String originCountry, MaterialOriginType originType, String primaryColor, String description, String applications,
+                                  String originCountry, MaterialOriginType originType, String primaryColor,
+                                  String description, String applications,
                                   Boolean active, List<@Valid ImageRequest> images) {
     }
 
-    public record VariantRequest(@Size(max = 100) String sku, @NotBlank String finish, @NotNull @DecimalMin("0.01") BigDecimal thicknessMm,
+    public record VariantRequest(@Size(max = 100) String sku, @NotBlank String finish,
+                                 @NotNull @DecimalMin("0.01") BigDecimal thicknessMm,
                                  String grade, @DecimalMin("0.00") BigDecimal indicativePrice, Boolean active) {
     }
 
@@ -46,7 +48,8 @@ public final class CatalogDtos {
     }
 
     public record MaterialResponse(Long id, Long sourceProductId, String name, String slug, String category,
-                                   String originCountry, MaterialOriginType originType, String primaryColor, String description, String applications,
+                                   String originCountry, MaterialOriginType originType, String primaryColor,
+                                   String description, String applications,
                                    boolean active, List<ImageResponse> images, List<VariantResponse> variants) {
     }
 }

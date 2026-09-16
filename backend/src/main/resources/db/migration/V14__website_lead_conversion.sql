@@ -5,8 +5,12 @@ set status = 'REJECTED'
 where status = 'CLOSED';
 
 alter table website_quote_requests
-    add column converted_customer_id bigint references customer_profiles(id),
-    add column converted_rfq_id bigint unique references quote_requests(id),
+    add column converted_customer_id bigint references customer_profiles(id);
+
+alter table website_quote_requests
+    add column converted_rfq_id bigint unique references quote_requests(id);
+
+alter table website_quote_requests
     add column converted_at timestamp with time zone;
 
 create index idx_website_quote_requests_converted_customer

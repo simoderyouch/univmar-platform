@@ -14,7 +14,8 @@ public final class RfqDtos {
     private RfqDtos() {
     }
 
-    public record Item(@NotNull Long variantId, @NotNull @DecimalMin("0.01") BigDecimal quantityM2, String note) {
+    public record Item(Long variantId, String description, @NotNull @DecimalMin("0.01") BigDecimal quantityM2,
+                       String note) {
     }
 
     public record Create(@NotEmpty List<@Valid Item> items, Long projectId, String notes, LocalDate desiredDate) {
@@ -23,12 +24,13 @@ public final class RfqDtos {
     public record Response(Long id, String status, String reference) {
     }
 
-    public record Detail(Long id, String status, String reference, Long customerId, Long projectId, String projectName, String notes,
+    public record Detail(Long id, String status, String reference, Long customerId, Long projectId, String projectName,
+                         String notes,
                          LocalDate desiredDate, Instant submittedAt, Long assigneeId, List<ItemDetail> items) {
     }
 
-    public record ItemDetail(Long id, Long variantId, String materialName, String finish, BigDecimal quantityM2,
-                             String note) {
+    public record ItemDetail(Long id, Long variantId, String materialName, String finish, String description,
+                             BigDecimal quantityM2, String note) {
     }
 
     public record Assign(@NotNull Long salesUserId) {

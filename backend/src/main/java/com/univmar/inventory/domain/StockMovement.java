@@ -1,5 +1,6 @@
 package com.univmar.inventory.domain;
 
+import com.univmar.order.domain.OrderItem;
 import com.univmar.shared.domain.BaseEntity;
 import jakarta.persistence.*;
 
@@ -24,11 +25,19 @@ public class StockMovement extends BaseEntity {
     private String reason;
     @Column(nullable = false)
     private Long actorId;
+    @ManyToOne
+    @JoinColumn(name = "source_order_item_id")
+    private OrderItem sourceOrderItem;
 
     protected StockMovement() {
     }
 
     public StockMovement(InventoryItem item, MovementType type, BigDecimal quantityM2, String referenceType, Long referenceId, String reason, Long actorId) {
+        this(item, type, quantityM2, referenceType, referenceId, reason, actorId, null);
+    }
+
+    public StockMovement(InventoryItem item, MovementType type, BigDecimal quantityM2, String referenceType, Long referenceId,
+                         String reason, Long actorId, OrderItem sourceOrderItem) {
         this.inventoryItem = item;
         this.type = type;
         this.quantityM2 = quantityM2;
@@ -36,6 +45,7 @@ public class StockMovement extends BaseEntity {
         this.referenceId = referenceId;
         this.reason = reason;
         this.actorId = actorId;
+        this.sourceOrderItem = sourceOrderItem;
     }
 
     public InventoryItem getInventoryItem() {
@@ -64,5 +74,9 @@ public class StockMovement extends BaseEntity {
 
     public Long getActorId() {
         return actorId;
+    }
+
+    public OrderItem getSourceOrderItem() {
+        return sourceOrderItem;
     }
 }

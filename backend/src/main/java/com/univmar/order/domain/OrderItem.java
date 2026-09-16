@@ -61,11 +61,17 @@ public class OrderItem extends BaseEntity {
         return descriptionSnapshot;
     }
 
-    public CommercialLineType getLineType() { return lineType; }
+    public CommercialLineType getLineType() {
+        return lineType;
+    }
 
-    public UnitType getUnit() { return unit; }
+    public UnitType getUnit() {
+        return unit;
+    }
 
-    public int getDisplayOrder() { return displayOrder; }
+    public int getDisplayOrder() {
+        return displayOrder;
+    }
 
     public BigDecimal getUnitPrice() {
         return unitPrice;

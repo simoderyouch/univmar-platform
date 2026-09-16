@@ -42,6 +42,10 @@ public class StoneVariant extends BaseEntity {
         this.indicativePrice = indicativePrice;
     }
 
+    private static String generatedSku() {
+        return "VAR-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase(Locale.ROOT);
+    }
+
     public StoneMaterial getMaterial() {
         return material;
     }
@@ -76,9 +80,5 @@ public class StoneVariant extends BaseEntity {
         this.grade = grade;
         this.indicativePrice = indicativePrice;
         this.active = active;
-    }
-
-    private static String generatedSku() {
-        return "VAR-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase(Locale.ROOT);
     }
 }

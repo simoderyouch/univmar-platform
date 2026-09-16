@@ -17,7 +17,7 @@ public final class OrderDtos {
                        BigDecimal unitPrice, BigDecimal lineTotal, int displayOrder) {
     }
 
-    public record Event(String type, BigDecimal quantityM2, String reason, Long actorId, Instant at) {
+    public record Event(String type, BigDecimal quantityM2, String reason, Long actorId, Long sourceOrderItemId, Instant at) {
     }
 
     public record Address(Long id, String type, String recipientName, String companyName, String phone,

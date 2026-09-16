@@ -4,6 +4,7 @@ import com.univmar.audit.AuditService;
 import com.univmar.catalog.domain.StoneVariantRepository;
 import com.univmar.customer.domain.AddressType;
 import com.univmar.customer.domain.CustomerAddressRepository;
+import com.univmar.customer.domain.CustomerProfileRepository;
 import com.univmar.inventory.domain.*;
 import com.univmar.order.domain.*;
 import com.univmar.quotation.api.QuotationDtos;
@@ -35,11 +36,12 @@ public class QuotationService {
     private final OrderItemRepository orderItems;
     private final OrderAddressRepository orderAddresses;
     private final CustomerAddressRepository customerAddresses;
+    private final CustomerProfileRepository customerProfiles;
     private final InventoryReservationRepository reservations;
     private final StockMovementRepository movements;
     private final AuditService audit;
 
-    public QuotationService(QuotationRepository quotes, QuotationItemRepository quoteItems, QuoteRequestRepository requests, StoneVariantRepository variants, InventoryItemRepository inventory, OrderRepository orders, OrderItemRepository orderItems, OrderAddressRepository orderAddresses, CustomerAddressRepository customerAddresses, InventoryReservationRepository reservations, StockMovementRepository movements, AuditService audit) {
+    public QuotationService(QuotationRepository quotes, QuotationItemRepository quoteItems, QuoteRequestRepository requests, StoneVariantRepository variants, InventoryItemRepository inventory, OrderRepository orders, OrderItemRepository orderItems, OrderAddressRepository orderAddresses, CustomerAddressRepository customerAddresses, CustomerProfileRepository customerProfiles, InventoryReservationRepository reservations, StockMovementRepository movements, AuditService audit) {
         this.quotes = quotes;
         this.quoteItems = quoteItems;
         this.requests = requests;
@@ -49,6 +51,7 @@ public class QuotationService {
         this.orderItems = orderItems;
         this.orderAddresses = orderAddresses;
         this.customerAddresses = customerAddresses;
+        this.customerProfiles = customerProfiles;
         this.reservations = reservations;
         this.movements = movements;
         this.audit = audit;
@@ -167,14 +170,18 @@ public class QuotationService {
         var deliveryAddress = customerAddresses.findByCustomerIdAndDefaultDeliveryTrue(customerId).stream().findFirst()
                 .or(() -> customerAddresses.findByCustomerIdOrderByCreatedAtDesc(customerId).stream().findFirst())
                 .orElseThrow(() -> ApiException.conflict(ErrorCode.DELIVERY_ADDRESS_REQUIRED, "A delivery address is required before accepting a quotation"));
-        orderAddresses.save(new OrderAddress(order, deliveryAddress, AddressType.DELIVERY));
+        String companyName = customerProfiles.findByUserId(customerId).map(profile -> profile.getCompanyName()).orElse(null);
+        orderAddresses.save(new OrderAddress(order, deliveryAddress, AddressType.DELIVERY, companyName));
+        customerAddresses.findByCustomerIdAndTypeOrderByCreatedAtDesc(customerId, AddressType.BILLING).stream()
+                .findFirst()
+                .ifPresent(billingAddress -> orderAddresses.save(new OrderAddress(order, billingAddress, AddressType.BILLING, companyName)));
         for (QuotationItem line : lines) {
             OrderItem item = orderItems.save(new OrderItem(order, line.getType(), line.getVariant(), line.getDescriptionSnapshot(), line.getQuantity(), line.getUnit(), line.getUnitPrice(), line.getLineTotal(), line.getDisplayOrder()));
             if (line.getType() == CommercialLineType.MATERIAL) {
                 InventoryItem balance = stock.get(line.getVariant().getId());
                 balance.reserve(line.getQuantity());
                 reservations.save(new InventoryReservation(item, balance, line.getQuantity()));
-                movements.save(new StockMovement(balance, MovementType.RESERVATION, line.getQuantity(), "ORDER", order.getId(), "Quotation accepted", customerId));
+                movements.save(new StockMovement(balance, MovementType.RESERVATION, line.getQuantity(), "ORDER", order.getId(), "Quotation accepted", customerId, item));
             }
         }
         if (lines.stream().anyMatch(line -> line.getType() == CommercialLineType.MATERIAL))
