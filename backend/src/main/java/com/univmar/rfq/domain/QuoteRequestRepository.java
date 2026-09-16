@@ -1,1 +1,9 @@
-package com.univmar.rfq.domain; import java.util.List; import org.springframework.data.jpa.repository.JpaRepository; public interface QuoteRequestRepository extends JpaRepository<QuoteRequest,Long>{List<QuoteRequest> findByCustomerId(Long customerId);}
+package com.univmar.rfq.domain;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface QuoteRequestRepository extends JpaRepository<QuoteRequest, Long> {
+    List<QuoteRequest> findByCustomerId(Long customerId);
+}

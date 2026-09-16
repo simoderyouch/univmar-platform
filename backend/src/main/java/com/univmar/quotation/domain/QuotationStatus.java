@@ -1,1 +1,3 @@
-package com.univmar.quotation.domain; public enum QuotationStatus { DRAFT, SENT, ACCEPTED, REJECTED, EXPIRED, CANCELLED }
+package com.univmar.quotation.domain;
+
+public enum QuotationStatus {DRAFT, SENT, ACCEPTED, REJECTED, EXPIRED, SUPERSEDED, CANCELLED}
