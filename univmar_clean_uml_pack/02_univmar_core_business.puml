@@ -1,0 +1,301 @@
+@startuml Univmar_Core_Business
+title Univmar V1 — Core Business Domain
+left to right direction
+
+skinparam dpi 170
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam linetype ortho
+skinparam nodesep 34
+skinparam ranksep 42
+skinparam classAttributeIconSize 0
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam packageStyle rectangle
+skinparam packageTitleAlignment center
+
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #64748B
+  ArrowColor #64748B
+  FontColor #0F172A
+}
+
+skinparam package {
+  BackgroundColor #F8FAFC
+  BorderColor #CBD5E1
+  FontColor #0F172A
+}
+
+hide methods
+hide empty members
+
+
+package "Customer" {
+  class CustomerProfile {
+    +id: Long
+    +customerType: CustomerType
+    +firstName: String?
+    +lastName: String?
+    +companyName: String?
+    +phone: String?
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class CustomerProject {
+    +id: Long
+    +reference: String
+    +name: String
+    +description: Text?
+    +projectType: String?
+    +status: ProjectStatus
+    +siteCity: String?
+    +siteCountry: String?
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class CustomerAddress {
+    +id: Long
+    +type: AddressType
+    +label: String?
+    +addressLine1: String
+    +addressLine2: String?
+    +city: String
+    +region: String?
+    +postalCode: String?
+    +countryCode: String
+    +defaultAddress: boolean
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+}
+
+package "Catalog" {
+  class CatalogCategory {
+    +id: Long
+    +name: String
+    +slug: String
+    +displayOrder: int
+    +active: boolean
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class StoneMaterial {
+    +id: Long
+    +name: String
+    +slug: String
+    +originCountry: String?
+    +originType: MaterialOriginType
+    +primaryColor: String?
+    +description: Text?
+    +active: boolean
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class StoneVariant {
+    +id: Long
+    +sku: String
+    +finish: String
+    +thicknessMm: Decimal
+    +grade: String?
+    +indicativePricePerM2: Decimal?
+    +active: boolean
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class StoneMaterialImage {
+    +id: Long
+    +storageKey: String
+    +imageUrl: String?
+    +contentType: String
+    +altText: String?
+    +displayOrder: int
+    +primaryImage: boolean
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+}
+
+package "Sales" {
+  class QuoteRequest {
+    +id: Long
+    +reference: String
+    +status: QuoteRequestStatus
+    +notes: Text?
+    +requestedDeliveryDate: LocalDate?
+    +submittedAt: Instant?
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class QuoteRequestItem {
+    +id: Long
+    +description: String?
+    +quantityM2: Decimal
+    +notes: Text?
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class RfqAttachment {
+    +id: Long
+    +originalFilename: String
+    +storageKey: String
+    +contentType: String
+    +fileSizeBytes: Long
+    +createdAt: Instant
+  }
+
+  class Quotation {
+    +id: Long
+    +quotationNumber: String
+    +revisionNumber: int
+    +status: QuotationStatus
+    +currency: String
+    +validUntil: LocalDate
+    +subtotal: Decimal
+    +discountTotal: Decimal
+    +taxTotal: Decimal
+    +grandTotal: Decimal
+    +sentAt: Instant?
+    +acceptedAt: Instant?
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class QuotationItem {
+    +id: Long
+    +lineType: CommercialLineType
+    +description: String
+    +quantity: Decimal
+    +unit: UnitType
+    +unitPrice: Decimal
+    +lineTotal: Decimal
+    +displayOrder: int
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class Order {
+    +id: Long
+    +orderNumber: String
+    +status: OrderStatus
+    +currency: String
+    +confirmedAt: Instant
+    +cancelledAt: Instant?
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class OrderItem {
+    +id: Long
+    +lineType: CommercialLineType
+    +description: String
+    +quantity: Decimal
+    +unit: UnitType
+    +unitPrice: Decimal
+    +lineTotal: Decimal
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class OrderAddress {
+    +id: Long
+    +type: AddressType
+    +recipientName: String
+    +companyName: String?
+    +phone: String?
+    +addressLine1: String
+    +addressLine2: String?
+    +city: String
+    +region: String?
+    +postalCode: String?
+    +countryCode: String
+  }
+}
+
+package "Inventory" {
+  class InventoryItem {
+    +id: Long
+    +onHandM2: Decimal
+    +reservedM2: Decimal
+    +minStockM2: Decimal
+    +version: Long
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class InventoryReservation {
+    +id: Long
+    +quantityM2: Decimal
+    +status: ReservationStatus
+    +reservedAt: Instant
+    +releasedAt: Instant?
+    +consumedAt: Instant?
+    +createdAt: Instant
+    +updatedAt: Instant
+  }
+
+  class StockMovement {
+    +id: Long
+    +type: MovementType
+    +quantityM2: Decimal
+    +reason: String?
+    +reference: String?
+    +createdAt: Instant
+  }
+}
+
+' CUSTOMER
+CustomerProfile "1" *-- "0..*" CustomerProject : projects
+CustomerProfile "1" *-- "0..*" CustomerAddress : saved addresses
+
+' CATALOG
+CatalogCategory "1" -- "0..*" StoneMaterial : contains
+StoneMaterial "1" *-- "0..*" StoneVariant : variants
+StoneMaterial "1" *-- "0..*" StoneMaterialImage : images
+
+' RFQ
+CustomerProfile "1" -- "0..*" QuoteRequest : requests
+CustomerProject "0..1" -- "0..*" QuoteRequest : project
+QuoteRequest "1" *-- "1..*" QuoteRequestItem : items
+QuoteRequest "1" *-- "0..*" RfqAttachment : attachments
+QuoteRequestItem "0..*" --> "0..1" StoneVariant : requested variant
+
+' QUOTATION
+QuoteRequest "1" *-- "0..*" Quotation : quotations
+Quotation "1" *-- "1..*" QuotationItem : items
+QuotationItem "0..*" --> "0..1" StoneVariant : material variant
+Quotation "0..1" --> "0..1" Quotation : previous revision
+
+' ORDER
+Quotation "1" --> "0..1" Order : accepted as
+CustomerProfile "1" -- "0..*" Order : customer
+Order "1" *-- "1..*" OrderItem : items
+Order "1" *-- "1..2" OrderAddress : address snapshots
+OrderItem "0..*" --> "0..1" StoneVariant : material variant
+
+' INVENTORY
+StoneVariant "1" -- "0..1" InventoryItem : stock
+InventoryItem "1" *-- "0..*" InventoryReservation : reservations
+OrderItem "1" -- "0..*" InventoryReservation : reserves
+InventoryItem "1" *-- "0..*" StockMovement : movements
+StockMovement "0..*" --> "0..1" OrderItem : source order item
+
+' Layout helpers
+CustomerProfile -[hidden]right-> QuoteRequest
+CatalogCategory -[hidden]right-> StoneMaterial
+QuoteRequest -[hidden]right-> Quotation
+Quotation -[hidden]right-> Order
+Order -[hidden]right-> InventoryItem
+
+legend bottom
+  Core diagram only: every class here participates directly in the main business flow.
+endlegend
+@enduml

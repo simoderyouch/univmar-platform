@@ -1,2 +1,6 @@
 package com.univmar.inventory.domain;
-public enum MovementType { STOCK_IN, RESERVATION, RESERVATION_RELEASED, SALE, ADJUSTMENT }
+
+public enum MovementType {
+    RECEIPT, ISSUE, RETURN_IN, ADJUSTMENT_IN, ADJUSTMENT_OUT,
+    RESERVATION, RESERVATION_RELEASED
+}

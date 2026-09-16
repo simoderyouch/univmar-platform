@@ -1,18 +1,15 @@
 package com.univmar.lead.api;
 
 import com.univmar.lead.domain.WebsiteLeadStatus;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
 public final class WebsiteLeadDtos {
-    private WebsiteLeadDtos() { }
+    private WebsiteLeadDtos() {
+    }
 
     public record CreateRequest(
             @NotBlank @Size(max = 160) String fullName,
@@ -28,14 +25,19 @@ public final class WebsiteLeadDtos {
             LocalDate desiredDate,
             @NotBlank @Pattern(regexp = "fr|en|ar", message = "language must be fr, en, or ar") String language,
             @Size(max = 120) String website
-    ) { }
+    ) {
+    }
 
-    public record ReceivedResponse(String referenceNumber, WebsiteLeadStatus status, String message) { }
+    public record ReceivedResponse(String referenceNumber, WebsiteLeadStatus status, String message) {
+    }
 
     public record LeadResponse(Long id, String referenceNumber, String fullName, String email, String phone,
                                String companyName, String projectType, String city, String materialName,
                                String materialSlug, BigDecimal quantityM2, String message, LocalDate desiredDate,
-                               String language, String source, WebsiteLeadStatus status, Instant createdAt) { }
+                               String language, String source, WebsiteLeadStatus status, Instant createdAt,
+                               Long convertedCustomerId, Long convertedRfqId, Instant convertedAt) {
+    }
 
-    public record StatusRequest(@NotNull WebsiteLeadStatus status) { }
+    public record StatusRequest(@NotNull WebsiteLeadStatus status) {
+    }
 }

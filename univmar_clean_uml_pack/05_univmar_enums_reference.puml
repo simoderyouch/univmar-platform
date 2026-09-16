@@ -1,0 +1,153 @@
+@startuml Univmar_Enums
+title Univmar V1 — Enum Reference
+top to bottom direction
+
+skinparam dpi 170
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam linetype ortho
+skinparam nodesep 34
+skinparam ranksep 42
+skinparam classAttributeIconSize 0
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam packageStyle rectangle
+skinparam packageTitleAlignment center
+
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #64748B
+  ArrowColor #64748B
+  FontColor #0F172A
+}
+
+skinparam package {
+  BackgroundColor #F8FAFC
+  BorderColor #CBD5E1
+  FontColor #0F172A
+}
+
+hide methods
+hide empty members
+
+
+enum Role {
+  ADMIN
+  SALES
+  INVENTORY_MANAGER
+  CUSTOMER
+}
+
+enum AccountStatus {
+  ACTIVE
+  PENDING
+  LOCKED
+  DISABLED
+}
+
+enum CustomerType {
+  INDIVIDUAL
+  COMPANY
+}
+
+enum AddressType {
+  BILLING
+  DELIVERY
+  PROJECT_SITE
+  OTHER
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum MaterialOriginType {
+  LOCAL
+  IMPORTED
+}
+
+enum WebsiteLeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  REJECTED
+}
+
+enum QuoteRequestStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  QUOTED
+  CLOSED
+  CANCELLED
+}
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  SUPERSEDED
+  CANCELLED
+}
+
+enum CommercialLineType {
+  MATERIAL
+  CUTTING
+  INSTALLATION
+  DELIVERY
+  SERVICE
+  DISCOUNT
+  OTHER
+}
+
+enum UnitType {
+  M2
+  UNIT
+  LOT
+  SERVICE
+}
+
+enum OrderStatus {
+  CONFIRMED
+  RESERVED
+  PROCESSING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum MovementType {
+  RECEIPT
+  ISSUE
+  RETURN_IN
+  ADJUSTMENT_IN
+  ADJUSTMENT_OUT
+}
+
+enum ReservationStatus {
+  ACTIVE
+  RELEASED
+  CONSUMED
+}
+
+Role -[hidden]right-> AccountStatus
+AccountStatus -[hidden]right-> CustomerType
+CustomerType -[hidden]right-> AddressType
+AddressType -[hidden]right-> ProjectStatus
+
+MaterialOriginType -[hidden]right-> WebsiteLeadStatus
+WebsiteLeadStatus -[hidden]right-> QuoteRequestStatus
+QuoteRequestStatus -[hidden]right-> QuotationStatus
+
+CommercialLineType -[hidden]right-> UnitType
+UnitType -[hidden]right-> OrderStatus
+OrderStatus -[hidden]right-> MovementType
+MovementType -[hidden]right-> ReservationStatus
+@enduml

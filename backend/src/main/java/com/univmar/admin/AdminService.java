@@ -1,3 +1,62 @@
 package com.univmar.admin;
-import com.univmar.admin.api.AdminDtos; import com.univmar.audit.domain.AuditEventRepository; import com.univmar.shared.api.ApiException; import com.univmar.user.domain.User; import com.univmar.user.domain.UserRepository; import java.util.List; import org.springframework.security.crypto.password.PasswordEncoder; import org.springframework.stereotype.Service; import org.springframework.transaction.annotation.Transactional;
-@Service public class AdminService {private final UserRepository users;private final AuditEventRepository events;private final PasswordEncoder passwords;public AdminService(UserRepository users,AuditEventRepository events,PasswordEncoder passwords){this.users=users;this.events=events;this.passwords=passwords;}@Transactional(readOnly=true) public List<AdminDtos.UserResponse> users(){return users.findAll().stream().map(this::user).toList();}@Transactional public AdminDtos.UserResponse createUser(AdminDtos.CreateUser input){String email=input.email().trim().toLowerCase();if(users.existsByEmailIgnoreCase(email))throw ApiException.conflict("EMAIL_ALREADY_EXISTS","An account already uses this email");return user(users.save(new User(email,passwords.encode(input.password()),input.role())));}@Transactional public AdminDtos.UserResponse updateUser(Long id,AdminDtos.UserUpdate input){User user=users.findById(id).orElseThrow(()->ApiException.notFound("User"));user.changeRole(input.role());if(input.active())user.enable();else user.disable();return user(user);}@Transactional public void resetPassword(Long id,AdminDtos.ResetPassword input){User user=users.findById(id).orElseThrow(()->ApiException.notFound("User"));user.changePassword(passwords.encode(input.password()));}@Transactional(readOnly=true) public List<AdminDtos.AuditResponse> audit(String type,Long id){return events.findTop100ByEntityTypeAndEntityIdOrderByCreatedAtDesc(type,id).stream().map(x->new AdminDtos.AuditResponse(x.getId(),x.getActorId(),x.getAction(),x.getEntityType(),x.getEntityId(),x.getDetail(),x.getCreatedAt())).toList();}private AdminDtos.UserResponse user(User x){return new AdminDtos.UserResponse(x.getId(),x.getEmail(),x.getRole().name(),x.getStatus().name(),x.getCreatedAt());}}
+
+import com.univmar.admin.api.AdminDtos;
+import com.univmar.audit.domain.AuditEventRepository;
+import com.univmar.shared.api.ApiException;
+import com.univmar.user.domain.User;
+import com.univmar.user.domain.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class AdminService {
+    private final UserRepository users;
+    private final AuditEventRepository events;
+    private final PasswordEncoder passwords;
+
+    public AdminService(UserRepository users, AuditEventRepository events, PasswordEncoder passwords) {
+        this.users = users;
+        this.events = events;
+        this.passwords = passwords;
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminDtos.UserResponse> users() {
+        return users.findAll().stream().map(this::user).toList();
+    }
+
+    @Transactional
+    public AdminDtos.UserResponse createUser(AdminDtos.CreateUser input) {
+        String email = input.email().trim().toLowerCase();
+        if (users.existsByEmailIgnoreCase(email))
+            throw ApiException.conflict("EMAIL_ALREADY_EXISTS", "An account already uses this email");
+        return user(users.save(new User(email, passwords.encode(input.password()), input.role())));
+    }
+
+    @Transactional
+    public AdminDtos.UserResponse updateUser(Long id, AdminDtos.UserUpdate input) {
+        User user = users.findById(id).orElseThrow(() -> ApiException.notFound("User"));
+        user.changeRole(input.role());
+        if (input.active()) user.enable();
+        else user.disable();
+        return user(user);
+    }
+
+    @Transactional
+    public void resetPassword(Long id, AdminDtos.ResetPassword input) {
+        User user = users.findById(id).orElseThrow(() -> ApiException.notFound("User"));
+        user.changePassword(passwords.encode(input.password()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminDtos.AuditResponse> audit(String type, Long id) {
+        return events.findTop100ByEntityTypeAndEntityIdOrderByCreatedAtDesc(type, id).stream().map(x -> new AdminDtos.AuditResponse(x.getId(), x.getActorId(), x.getAction(), x.getEntityType(), x.getEntityId(), x.getDetail(), x.getCreatedAt())).toList();
+    }
+
+    private AdminDtos.UserResponse user(User x) {
+        return new AdminDtos.UserResponse(x.getId(), x.getEmail(), x.getRole().name(), x.getStatus().name(), x.getCreatedAt());
+    }
+}

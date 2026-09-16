@@ -1,3 +1,25 @@
 package com.univmar.auth;
-import jakarta.annotation.PostConstruct; import java.util.Arrays; import org.springframework.beans.factory.annotation.Value; import org.springframework.core.env.Environment; import org.springframework.stereotype.Component;
-@Component class ProductionSecurityValidator {private final Environment environment;private final String secret;ProductionSecurityValidator(Environment environment,@Value("${univmar.security.jwt-secret}")String secret){this.environment=environment;this.secret=secret;}@PostConstruct void validate(){if(Arrays.asList(environment.getActiveProfiles()).contains("prod")&&(secret.length()<32||secret.startsWith("change-this-development-secret")))throw new IllegalStateException("UNIVMAR_JWT_SECRET must be a strong, non-default value in production");}}
+
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+
+@Component
+class ProductionSecurityValidator {
+    private final Environment environment;
+    private final String secret;
+
+    ProductionSecurityValidator(Environment environment, @Value("${univmar.security.jwt-secret}") String secret) {
+        this.environment = environment;
+        this.secret = secret;
+    }
+
+    @PostConstruct
+    void validate() {
+        if (Arrays.asList(environment.getActiveProfiles()).contains("prod") && (secret.length() < 32 || secret.startsWith("change-this-development-secret")))
+            throw new IllegalStateException("UNIVMAR_JWT_SECRET must be a strong, non-default value in production");
+    }
+}

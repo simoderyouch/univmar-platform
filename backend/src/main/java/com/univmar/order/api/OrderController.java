@@ -1,3 +1,37 @@
 package com.univmar.order.api;
-import com.univmar.order.OrderService; import com.univmar.order.domain.OrderStatus; import jakarta.validation.constraints.NotNull; import org.springframework.security.access.prepost.PreAuthorize; import org.springframework.security.core.Authentication; import org.springframework.web.bind.annotation.*;
-@RestController @RequestMapping("/api/v1/sales/orders") @PreAuthorize("hasAnyRole('SALES','ADMIN')") public class OrderController {private final OrderService service;public OrderController(OrderService s){service=s;}public record Transition(@NotNull OrderStatus status){}@GetMapping public java.util.List<OrderDtos.Detail> list(){return service.sales();}@GetMapping("/{id}") public OrderDtos.Detail detail(@PathVariable Long id){return service.salesDetail(id);}@PostMapping("/{id}/status") public OrderDtos.StatusResponse transition(@PathVariable Long id,@RequestBody Transition request,Authentication auth){return new OrderDtos.StatusResponse(service.transition(id,request.status(),(Long)auth.getPrincipal()).name());}}
+
+import com.univmar.order.OrderService;
+import com.univmar.order.domain.OrderStatus;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/sales/orders")
+@PreAuthorize("hasAnyRole('SALES','ADMIN')")
+public class OrderController {
+    private final OrderService service;
+
+    public OrderController(OrderService s) {
+        service = s;
+    }
+
+    @GetMapping
+    public java.util.List<OrderDtos.Detail> list() {
+        return service.sales();
+    }
+
+    @GetMapping("/{id}")
+    public OrderDtos.Detail detail(@PathVariable Long id) {
+        return service.salesDetail(id);
+    }
+
+    @PostMapping("/{id}/status")
+    public OrderDtos.StatusResponse transition(@PathVariable Long id, @RequestBody Transition request, Authentication auth) {
+        return new OrderDtos.StatusResponse(service.transition(id, request.status(), (Long) auth.getPrincipal()).name());
+    }
+
+    public record Transition(@NotNull OrderStatus status) {
+    }
+}

@@ -1,26 +1,38 @@
 package com.univmar.shared.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
+
 import java.time.Instant;
 
 @MappedSuperclass
 public abstract class BaseEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
     @Column(nullable = false)
     private Instant updatedAt;
 
-    @PrePersist void createTimestamps() { createdAt = updatedAt = Instant.now(); }
-    @PreUpdate void updateTimestamp() { updatedAt = Instant.now(); }
-    public Long getId() { return id; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
+    @PrePersist
+    void createTimestamps() {
+        createdAt = updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    void updateTimestamp() {
+        updatedAt = Instant.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 }

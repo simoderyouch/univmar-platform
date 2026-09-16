@@ -1,1 +1,3 @@
-package com.univmar.order.domain; public enum ReservationStatus { ACTIVE, RELEASED, CONSUMED }
+package com.univmar.order.domain;
+
+public enum ReservationStatus {ACTIVE, RELEASED, CONSUMED}

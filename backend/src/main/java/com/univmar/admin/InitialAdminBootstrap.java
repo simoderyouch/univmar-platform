@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/** Creates an administrator only when both one-time bootstrap variables are supplied. */
+/**
+ * Creates an administrator only when both one-time bootstrap variables are supplied.
+ */
 @Configuration
 class InitialAdminBootstrap {
     @Bean

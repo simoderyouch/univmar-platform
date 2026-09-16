@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class HealthController {
-    public record HealthResponse(String status, String service) { }
-    @GetMapping("/health") public HealthResponse health() { return new HealthResponse("UP", "univmar-api"); }
+    @GetMapping("/health")
+    public HealthResponse health() {
+        return new HealthResponse("UP", "univmar-api");
+    }
+
+    public record HealthResponse(String status, String service) {
+    }
 }

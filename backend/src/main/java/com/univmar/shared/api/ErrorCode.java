@@ -1,14 +1,22 @@
 package com.univmar.shared.api;
 
-/** Stable machine-readable API error catalogue. Never expose database/provider messages as codes. */
+/**
+ * Stable machine-readable API error catalogue. Never expose database/provider messages as codes.
+ */
 public enum ErrorCode {
     RESOURCE_NOT_FOUND, ACCESS_DENIED, VALIDATION_ERROR, INVALID_REQUEST_BODY, INVALID_PARAMETER,
     INVALID_CREDENTIALS, INVALID_REFRESH_TOKEN, EMAIL_ALREADY_EXISTS, RATE_LIMITED,
     DUPLICATE_INVENTORY, DUPLICATE_ORDER, DUPLICATE_SLUG, EMPTY_RFQ, INVALID_ASSIGNEE,
     INVALID_STATE_TRANSITION, INVALID_REVISION, INVALID_QUOTATION, INACTIVE_MATERIAL,
-    INSUFFICIENT_STOCK, QUOTATION_EXPIRED, INVALID_DISCOUNT, INVALID_INVENTORY_ADJUSTMENT,
+    INSUFFICIENT_STOCK, QUOTATION_EXPIRED, INVALID_DISCOUNT, INVALID_INVENTORY_ADJUSTMENT, DELIVERY_ADDRESS_REQUIRED,
     CONCURRENT_MODIFICATION, SPAM_REJECTED, INVALID_ATTACHMENT, ATTACHMENT_STORAGE_ERROR,
     PAYLOAD_TOO_LARGE, INTERNAL_ERROR;
 
-    static ErrorCode fromLegacy(String value) { try { return valueOf(value); } catch (IllegalArgumentException ignored) { return INTERNAL_ERROR; } }
+    static ErrorCode fromLegacy(String value) {
+        try {
+            return valueOf(value);
+        } catch (IllegalArgumentException ignored) {
+            return INTERNAL_ERROR;
+        }
+    }
 }
