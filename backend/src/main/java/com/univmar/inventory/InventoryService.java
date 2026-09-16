@@ -97,7 +97,7 @@ public class InventoryService {
     @Transactional(readOnly = true)
     public List<InventoryDtos.MovementResponse> movements(Long id) {
         find(id);
-        return movements.findTop50ByInventoryItemIdOrderByCreatedAtDesc(id).stream().map(x -> new InventoryDtos.MovementResponse(x.getId(), x.getType().name(), x.getQuantityM2(), x.getReferenceType(), x.getReferenceId(), x.getReason(), x.getActorId(), x.getCreatedAt())).toList();
+        return movements.findTop50ByInventoryItemIdOrderByCreatedAtDesc(id).stream().map(x -> new InventoryDtos.MovementResponse(x.getId(), x.getType().name(), x.getQuantityM2(), x.getReferenceType(), x.getReferenceId(), x.getReason(), x.getActorId(), x.getSourceOrderItem() == null ? null : x.getSourceOrderItem().getId(), x.getCreatedAt())).toList();
     }
 
     private InventoryItem find(Long id) {

@@ -54,6 +54,14 @@ public class User extends BaseEntity {
         status = AccountStatus.PENDING;
     }
 
+    public void lock() {
+        status = AccountStatus.LOCKED;
+    }
+
+    public void updateStatus(AccountStatus status) {
+        this.status = status;
+    }
+
     public void changeRole(Role role) {
         this.role = role;
     }

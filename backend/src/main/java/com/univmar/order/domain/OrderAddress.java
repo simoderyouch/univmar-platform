@@ -38,10 +38,11 @@ public class OrderAddress {
     protected OrderAddress() {
     }
 
-    public OrderAddress(Order order, CustomerAddress source, AddressType type) {
+    public OrderAddress(Order order, CustomerAddress source, AddressType type, String companyName) {
         this.order = order;
         this.type = type;
         recipientName = source.getRecipientName();
+        this.companyName = companyName;
         phone = source.getPhone();
         addressLine1 = source.getLine1();
         addressLine2 = source.getLine2();
@@ -51,15 +52,47 @@ public class OrderAddress {
         countryCode = source.getCountryCode();
     }
 
-    public Long getId() { return id; }
-    public AddressType getType() { return type; }
-    public String getRecipientName() { return recipientName; }
-    public String getCompanyName() { return companyName; }
-    public String getPhone() { return phone; }
-    public String getAddressLine1() { return addressLine1; }
-    public String getAddressLine2() { return addressLine2; }
-    public String getCity() { return city; }
-    public String getRegion() { return region; }
-    public String getPostalCode() { return postalCode; }
-    public String getCountryCode() { return countryCode; }
+    public Long getId() {
+        return id;
+    }
+
+    public AddressType getType() {
+        return type;
+    }
+
+    public String getRecipientName() {
+        return recipientName;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getAddressLine1() {
+        return addressLine1;
+    }
+
+    public String getAddressLine2() {
+        return addressLine2;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
 }

@@ -65,8 +65,8 @@ public class CustomerProfile extends BaseEntity {
     }
 
     public void update(CustomerType type, String firstName, String lastName, String companyName, String phone, String taxId) {
-        if (type == CustomerType.PROFESSIONAL && (companyName == null || companyName.isBlank()))
-            throw new IllegalArgumentException("companyName is required for a professional customer");
+        if (type == CustomerType.COMPANY && (companyName == null || companyName.isBlank()))
+            throw new IllegalArgumentException("companyName is required for a company customer");
         this.type = type;
         this.firstName = firstName;
         this.lastName = lastName;

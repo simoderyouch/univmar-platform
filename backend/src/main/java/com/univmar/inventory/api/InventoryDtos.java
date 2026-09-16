@@ -30,6 +30,6 @@ public final class InventoryDtos {
     }
 
     public record MovementResponse(Long id, String type, BigDecimal quantityM2, String referenceType, Long referenceId,
-                                   String reason, Long actorId, Instant createdAt) {
+                                   String reason, Long actorId, Long sourceOrderItemId, Instant createdAt) {
     }
 }

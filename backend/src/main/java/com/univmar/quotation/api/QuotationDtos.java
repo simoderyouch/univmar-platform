@@ -32,7 +32,8 @@ public final class QuotationDtos {
 
     public record Detail(Long id, String quoteNumber, String status, LocalDate validUntil, BigDecimal subtotal,
                          BigDecimal discount, BigDecimal tax, BigDecimal total, String currency, int revisionNumber,
-                         Long revisionOfId, Long requestId, List<LineDetail> lines, Instant sentAt, Instant acceptedAt) {
+                         Long revisionOfId, Long requestId, List<LineDetail> lines, Instant sentAt,
+                         Instant acceptedAt) {
     }
 
     public record LineDetail(Long id, String type, Long variantId, String description, BigDecimal quantity,

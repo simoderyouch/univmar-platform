@@ -17,9 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.SecureRandom;
-import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
@@ -46,8 +46,8 @@ public class AuthService {
         String email = request.email().trim().toLowerCase();
         if (users.existsByEmailIgnoreCase(email))
             throw ApiException.conflict(ErrorCode.EMAIL_ALREADY_EXISTS, "An account already uses this email");
-        if (request.customerType() == CustomerType.PROFESSIONAL && (request.companyName() == null || request.companyName().isBlank()))
-            throw ApiException.badRequest(ErrorCode.VALIDATION_ERROR, "companyName is required for a professional customer");
+        if (request.customerType() == CustomerType.COMPANY && (request.companyName() == null || request.companyName().isBlank()))
+            throw ApiException.badRequest(ErrorCode.VALIDATION_ERROR, "companyName is required for a company customer");
         User user = users.save(new User(email, passwords.encode(request.password()), Role.CUSTOMER));
         profiles.save(new CustomerProfile(user, request.customerType(), request.firstName().trim(), request.lastName().trim(), trimToNull(request.companyName()), trimToNull(request.phone())));
         return issue(user);

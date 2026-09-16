@@ -26,14 +26,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class WebsiteLeadConversionIntegrationTest {
-    @Autowired private WebsiteLeadService service;
-    @Autowired private WebsiteQuoteRequestRepository leads;
-    @Autowired private UserRepository users;
-    @Autowired private CustomerProfileRepository profiles;
-    @Autowired private QuoteRequestRepository rfqs;
-    @Autowired private QuoteRequestItemRepository rfqItems;
-    @Autowired private StoneMaterialRepository materials;
-    @Autowired private StoneVariantRepository variants;
+    @Autowired
+    private WebsiteLeadService service;
+    @Autowired
+    private WebsiteQuoteRequestRepository leads;
+    @Autowired
+    private UserRepository users;
+    @Autowired
+    private CustomerProfileRepository profiles;
+    @Autowired
+    private QuoteRequestRepository rfqs;
+    @Autowired
+    private QuoteRequestItemRepository rfqItems;
+    @Autowired
+    private StoneMaterialRepository materials;
+    @Autowired
+    private StoneVariantRepository variants;
 
     @Test
     void qualifiedLeadConvertsIntoPendingCustomerAndDraftRfq() {

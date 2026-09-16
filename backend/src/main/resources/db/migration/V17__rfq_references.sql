@@ -1,5 +1,6 @@
 alter table quote_requests
-    add column reference varchar(64),
+    add column reference varchar(64);
+alter table quote_requests
     add column submitted_at timestamp with time zone;
 update quote_requests
 set reference = 'RFQ-' || id,

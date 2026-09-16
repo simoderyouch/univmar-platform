@@ -42,13 +42,13 @@ public class OrderService {
             for (var r : reservations.findByOrderItem_Order_IdAndStatus(id, ReservationStatus.ACTIVE)) {
                 r.getInventoryItem().release(r.getQuantityM2());
                 r.release();
-                movements.save(new StockMovement(r.getInventoryItem(), MovementType.RESERVATION_RELEASED, r.getQuantityM2(), "ORDER", id, "Order cancelled", actorId));
+                movements.save(new StockMovement(r.getInventoryItem(), MovementType.RESERVATION_RELEASED, r.getQuantityM2(), "ORDER", id, "Order cancelled", actorId, r.getOrderItem()));
             }
         if (target == OrderStatus.COMPLETED)
             for (var r : reservations.findByOrderItem_Order_IdAndStatus(id, ReservationStatus.ACTIVE)) {
                 r.getInventoryItem().consume(r.getQuantityM2());
                 r.consume();
-                movements.save(new StockMovement(r.getInventoryItem(), MovementType.ISSUE, r.getQuantityM2(), "ORDER", id, "Order completed", actorId));
+                movements.save(new StockMovement(r.getInventoryItem(), MovementType.ISSUE, r.getQuantityM2(), "ORDER", id, "Order completed", actorId, r.getOrderItem()));
             }
         audit.record(actorId, "ORDER_" + target.name(), "ORDER", id, "Order status changed to " + target.name());
         return order.getStatus();
@@ -80,7 +80,7 @@ public class OrderService {
 
     private OrderDtos.Detail detail(Order order) {
         var lines = items.findByOrderId(order.getId()).stream().map(x -> new OrderDtos.Line(x.getId(), x.getLineType().name(), x.getVariant() == null ? null : x.getVariant().getId(), x.getDescriptionSnapshot(), x.getQuantity(), x.getUnit().name(), x.getUnitPrice(), x.getLineTotal(), x.getDisplayOrder())).toList();
-        var timeline = movements.findByReferenceTypeAndReferenceIdOrderByCreatedAtDesc("ORDER", order.getId()).stream().map(x -> new OrderDtos.Event(x.getType().name(), x.getQuantityM2(), x.getReason(), x.getActorId(), x.getCreatedAt())).toList();
+        var timeline = movements.findByReferenceTypeAndReferenceIdOrderByCreatedAtDesc("ORDER", order.getId()).stream().map(x -> new OrderDtos.Event(x.getType().name(), x.getQuantityM2(), x.getReason(), x.getActorId(), x.getSourceOrderItem() == null ? null : x.getSourceOrderItem().getId(), x.getCreatedAt())).toList();
         var addressSnapshots = addresses.findByOrderId(order.getId()).stream().map(x -> new OrderDtos.Address(x.getId(), x.getType().name(), x.getRecipientName(), x.getCompanyName(), x.getPhone(), x.getAddressLine1(), x.getAddressLine2(), x.getCity(), x.getRegion(), x.getPostalCode(), x.getCountryCode())).toList();
         return new OrderDtos.Detail(order.getId(), order.getOrderNumber(), order.getStatus().name(), order.getCustomer().getId(), order.getQuotation().getId(), order.getTotalSnapshot(), order.getCreatedAt(), lines, timeline, order.getCurrency(), order.getConfirmedAt(), order.getCancelledAt(), addressSnapshots);
     }

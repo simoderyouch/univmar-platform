@@ -16,8 +16,7 @@ public class RefreshToken extends BaseEntity {
     private String tokenHash;
     @Column(nullable = false)
     private Instant expiresAt;
-    @Column(nullable = false)
-    private boolean revoked;
+    private Instant revokedAt;
 
     protected RefreshToken() {
     }
@@ -36,11 +35,19 @@ public class RefreshToken extends BaseEntity {
         return tokenHash;
     }
 
+    public Instant getExpiresAt() {
+        return expiresAt;
+    }
+
+    public Instant getRevokedAt() {
+        return revokedAt;
+    }
+
     public boolean isUsable() {
-        return !revoked && expiresAt.isAfter(Instant.now());
+        return revokedAt == null && expiresAt.isAfter(Instant.now());
     }
 
     public void revoke() {
-        revoked = true;
+        if (revokedAt == null) revokedAt = Instant.now();
     }
 }

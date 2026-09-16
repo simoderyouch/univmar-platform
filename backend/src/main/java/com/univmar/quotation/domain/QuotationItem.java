@@ -71,7 +71,11 @@ public class QuotationItem extends BaseEntity {
         return lineTotal;
     }
 
-    public UnitType getUnit() { return unit; }
+    public UnitType getUnit() {
+        return unit;
+    }
 
-    public int getDisplayOrder() { return displayOrder; }
+    public int getDisplayOrder() {
+        return displayOrder;
+    }
 }

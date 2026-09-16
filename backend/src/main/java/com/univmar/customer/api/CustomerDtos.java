@@ -30,7 +30,8 @@ public final class CustomerDtos {
 
     public record AddressResponse(Long id, String label, String recipientName, String phone, String line1, String line2,
                                   String city, String region, String postalCode, String country,
-                                  boolean defaultDelivery, AddressType type, String countryCode, boolean defaultAddress) {
+                                  boolean defaultDelivery, AddressType type, String countryCode,
+                                  boolean defaultAddress) {
     }
 
     public record Project(@NotBlank @Size(max = 180) String name, @Size(max = 100) String projectType,
@@ -40,6 +41,7 @@ public final class CustomerDtos {
     }
 
     public record ProjectResponse(Long id, String name, String projectType, String siteCity, String siteAddress,
-                                  String notes, String reference, String description, ProjectStatus status, String siteCountry) {
+                                  String notes, String reference, String description, ProjectStatus status,
+                                  String siteCountry) {
     }
 }

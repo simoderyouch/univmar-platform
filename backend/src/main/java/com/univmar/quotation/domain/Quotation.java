@@ -122,6 +122,7 @@ public class Quotation extends BaseEntity {
     public void accept() {
         status = QuotationStatus.ACCEPTED;
         acceptedAt = Instant.now();
+        request.close();
     }
 
     public void reject() {

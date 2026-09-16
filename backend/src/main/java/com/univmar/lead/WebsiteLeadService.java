@@ -99,7 +99,7 @@ public class WebsiteLeadService {
             QuoteRequest rfq = rfqs.save(new QuoteRequest(customerUser, lead.getMessage(), lead.getDesiredDate()));
             var variant = requestedVariant(lead).orElseThrow(() -> ApiException.conflict(ErrorCode.INACTIVE_MATERIAL,
                     "The website lead must identify an active material variant before conversion"));
-            rfqItems.save(new QuoteRequestItem(rfq, variant, lead.getQuantityM2(), lead.getMaterialName()));
+            rfqItems.save(new QuoteRequestItem(rfq, variant, lead.getMaterialName(), lead.getQuantityM2(), lead.getMessage()));
             lead.convert(customer, rfq);
             audit.record(actorId, "WEBSITE_LEAD_CONVERTED", "WEBSITE_QUOTE_REQUEST", lead.getId(), "Created customer " + customer.getId() + " and RFQ " + rfq.getId());
             return response(lead);
@@ -140,7 +140,7 @@ public class WebsiteLeadService {
     }
 
     private CustomerType customerType(WebsiteQuoteRequest lead) {
-        return lead.getCompanyName() == null || lead.getCompanyName().isBlank() ? CustomerType.INDIVIDUAL : CustomerType.PROFESSIONAL;
+        return lead.getCompanyName() == null || lead.getCompanyName().isBlank() ? CustomerType.INDIVIDUAL : CustomerType.COMPANY;
     }
 
     private String firstName(WebsiteQuoteRequest lead) {

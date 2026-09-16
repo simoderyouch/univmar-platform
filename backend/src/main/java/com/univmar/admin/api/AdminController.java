@@ -3,6 +3,7 @@ package com.univmar.admin.api;
 import com.univmar.admin.AdminService;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,19 +25,19 @@ public class AdminController {
 
     @PostMapping("/users")
     @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
-    public AdminDtos.UserResponse create(@Valid @RequestBody AdminDtos.CreateUser input) {
-        return service.createUser(input);
+    public AdminDtos.UserResponse create(@Valid @RequestBody AdminDtos.CreateUser input, Authentication auth) {
+        return service.createUser(input, (Long) auth.getPrincipal());
     }
 
     @PatchMapping("/users/{id}")
-    public AdminDtos.UserResponse update(@PathVariable Long id, @Valid @RequestBody AdminDtos.UserUpdate input) {
-        return service.updateUser(id, input);
+    public AdminDtos.UserResponse update(@PathVariable Long id, @Valid @RequestBody AdminDtos.UserUpdate input, Authentication auth) {
+        return service.updateUser(id, input, (Long) auth.getPrincipal());
     }
 
     @PostMapping("/users/{id}/reset-password")
     @ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
-    public void resetPassword(@PathVariable Long id, @Valid @RequestBody AdminDtos.ResetPassword input) {
-        service.resetPassword(id, input);
+    public void resetPassword(@PathVariable Long id, @Valid @RequestBody AdminDtos.ResetPassword input, Authentication auth) {
+        service.resetPassword(id, input, (Long) auth.getPrincipal());
     }
 
     @GetMapping("/audit/{entityType}/{entityId}")

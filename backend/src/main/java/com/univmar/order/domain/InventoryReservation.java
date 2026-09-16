@@ -5,6 +5,7 @@ import com.univmar.shared.domain.BaseEntity;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Entity
 @Table(name = "inventory_reservations")
@@ -20,6 +21,10 @@ public class InventoryReservation extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status = ReservationStatus.ACTIVE;
+    @Column(nullable = false)
+    private Instant reservedAt;
+    private Instant releasedAt;
+    private Instant consumedAt;
 
     protected InventoryReservation() {
     }
@@ -28,10 +33,15 @@ public class InventoryReservation extends BaseEntity {
         orderItem = line;
         inventoryItem = item;
         quantityM2 = quantity;
+        reservedAt = Instant.now();
     }
 
     public InventoryItem getInventoryItem() {
         return inventoryItem;
+    }
+
+    public OrderItem getOrderItem() {
+        return orderItem;
     }
 
     public BigDecimal getQuantityM2() {
@@ -42,11 +52,25 @@ public class InventoryReservation extends BaseEntity {
         return status;
     }
 
+    public Instant getReservedAt() {
+        return reservedAt;
+    }
+
+    public Instant getReleasedAt() {
+        return releasedAt;
+    }
+
+    public Instant getConsumedAt() {
+        return consumedAt;
+    }
+
     public void release() {
         status = ReservationStatus.RELEASED;
+        releasedAt = Instant.now();
     }
 
     public void consume() {
         status = ReservationStatus.CONSUMED;
+        consumedAt = Instant.now();
     }
 }

@@ -1,5 +1,6 @@
 alter table quotations
-    add column sent_at timestamp with time zone,
+    add column sent_at timestamp with time zone;
+alter table quotations
     add column accepted_at timestamp with time zone;
 update quotations
 set sent_at = updated_at
@@ -9,8 +10,10 @@ set accepted_at = updated_at
 where accepted_at is null and status = 'ACCEPTED';
 
 alter table customer_orders
-    add column currency varchar(3) not null default 'MAD',
-    add column confirmed_at timestamp with time zone,
+    add column currency varchar(3) not null default 'MAD';
+alter table customer_orders
+    add column confirmed_at timestamp with time zone;
+alter table customer_orders
     add column cancelled_at timestamp with time zone;
 update customer_orders
 set confirmed_at = created_at
