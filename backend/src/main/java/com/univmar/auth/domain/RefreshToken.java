@@ -13,7 +13,7 @@ public class RefreshToken extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     @Column(nullable = false, unique = true, length = 128)
-    private String token;
+    private String tokenHash;
     @Column(nullable = false)
     private Instant expiresAt;
     @Column(nullable = false)
@@ -22,9 +22,9 @@ public class RefreshToken extends BaseEntity {
     protected RefreshToken() {
     }
 
-    public RefreshToken(User user, String token, Instant expiresAt) {
+    public RefreshToken(User user, String tokenHash, Instant expiresAt) {
         this.user = user;
-        this.token = token;
+        this.tokenHash = tokenHash;
         this.expiresAt = expiresAt;
     }
 
@@ -32,8 +32,8 @@ public class RefreshToken extends BaseEntity {
         return user;
     }
 
-    public String getToken() {
-        return token;
+    public String getTokenHash() {
+        return tokenHash;
     }
 
     public boolean isUsable() {

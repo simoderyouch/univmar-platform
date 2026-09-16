@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
@@ -61,7 +63,7 @@ public class AuthService {
 
     @Transactional
     public AuthDtos.TokenResponse refresh(String token) {
-        RefreshToken refresh = refreshTokens.findByToken(token).orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_REFRESH_TOKEN, "Refresh token is invalid"));
+        RefreshToken refresh = refreshTokens.findByTokenHash(hash(token)).orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_REFRESH_TOKEN, "Refresh token is invalid"));
         if (!refresh.isUsable() || refresh.getUser().getStatus() != AccountStatus.ACTIVE)
             throw new ApiException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_REFRESH_TOKEN, "Refresh token is expired or revoked");
         refresh.revoke();
@@ -70,18 +72,27 @@ public class AuthService {
 
     @Transactional
     public void logout(String token) {
-        refreshTokens.findByToken(token).ifPresent(RefreshToken::revoke);
+        refreshTokens.findByTokenHash(hash(token)).ifPresent(RefreshToken::revoke);
     }
 
     private AuthDtos.TokenResponse issue(User user) {
         byte[] bytes = new byte[48];
         random.nextBytes(bytes);
         String refresh = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-        refreshTokens.save(new RefreshToken(user, refresh, Instant.now().plus(30, ChronoUnit.DAYS)));
+        refreshTokens.save(new RefreshToken(user, hash(refresh), Instant.now().plus(30, ChronoUnit.DAYS)));
         return new AuthDtos.TokenResponse(jwt.create(user), refresh, "Bearer", jwt.expiresInSeconds());
     }
 
     private String trimToNull(String value) {
         return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private String hash(String value) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(digest);
+        } catch (java.security.NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 is unavailable", exception);
+        }
     }
 }
