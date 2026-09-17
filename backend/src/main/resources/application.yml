@@ -20,8 +20,10 @@ server:
     include-message: never
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 11MB
+      # The browser enforces 10 MiB (10 × 1024 × 1024 bytes). Spring's MB unit is decimal,
+      # so allow 11 MB here to avoid rejecting a valid browser-accepted 10 MiB image.
+      max-file-size: 11MB
+      max-request-size: 12MB
   forward-headers-strategy: framework
 management:
   endpoints:

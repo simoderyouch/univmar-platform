@@ -1,84 +1,79 @@
 package com.univmar.catalog.domain;
 
-import com.univmar.shared.domain.BaseEntity;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.util.Locale;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "stone_variants")
-public class StoneVariant extends BaseEntity {
-    @ManyToOne(optional = false)
+@Table(name = "stone_variant")
+public class StoneVariant {
+    @Id
+    private UUID id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "material_id", nullable = false)
     private StoneMaterial material;
-    @Column(nullable = false, unique = true, length = 100)
-    private String sku;
-    @Column(nullable = false, length = 100)
-    private String finish;
-    @Column(nullable = false, precision = 8, scale = 2)
+    @Column(name = "thickness_mm", nullable = false, precision = 12, scale = 3)
     private BigDecimal thicknessMm;
-    @Column(length = 100)
-    private String grade;
-    @Column(precision = 19, scale = 2)
-    private BigDecimal indicativePrice;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private Finish finish;
+    @Column(name = "format_description", length = 160)
+    private String format;
     @Column(nullable = false)
     private boolean active = true;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 
     protected StoneVariant() {
     }
 
-    public StoneVariant(StoneMaterial material, String finish, BigDecimal thicknessMm, String grade, BigDecimal indicativePrice) {
-        this(material, generatedSku(), finish, thicknessMm, grade, indicativePrice);
-    }
-
-    public StoneVariant(StoneMaterial material, String sku, String finish, BigDecimal thicknessMm, String grade, BigDecimal indicativePrice) {
+    public StoneVariant(StoneMaterial material, BigDecimal thicknessMm, Finish finish, String format) {
+        this.id = UUID.randomUUID();
         this.material = material;
-        this.sku = sku;
-        this.finish = finish;
+        update(thicknessMm, finish, format);
+    }
+
+    public void update(BigDecimal thicknessMm, Finish finish, String format) {
         this.thicknessMm = thicknessMm;
-        this.grade = grade;
-        this.indicativePrice = indicativePrice;
+        this.finish = finish;
+        this.format = format;
     }
 
-    private static String generatedSku() {
-        return "VAR-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase(Locale.ROOT);
+    @PrePersist
+    void createTimestamp() {
+        createdAt = updatedAt = Instant.now();
     }
 
-    public StoneMaterial getMaterial() {
-        return material;
+    @PreUpdate
+    void updateTimestamp() {
+        updatedAt = Instant.now();
     }
 
-    public String getSku() {
-        return sku;
-    }
-
-    public String getFinish() {
-        return finish;
+    public UUID getId() {
+        return id;
     }
 
     public BigDecimal getThicknessMm() {
         return thicknessMm;
     }
 
-    public String getGrade() {
-        return grade;
+    public Finish getFinish() {
+        return finish;
     }
 
-    public BigDecimal getIndicativePrice() {
-        return indicativePrice;
+    public String getFormat() {
+        return format;
     }
 
     public boolean isActive() {
         return active;
     }
 
-    public void update(String finish, BigDecimal thicknessMm, String grade, BigDecimal indicativePrice, boolean active) {
-        this.finish = finish;
-        this.thicknessMm = thicknessMm;
-        this.grade = grade;
-        this.indicativePrice = indicativePrice;
+    public void setActive(boolean active) {
         this.active = active;
     }
 }

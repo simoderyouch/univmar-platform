@@ -3,6 +3,15 @@
 !.env.example
 
 data/
+backend/data/
 backend/target/
 frontend/dist/
 frontend/node_modules/
+.run/
+
+# Local IDE, build recovery, and internal planning artifacts
+.idea/
+backend/target-old/
+/phase *.txt
+/univmar_feature_spec
+/univmar_phase_by_phase_roadmap.txt

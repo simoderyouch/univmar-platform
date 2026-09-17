@@ -36,6 +36,9 @@ public class AuthController {
 
     @GetMapping("/me")
     ApiResponse<UserResponse> me(Authentication authentication, HttpServletRequest request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED", "Authentication is required.");
+        }
         User user = users.findById(java.util.UUID.fromString(authentication.getName()))
             .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED", "Authentication is required."));
         return ApiResponse.of(UserResponse.from(user), requestId(request));
