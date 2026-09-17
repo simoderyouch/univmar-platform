@@ -57,6 +57,10 @@ public class StoneVariant {
         return id;
     }
 
+    public StoneMaterial getMaterial() {
+        return material;
+    }
+
     public BigDecimal getThicknessMm() {
         return thicknessMm;
     }
