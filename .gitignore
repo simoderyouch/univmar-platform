@@ -1,35 +1,17 @@
-# Editor and operating-system files
-.DS_Store
-.idea/
-.vscode/
-*.iml
-
-# Local agent metadata
-.agents/
-.codex/
-
-# Secrets and machine-specific configuration
 .env
 .env.*
 !.env.example
-**/.env.local
-*.pem
-*.key
 
-# Build output, dependencies, and reports
-**/node_modules/
-**/.next/
-**/dist/
-**/target/
-**/coverage/
-*.tsbuildinfo
-*.log
+data/
+backend/data/
+backend/target/
+frontend/dist/
+frontend/node_modules/
+.run/
 
-# Deliberately excluded from this source-only repository
-docs/
-*.txt
-*.pdf
-
-# Private landing media: supplied at runtime, never committed or baked into an image
-landing/public/
-landing/private-assets/
+# Local IDE, build recovery, and internal planning artifacts
+.idea/
+backend/target-old/
+/phase *.txt
+/univmar_feature_spec
+/univmar_phase_by_phase_roadmap.txt

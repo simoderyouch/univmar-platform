@@ -1,123 +1,70 @@
 package com.univmar.catalog.api;
 
 import com.univmar.catalog.CatalogService;
+import com.univmar.catalog.api.CatalogDtos.*;
+import com.univmar.catalog.domain.StoneType;
+import com.univmar.common.api.ApiResponse;
+import com.univmar.common.api.RequestIdFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/materials")
 public class CatalogController {
-    private final CatalogService service;
+    private final CatalogService catalog;
 
-    public CatalogController(CatalogService service) {
-        this.service = service;
+    public CatalogController(CatalogService catalog) {
+        this.catalog = catalog;
     }
 
-    @GetMapping("/materials/categories")
-    public java.util.List<CatalogDtos.CategoryResponse> categories() {
-        return service.categories();
+    @GetMapping
+    public ApiResponse<PageResult<MaterialSummary>> list(@RequestParam(required = false) String search, @RequestParam(required = false) String type, @RequestParam(required = false) String origin, @RequestParam(required = false) String color, @RequestParam(required = false) Boolean active, @PageableDefault(size = 20, sort = "name") Pageable pageable, HttpServletRequest request) {
+        return ok(catalog.list(search, type == null || type.isBlank() ? null : StoneType.from(type), origin, color, active, pageable), request);
     }
 
-    @GetMapping("/materials")
-    public Page<CatalogDtos.MaterialResponse> list(Pageable pageable) {
-        return service.list(pageable);
+    @PostMapping
+    public ResponseEntity<ApiResponse<MaterialDetail>> create(@Valid @RequestBody MaterialInput input, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ok(catalog.create(input), request));
     }
 
-    @GetMapping("/materials/{slug}")
-    public CatalogDtos.MaterialResponse detail(@PathVariable String slug) {
-        return service.bySlug(slug);
+    @GetMapping("/{id}")
+    public ApiResponse<MaterialDetail> get(@PathVariable UUID id, HttpServletRequest request) {
+        return ok(catalog.get(id), request);
     }
 
-    @GetMapping("/public/material-images/{imageId}")
-    public ResponseEntity<Resource> image(@PathVariable Long imageId) {
-        var media = service.media(imageId);
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType(media.contentType())).cacheControl(org.springframework.http.CacheControl.maxAge(java.time.Duration.ofDays(30)).cachePublic()).body(media.resource());
+    @PutMapping("/{id}")
+    public ApiResponse<MaterialDetail> update(@PathVariable UUID id, @Valid @RequestBody MaterialInput input, HttpServletRequest request) {
+        return ok(catalog.update(id, input), request);
     }
 
-    @GetMapping("/admin/materials")
-    @PreAuthorize("hasRole('ADMIN')")
-    public Page<CatalogDtos.MaterialResponse> adminList(Pageable pageable) {
-        return service.adminList(pageable);
+    @PatchMapping("/{id}/active")
+    public ApiResponse<MaterialDetail> setActive(@PathVariable UUID id, @Valid @RequestBody ActiveInput input, HttpServletRequest request) {
+        return ok(catalog.setMaterialActive(id, input.active()), request);
     }
 
-    @GetMapping("/admin/categories")
-    @PreAuthorize("hasRole('ADMIN')")
-    public java.util.List<CatalogDtos.AdminCategoryResponse> adminCategories() {
-        return service.adminCategories();
+    @PostMapping("/{id}/variants")
+    public ResponseEntity<ApiResponse<VariantResponse>> createVariant(@PathVariable UUID id, @Valid @RequestBody VariantInput input, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ok(catalog.createVariant(id, input), request));
     }
 
-    @PostMapping("/admin/categories")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
-    public CatalogDtos.AdminCategoryResponse createCategory(@Valid @RequestBody CatalogDtos.CategoryRequest request) {
-        return service.createCategory(request);
+    @PutMapping("/{materialId}/variants/{variantId}")
+    public ApiResponse<VariantResponse> updateVariant(@PathVariable UUID materialId, @PathVariable UUID variantId, @Valid @RequestBody VariantInput input, HttpServletRequest request) {
+        return ok(catalog.updateVariant(materialId, variantId, input), request);
     }
 
-    @PutMapping("/admin/categories/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public CatalogDtos.AdminCategoryResponse updateCategory(@PathVariable Long id, @Valid @RequestBody CatalogDtos.CategoryRequest request) {
-        return service.updateCategory(id, request);
+    @PatchMapping("/{materialId}/variants/{variantId}/active")
+    public ApiResponse<VariantResponse> setVariantActive(@PathVariable UUID materialId, @PathVariable UUID variantId, @Valid @RequestBody ActiveInput input, HttpServletRequest request) {
+        return ok(catalog.setVariantActive(materialId, variantId, input.active()), request);
     }
 
-    @PostMapping("/admin/materials")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
-    public CatalogDtos.MaterialResponse create(@Valid @RequestBody CatalogDtos.MaterialRequest request) {
-        return service.create(request);
-    }
-
-    @PutMapping("/admin/materials/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public CatalogDtos.MaterialResponse update(@PathVariable Long id, @Valid @RequestBody CatalogDtos.MaterialRequest request) {
-        return service.update(id, request);
-    }
-
-    @DeleteMapping("/admin/materials/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
-    public void deactivate(@PathVariable Long id) {
-        service.deactivate(id);
-    }
-
-    @PostMapping(value = "/admin/materials/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
-    public CatalogDtos.ImageResponse uploadImage(@PathVariable Long id, @RequestPart("file") MultipartFile file, @RequestPart(value = "altText", required = false) String altText) {
-        return service.uploadImage(id, file, altText);
-    }
-
-    @DeleteMapping("/admin/materials/{materialId}/images/{imageId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
-    public void deleteImage(@PathVariable Long materialId, @PathVariable Long imageId) {
-        service.deleteImage(materialId, imageId);
-    }
-
-    @PostMapping("/admin/materials/{id}/variants")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
-    public CatalogDtos.VariantResponse variant(@PathVariable Long id, @Valid @RequestBody CatalogDtos.VariantRequest request) {
-        return service.createVariant(id, request);
-    }
-
-    @PutMapping("/admin/materials/{materialId}/variants/{variantId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public CatalogDtos.VariantResponse updateVariant(@PathVariable Long materialId, @PathVariable Long variantId, @Valid @RequestBody CatalogDtos.VariantRequest request) {
-        return service.updateVariant(materialId, variantId, request);
-    }
-
-    @DeleteMapping("/admin/materials/{materialId}/variants/{variantId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
-    public void deactivateVariant(@PathVariable Long materialId, @PathVariable Long variantId) {
-        service.deactivateVariant(materialId, variantId);
+    private <T> ApiResponse<T> ok(T data, HttpServletRequest request) {
+        return ApiResponse.of(data, (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE));
     }
 }

@@ -1,82 +1,119 @@
 package com.univmar.catalog.domain;
 
-import com.univmar.shared.domain.BaseEntity;
 import jakarta.persistence.*;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 @Entity
-@Table(name = "stone_materials")
-public class StoneMaterial extends BaseEntity {
-    @Column(unique = true)
-    private Long sourceProductId;
+@Table(name = "stone_material")
+public class StoneMaterial {
+    @Id
+    private UUID id;
     @Column(nullable = false, length = 160)
     private String name;
-    @Column(nullable = false, unique = true, length = 180)
-    private String slug;
-    @Column(nullable = false, length = 100)
-    private String category;
-    @Column(length = 100)
-    private String originCountry;
+    @Column(name = "commercial_name", length = 160)
+    private String commercialName;
+    @Column(nullable = false, unique = true, length = 80)
+    private String sku;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 16)
-    private MaterialOriginType originType;
+    @Column(name = "stone_type", nullable = false, length = 30)
+    private StoneType stoneType;
     @Column(length = 100)
-    private String primaryColor;
-    @Column(length = 4000)
+    private String origin;
+    @Column(length = 100)
+    private String color;
+    @Column(length = 160)
+    private String pattern;
+    @Column(columnDefinition = "text")
     private String description;
-    @Column(length = 500)
+    @Column(columnDefinition = "text")
     private String applications;
+    @Column(name = "main_image_url", length = 1000)
+    private String mainImageUrl;
     @Column(nullable = false)
     private boolean active = true;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+    @ElementCollection
+    @CollectionTable(name = "stone_material_image", joinColumns = @JoinColumn(name = "material_id"))
+    @Column(name = "image_url", nullable = false, length = 1000)
+    @OrderColumn(name = "position")
+    private final List<String> galleryImageUrls = new ArrayList<>();
+    @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<StoneVariant> variants = new ArrayList<>();
 
     protected StoneMaterial() {
     }
 
-    public StoneMaterial(String name, String slug, String category, String originCountry, String primaryColor, String description, String applications) {
-        this(name, slug, category, originCountry, defaultOriginType(originCountry), primaryColor, description, applications);
+    public StoneMaterial(String name, String commercialName, String sku, StoneType stoneType, String origin, String color, String pattern, String description, String applications, String mainImageUrl, List<String> galleryImageUrls) {
+        this.id = UUID.randomUUID();
+        update(name, commercialName, sku, stoneType, origin, color, pattern, description, applications, mainImageUrl, galleryImageUrls);
     }
 
-    public StoneMaterial(String name, String slug, String category, String originCountry, MaterialOriginType originType,
-                         String primaryColor, String description, String applications) {
+    public void update(String name, String commercialName, String sku, StoneType stoneType, String origin, String color, String pattern, String description, String applications, String mainImageUrl, List<String> galleryImageUrls) {
         this.name = name;
-        this.slug = slug;
-        this.category = category;
-        this.originCountry = originCountry;
-        this.originType = originType == null ? defaultOriginType(originCountry) : originType;
-        this.primaryColor = primaryColor;
+        this.commercialName = commercialName;
+        this.sku = sku;
+        this.stoneType = stoneType;
+        this.origin = origin;
+        this.color = color;
+        this.pattern = pattern;
         this.description = description;
         this.applications = applications;
+        this.mainImageUrl = mainImageUrl;
+        this.galleryImageUrls.clear();
+        if (galleryImageUrls != null) this.galleryImageUrls.addAll(galleryImageUrls);
     }
 
-    private static MaterialOriginType defaultOriginType(String country) {
-        return country != null && country.toLowerCase(java.util.Locale.ROOT).contains("maroc") ? MaterialOriginType.LOCAL : MaterialOriginType.IMPORTED;
+    public void addVariant(StoneVariant variant) {
+        variants.add(variant);
     }
 
-    public Long getSourceProductId() {
-        return sourceProductId;
+    @PrePersist
+    void createTimestamp() {
+        createdAt = updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    void updateTimestamp() {
+        updatedAt = Instant.now();
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getSlug() {
-        return slug;
+    public String getCommercialName() {
+        return commercialName;
     }
 
-    public String getCategory() {
-        return category;
+    public String getSku() {
+        return sku;
     }
 
-    public String getOriginCountry() {
-        return originCountry;
+    public StoneType getStoneType() {
+        return stoneType;
     }
 
-    public MaterialOriginType getOriginType() {
-        return originType;
+    public String getOrigin() {
+        return origin;
     }
 
-    public String getPrimaryColor() {
-        return primaryColor;
+    public String getColor() {
+        return color;
+    }
+
+    public String getPattern() {
+        return pattern;
     }
 
     public String getDescription() {
@@ -87,23 +124,23 @@ public class StoneMaterial extends BaseEntity {
         return applications;
     }
 
+    public String getMainImageUrl() {
+        return mainImageUrl;
+    }
+
     public boolean isActive() {
         return active;
     }
 
-    public void update(String name, String category, String originCountry, String primaryColor, String description, String applications, boolean active) {
-        update(name, category, originCountry, defaultOriginType(originCountry), primaryColor, description, applications, active);
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
-    public void update(String name, String category, String originCountry, MaterialOriginType originType,
-                       String primaryColor, String description, String applications, boolean active) {
-        this.name = name;
-        this.category = category;
-        this.originCountry = originCountry;
-        this.originType = originType == null ? defaultOriginType(originCountry) : originType;
-        this.primaryColor = primaryColor;
-        this.description = description;
-        this.applications = applications;
-        this.active = active;
+    public List<String> getGalleryImageUrls() {
+        return List.copyOf(galleryImageUrls);
+    }
+
+    public List<StoneVariant> getVariants() {
+        return List.copyOf(variants);
     }
 }

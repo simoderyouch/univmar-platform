@@ -3,9 +3,11 @@ package com.univmar.catalog.domain;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-public interface StoneVariantRepository extends JpaRepository<StoneVariant, Long> {
-    List<StoneVariant> findByMaterialIdAndActiveTrue(Long materialId);
+public interface StoneVariantRepository extends JpaRepository<StoneVariant, UUID> {
+    Optional<StoneVariant> findByIdAndMaterialId(UUID id, UUID materialId);
 
-    boolean existsBySku(String sku);
+    List<StoneVariant> findAllByMaterialId(UUID materialId);
 }
