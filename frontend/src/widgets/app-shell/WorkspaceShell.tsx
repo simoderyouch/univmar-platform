@@ -4,6 +4,7 @@ import { Redirect, useRouter } from "../../app/providers/router";
 import { useAuth } from "../../features/auth/AuthProvider";
 import { CatalogPage } from "../../features/catalog";
 import { DashboardPage } from "../../features/dashboard";
+import { InventoryPage } from "../../features/inventory";
 import { PlaceholderPage } from "../../features/workspace";
 import { workspaceNavigation, type NavigationEntry } from "./navigation";
 
@@ -39,16 +40,17 @@ export function WorkspaceShell() {
     ? <DashboardPage />
     : path === "/catalog"
       ? <CatalogPage />
-      : <PlaceholderPage title={title} />;
+      : path === "/inventory"
+        ? <InventoryPage />
+        : <PlaceholderPage title={title} />;
 
   const sidebar = (
     <>
-      <div className="flex h-16 items-center border-b border-white/10 px-3">
-        <img src="/univmar-logo-w.png" alt="Univmar Marble" className="h-auto w-28 object-contain object-left" />
+      <div className="flex h-16 items-center justify-center py-12 border-b border-white/10 px-3">
+        <img src="/univmar-logo-w.png" alt="Univmar Marble" className="h-auto w-[11rem] object-contain object-left" />
         <button type="button" className="ml-auto p-2 lg:hidden" onClick={closeMenu} aria-label="Close navigation"><X size={18} /></button>
       </div>
-      <p className="mb-3 mt-6 px-3 text-[10px] font-bold tracking-[0.16em] text-white/40">WORKSPACE</p>
-      <nav className="grid gap-1">{workspaceNavigation.map((item) => <NavigationItem key={item.to} item={item} onNavigate={closeMenu} />)}</nav>
+      <nav className="grid pt-6 gap-1">{workspaceNavigation.map((item) => <NavigationItem key={item.to} item={item} onNavigate={closeMenu} />)}</nav>
       <div className="mt-auto border-t border-white/10 p-3">
         <p className="truncate text-xs font-medium text-white/80">{user.email}</p>
         <p className="mt-1 text-[10px] tracking-wider text-white/40">{user.role.replaceAll("_", " ")}</p>

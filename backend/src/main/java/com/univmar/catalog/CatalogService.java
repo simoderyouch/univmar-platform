@@ -69,7 +69,6 @@ public class CatalogService {
         ensureUniqueVariant(materialId, input, null);
         StoneVariant variant = new StoneVariant(material, input.thicknessMm(), input.finish(), trim(input.format()));
         material.addVariant(variant);
-        variants.save(variant);
         return variant(variant);
     }
 
