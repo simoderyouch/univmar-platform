@@ -1,0 +1,995 @@
+UNIVMAR — Feature Specification
+Stone Company Management Platform
+
+FEATURE: Sales, Quotation, Inventory & Order Management
+
+1. FEATURE OBJECTIVE
+
+This feature manages the complete commercial flow of a stone company, from the first customer request to the final delivery.
+
+Main business flow:
+
+Customer / Company
+→ Project
+→ Request for Quotation (RFQ)
+→ Quotation
+→ Customer Acceptance
+→ Order
+→ Stock Reservation
+→ Preparation
+→ Delivery
+→ Invoice / Payment
+
+The objective is to make UNIVMAR behave like a real stone-company management system rather than a simple e-commerce website.
+
+
+2. MAIN ACTORS
+
+Administrator
+- Manages users, roles, permissions and system configuration.
+- Has visibility over all business operations.
+
+Sales Agent
+- Manages customers and companies.
+- Receives quotation requests.
+- Creates and sends quotations.
+- Converts accepted quotations into orders.
+- Follows customer projects and negotiations.
+
+Inventory Manager
+- Manages stone inventory.
+- Records stock entries, adjustments and movements.
+- Manages slab, lot or bundle availability.
+- Confirms stock reservations and releases.
+
+Purchasing Manager
+- Manages suppliers.
+- Creates purchase orders.
+- Tracks incoming stone, slabs, bundles and materials.
+
+Customer
+- Browses available stones.
+- Creates quotation requests.
+- Follows quotations and orders.
+- Accepts or rejects quotations.
+- Accesses commercial documents.
+
+Manager
+- Monitors sales, stock, margins, quotations, orders and performance.
+
+
+3. CUSTOMER & COMPANY MANAGEMENT
+
+UNIVMAR must support both individual customers and professional companies.
+
+Customer information may include:
+- Name
+- Contact information
+- Billing information
+- Delivery addresses
+- Customer type: B2C or B2B
+- Company
+- Tax information
+- Payment terms
+- Assigned salesperson
+- Notes
+- Order history
+- Quotation history
+- Active projects
+
+A professional customer may have multiple contacts and multiple projects.
+
+
+4. PROJECT MANAGEMENT
+
+A customer can have one or more projects.
+
+Example:
+
+Customer:
+Atlas Construction
+
+Projects:
+- Marrakech Hotel
+- Rabat Villas
+- Casablanca Office Tower
+
+A project can contain:
+- Project name
+- Customer
+- Location
+- Project type
+- Architect / contractor information
+- Required materials
+- RFQs
+- Quotations
+- Orders
+- Documents
+- Delivery information
+- Notes
+- Status
+
+Possible project statuses:
+- LEAD
+- ACTIVE
+- ON_HOLD
+- COMPLETED
+- CANCELLED
+
+
+5. STONE CATALOG
+
+UNIVMAR must provide a structured stone catalog.
+
+A stone can contain:
+- Commercial name
+- Stone family
+- Material type
+- Origin
+- Color
+- Pattern / veining
+- Description
+- Thickness
+- Finish
+- Available formats
+- Applications
+- Technical information
+- Images
+- Status
+
+Example material types:
+- Marble
+- Granite
+- Travertine
+- Limestone
+- Quartzite
+- Onyx
+
+Example finishes:
+- Polished
+- Honed
+- Brushed
+- Leathered
+- Flamed
+- Sandblasted
+
+The catalog is connected to inventory, but catalog information and physical stock must remain separate concepts.
+
+
+6. INVENTORY MANAGEMENT
+
+UNIVMAR must manage physical stone inventory.
+
+Inventory can be managed by:
+- Material
+- Variant
+- Lot
+- Bundle
+- Slab
+
+For the first version, lot/bundle level can be the main stock unit.
+
+Inventory information:
+- Material
+- Finish
+- Thickness
+- Quantity
+- Unit
+- Warehouse
+- Rack / location
+- Supplier
+- Lot or bundle number
+- Purchase cost
+- Arrival date
+- Available quantity
+- Reserved quantity
+- Damaged quantity
+- Status
+
+Important stock values:
+
+On Hand:
+Physical quantity currently present.
+
+Reserved:
+Quantity already allocated to customer orders.
+
+Available:
+Quantity that can still be sold.
+
+Available = On Hand - Reserved
+
+
+7. SLAB / BUNDLE TRACKING
+
+For more advanced stone management, UNIVMAR can track individual slabs or bundles.
+
+Slab information:
+- Slab number
+- Bundle number
+- Material
+- Length
+- Width
+- Thickness
+- Surface area
+- Finish
+- Supplier
+- Cost
+- Warehouse location
+- Photo
+- Status
+- Associated customer/project
+
+Possible slab statuses:
+- AVAILABLE
+- HELD
+- RESERVED
+- SOLD
+- DAMAGED
+- CONSUMED
+
+
+8. REQUEST FOR QUOTATION (RFQ)
+
+Customers should be able to request a quotation instead of directly purchasing stone.
+
+An RFQ may contain:
+- Customer
+- Project
+- Requested material
+- Finish
+- Thickness
+- Quantity
+- Dimensions
+- Required service
+- Delivery location
+- Required date
+- Customer notes
+- Attachments
+
+RFQ statuses:
+- DRAFT
+- SUBMITTED
+- UNDER_REVIEW
+- QUOTED
+- CANCELLED
+
+Important rule:
+An RFQ does not reserve inventory.
+
+
+9. QUOTATION MANAGEMENT
+
+A Sales Agent reviews the RFQ and prepares a commercial quotation.
+
+Quotation information:
+- Quotation number
+- Customer
+- Project
+- Sales Agent
+- Creation date
+- Expiration date
+- Items
+- Unit prices
+- Quantities
+- Discounts
+- Taxes
+- Transport
+- Processing services
+- Payment conditions
+- Commercial notes
+- Total amount
+
+Quotation statuses:
+- DRAFT
+- SENT
+- ACCEPTED
+- REJECTED
+- EXPIRED
+- CANCELLED
+
+A sent quotation should not be silently overwritten.
+
+If pricing or quantities change after sending, the system can create a quotation revision.
+
+
+10. QUOTATION REVISION
+
+Example:
+
+Q-2026-0042
+Revision 1
+Revision 2
+Revision 3
+
+Each revision preserves:
+- Previous prices
+- Previous quantities
+- Previous terms
+- Date
+- Person who changed it
+
+This provides a complete commercial history.
+
+
+11. CUSTOMER QUOTATION ACCEPTANCE
+
+The customer can:
+- View quotation
+- Download quotation
+- Accept quotation
+- Reject quotation
+- Send a comment or negotiation request
+
+When a quotation is accepted, the system must:
+
+1. Verify quotation status.
+2. Verify that it has not expired.
+3. Check stock availability.
+4. Reserve required stock.
+5. Create an order.
+6. Link the order to the quotation.
+7. Mark the quotation as accepted.
+8. Record the operation in the audit history.
+
+One quotation should create only one order.
+
+
+12. ORDER MANAGEMENT
+
+An accepted quotation becomes a sales order.
+
+Order information:
+- Order number
+- Customer
+- Project
+- Source quotation
+- Order date
+- Items
+- Prices
+- Quantities
+- Reserved inventory
+- Delivery address
+- Payment status
+- Order status
+- Notes
+
+Recommended order statuses:
+- PENDING
+- CONFIRMED
+- PREPARING
+- READY
+- PARTIALLY_DELIVERED
+- DELIVERED
+- CANCELLED
+
+
+13. ORDER SNAPSHOT
+
+The order must preserve the commercial information that existed when it was created.
+
+For every order item, store the commercial snapshot:
+- Material name
+- Finish
+- Thickness
+- Quantity
+- Unit price
+- Discount
+- Tax
+- Total
+
+If catalog prices change later, old orders must remain unchanged.
+
+
+14. STOCK RESERVATION
+
+When an order is confirmed, inventory is reserved.
+
+Example:
+
+Travertine Beige
+
+On Hand: 240 m²
+Reserved: 80 m²
+Available: 160 m²
+
+New order requires:
+85 m²
+
+After reservation:
+
+On Hand: 240 m²
+Reserved: 165 m²
+Available: 75 m²
+
+The stone is physically still in the warehouse, therefore On Hand does not decrease until dispatch or delivery.
+
+
+15. INVENTORY RESERVATION RECORD
+
+Each reservation should be traceable.
+
+Reservation information:
+- Order
+- Inventory item
+- Quantity
+- Reservation date
+- Status
+
+Reservation statuses:
+- ACTIVE
+- RELEASED
+- CONSUMED
+
+This makes it possible to know exactly which order is consuming available stock.
+
+
+16. STOCK MOVEMENTS
+
+All physical inventory changes must be recorded.
+
+Movement types:
+- INITIAL_STOCK
+- PURCHASE_RECEIPT
+- STOCK_IN
+- STOCK_OUT
+- TRANSFER
+- ADJUSTMENT_IN
+- ADJUSTMENT_OUT
+- DAMAGE
+- RETURN
+- ORDER_DELIVERY
+
+Every movement contains:
+- Material
+- Quantity
+- Source
+- Destination
+- Reference
+- Reason
+- User
+- Date
+
+Stock should never be changed without traceability.
+
+
+17. ORDER CANCELLATION
+
+If an order is cancelled before the material leaves the warehouse:
+
+- Active reservations are released.
+- Reserved quantity decreases.
+- Available quantity increases.
+- The order is marked as cancelled.
+- The cancellation reason is recorded.
+
+The physical On Hand quantity remains unchanged.
+
+
+18. DELIVERY MANAGEMENT
+
+UNIVMAR should manage customer deliveries.
+
+Delivery information:
+- Order
+- Customer
+- Delivery address
+- Planned date
+- Actual date
+- Vehicle
+- Driver
+- Items
+- Quantity
+- Delivery status
+- Delivery note
+- Customer signature
+- Notes
+
+Delivery statuses:
+- PLANNED
+- PREPARING
+- DISPATCHED
+- DELIVERED
+- FAILED
+- CANCELLED
+
+When material physically leaves the warehouse:
+- On Hand decreases.
+- Reserved quantity decreases.
+- Reservation becomes consumed.
+
+
+19. SUPPLIER MANAGEMENT
+
+Supplier information:
+- Supplier name
+- Country
+- Contact information
+- Materials supplied
+- Price history
+- Payment conditions
+- Lead time
+- Notes
+- Purchase history
+
+A supplier may provide multiple materials, lots or bundles.
+
+
+20. PURCHASE ORDER MANAGEMENT
+
+When stock becomes low, the Purchasing Manager can create a purchase order.
+
+Purchase Order contains:
+- Supplier
+- Material
+- Quantity
+- Unit cost
+- Currency
+- Expected arrival
+- Transport cost
+- Taxes
+- Status
+
+Statuses:
+- DRAFT
+- SENT
+- CONFIRMED
+- PARTIALLY_RECEIVED
+- RECEIVED
+- CANCELLED
+
+Receiving the material creates stock movements and increases On Hand quantity.
+
+
+21. WAREHOUSE MANAGEMENT
+
+UNIVMAR should identify where physical stone is stored.
+
+Example:
+
+Main Warehouse
+→ Zone A
+→ Rack A12
+→ Bundle B-103
+
+Possible structure:
+- Warehouse
+- Zone
+- Rack
+- Position
+
+This helps workers quickly locate materials.
+
+
+22. QR / BARCODE MANAGEMENT
+
+Every slab, lot or bundle can have a QR code.
+
+Scanning the QR code can show:
+- Material
+- Slab/bundle number
+- Dimensions
+- Warehouse position
+- Availability
+- Current reservation
+- Customer/project
+- Photos
+- History
+
+This can later be used by warehouse workers with a phone.
+
+
+23. REMNANT / OFFCUT MANAGEMENT
+
+Stone left after cutting can still have commercial value.
+
+A remnant contains:
+- Parent slab
+- Material
+- Length
+- Width
+- Thickness
+- Surface area
+- Location
+- Photo
+- Status
+
+Possible uses:
+- Small countertops
+- Bathroom pieces
+- Stairs
+- Samples
+- Decorative pieces
+
+Tracking remnants reduces waste.
+
+
+24. SAMPLE MANAGEMENT
+
+Architects and customers frequently request samples.
+
+Sample information:
+- Material
+- Customer
+- Project
+- Sales Agent
+- Date sent
+- Quantity
+- Status
+- Return date
+- Notes
+
+Statuses:
+- AVAILABLE
+- REQUESTED
+- SENT
+- RETURNED
+- LOST
+- CONSUMED
+
+
+25. FABRICATION / PROCESSING SERVICES
+
+UNIVMAR can optionally support value-added stone services.
+
+Examples:
+- Cutting
+- Polishing
+- Honing
+- Edge finishing
+- Drilling
+- Sink cut-outs
+- Stairs
+- Custom dimensions
+
+These services can be added to quotations and orders.
+
+
+26. FABRICATION JOB
+
+For companies that cut and prepare stone, an order can generate a fabrication job.
+
+Possible flow:
+
+MEASUREMENT
+→ DRAWING
+→ MATERIAL_ALLOCATED
+→ CUTTING
+→ FINISHING
+→ QUALITY_CONTROL
+→ READY
+
+The fabrication job can reference:
+- Order
+- Stone/slabs
+- Measurements
+- Drawings
+- Required operations
+- Assigned workers
+- Planned dates
+- Actual completion date
+
+
+27. DOCUMENT MANAGEMENT
+
+Documents can be attached to:
+- Customer
+- Project
+- RFQ
+- Quotation
+- Order
+- Purchase Order
+- Delivery
+- Fabrication Job
+
+Examples:
+- Plans
+- Technical drawings
+- Signed quotations
+- Purchase orders
+- Delivery notes
+- Invoices
+- Stone technical sheets
+- Site photos
+
+
+28. INVOICE MANAGEMENT
+
+An order can generate one or more invoices.
+
+Invoice information:
+- Customer
+- Order
+- Invoice number
+- Items
+- Taxes
+- Discounts
+- Total
+- Amount paid
+- Remaining balance
+- Due date
+- Payment status
+
+Payment statuses:
+- UNPAID
+- PARTIALLY_PAID
+- PAID
+- OVERDUE
+- REFUNDED
+
+
+29. PAYMENT MANAGEMENT
+
+The platform should support:
+- Deposit
+- Partial payment
+- Final payment
+- Refund
+- Payment reference
+- Payment method
+- Payment date
+
+Example:
+
+Order total: 50,000 MAD
+Deposit: 15,000 MAD
+Remaining: 35,000 MAD
+
+
+30. COST & MARGIN MANAGEMENT
+
+For each sale, UNIVMAR can calculate:
+
+Revenue
+- Stone purchase cost
+- Transport cost
+- Processing cost
+- Delivery cost
+- Other expenses
+= Gross margin
+
+This information should normally be visible only to authorized employees.
+
+
+31. DAMAGE & BREAKAGE MANAGEMENT
+
+Stone can be damaged:
+- During transport
+- In the warehouse
+- During handling
+- During fabrication
+- During installation
+
+The system should record:
+- Material/slab
+- Quantity
+- Reason
+- Photo
+- Responsible operation
+- Cost impact
+- Date
+
+Damaged stock must no longer appear as normal available stock.
+
+
+32. RETURNS
+
+If a customer returns material:
+
+- Create return record.
+- Inspect returned material.
+- Decide whether it can return to available inventory.
+- Create the required stock movement.
+- Update payment or credit information.
+
+
+33. SALES PIPELINE / CRM
+
+Sales Agents can manage opportunities.
+
+Example pipeline:
+
+NEW_LEAD
+→ CONTACTED
+→ MATERIAL_SELECTED
+→ RFQ_RECEIVED
+→ QUOTE_SENT
+→ NEGOTIATION
+→ WON
+or
+→ LOST
+
+Opportunity information:
+- Customer
+- Project
+- Estimated value
+- Expected quantity
+- Interested materials
+- Sales Agent
+- Next action
+- Expected closing date
+
+
+34. ACTIVITY / AUDIT HISTORY
+
+Important operations must be traceable.
+
+Examples:
+- Customer created
+- RFQ submitted
+- Quote created
+- Quote sent
+- Quote accepted
+- Price changed
+- Order confirmed
+- Stock reserved
+- Reservation released
+- Material dispatched
+- Payment registered
+
+Audit information:
+- User
+- Action
+- Entity
+- Date
+- Previous value
+- New value
+
+
+35. NOTIFICATIONS
+
+Useful notifications:
+- New RFQ received
+- Quote about to expire
+- Quotation accepted
+- New order
+- Stock below threshold
+- Order ready
+- Delivery scheduled
+- Payment overdue
+- Purchase order received
+
+
+36. DASHBOARD
+
+Management dashboard can display:
+
+Sales:
+- Revenue
+- Orders
+- Average order value
+- Sales by month
+
+Quotations:
+- Quotes sent
+- Accepted quotes
+- Rejected quotes
+- Expiring quotes
+- Conversion rate
+
+Inventory:
+- Total inventory value
+- Available stock
+- Reserved stock
+- Low-stock materials
+- Damaged stock
+- Slow-moving stock
+
+Customers:
+- Top customers
+- New customers
+- Active projects
+
+Materials:
+- Best-selling stone
+- Most-requested material
+- Stock turnover
+
+Operations:
+- Orders preparing
+- Orders ready
+- Deliveries due
+- Delayed orders
+
+
+37. RECOMMENDED UNIVMAR V1
+
+The first serious version should include:
+
+1. Authentication & Roles
+2. Customers / Companies
+3. Projects
+4. Stone Catalog
+5. Inventory
+6. Lots / Bundles
+7. Suppliers
+8. Purchase Orders
+9. RFQ
+10. Quotations
+11. Quotation Revisions
+12. Orders
+13. Inventory Reservations
+14. Stock Movements
+15. Deliveries
+16. Invoices
+17. Payments
+18. Documents
+19. Audit History
+20. Dashboard
+
+
+38. RECOMMENDED UNIVMAR V2
+
+After V1 is stable:
+
+1. Individual Slab Tracking
+2. Slab Photos
+3. QR / Barcode Labels
+4. Samples
+5. Remnants / Offcuts
+6. Fabrication Jobs
+7. Measurements
+8. Technical Drawings
+9. Cutting / Processing Workflow
+10. Installation Scheduling
+11. Vehicle / Driver Management
+12. Advanced Margin Analytics
+13. Customer Portal
+14. Supplier Portal
+
+
+39. CORE BUSINESS FLOW
+
+The central UNIVMAR workflow should be:
+
+STONE CATALOG
+     ↓
+CUSTOMER / COMPANY
+     ↓
+PROJECT
+     ↓
+RFQ
+     ↓
+QUOTATION
+     ↓
+NEGOTIATION / REVISION
+     ↓
+ACCEPTED QUOTATION
+     ↓
+ORDER
+     ↓
+STOCK RESERVATION
+     ↓
+PREPARATION / FABRICATION
+     ↓
+DELIVERY
+     ↓
+INVOICE
+     ↓
+PAYMENT
+
+
+40. FINAL PRODUCT POSITIONING
+
+UNIVMAR should be designed as:
+
+Stone Industry ERP
++
+CRM
++
+Inventory Management
++
+B2B Sales Platform
++
+Order & Delivery Management
+
+The strongest part of the project should be the connection between commercial operations and physical stone inventory.
+
+A quotation should not exist independently from stock.
+An order should not exist independently from inventory reservation.
+A delivery should affect physical inventory.
+A cancellation should release reserved inventory.
+A purchase receipt should increase inventory.
+Every important operation should be traceable.
+
+This makes UNIVMAR a realistic stone-company management platform instead of a generic CRUD or e-commerce application.

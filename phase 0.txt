@@ -1,0 +1,91 @@
+UNIVMAR — PHASE 0 EXPLANATION
+
+Phase 0 is the project foundation. It does not build the stone catalogue,
+inventory, suppliers, customers, quotations, or orders yet. Its job is to make
+all later phases consistent, secure, and easy to extend.
+
+WHAT WAS DONE
+
+1. Backend foundation
+
+- Created the Spring Boot application entry point.
+- Configured PostgreSQL as the Docker database and H2 as a lightweight local
+  fallback configuration.
+- Added Flyway migration V1. It creates the initial app_user table. Future
+  database changes must be new Flyway migrations, never manual schema edits.
+- Added one standard success-response format:
+  { data, timestamp, requestId }
+- Added one standard error-response format:
+  { code, message, fields, timestamp, requestId }
+- Added request IDs and structured log output, making errors traceable.
+- Configured validation for incoming API requests.
+- Set persisted timestamps to UTC. The configured business zone remains
+  Africa/Casablanca for future business-facing dates and times.
+- Established the API prefix: /api/v1.
+- Documented the pagination convention for future list endpoints:
+  page, size, and sort query parameters.
+
+2. Authentication and security
+
+
+- Added the User model and roles needed by the future platform.
+- Added a bootstrap administrator. It is created only when the administrator email and password environment variables are configured.
+- Added POST /api/v1/auth/login. It validates the email and password and returns a short-lived JWT access token.
+- Added GET /api/v1/auth/me. It returns the signed-in user.
+- Added JWT validation for protected API routes.
+- Public endpoints are limited to login, health, and API documentation.
+- Added configurable CORS origins for the frontend.
+
+
+3. Frontend foundation
+
+- Rebuilt the dashboard shell as a real application rather than a static mock.
+- Added a login screen that calls the backend API.
+- Stored the access token locally and restores the signed-in session by calling
+  /auth/me when the application opens.
+- Added protected routes: users without a valid session are sent to login.
+- Added logout, responsive sidebar navigation, header, and placeholders for:
+  Dashboard, Catalog, Inventory, Customers, Suppliers, Sales, Orders, and
+  Deliveries.
+- Added reusable UI foundations: button/loading state, text field/validation
+  display, modal, table wrapper, error messages, and toast notifications.
+- Added a small browser-history router without adding a new dependency.
+
+4. Local environment and Docker
+
+- Added Docker services for PostgreSQL, the Spring API, and the React web app.
+- The web application proxies /api requests to the API container.
+- Added .env.example for local credentials and secrets.
+- Added .gitignore rules so .env, upload data, build output, and node_modules
+  are not committed.
+- Updated README.md with setup instructions and the project conventions.
+
+USER FLOW AVAILABLE NOW
+
+1. Start the Docker environment.
+2. Open the dashboard in a browser.
+3. Log in with the configured administrator account.
+4. See the protected dashboard.
+5. Navigate to the planned workspace sections.
+6. Log out.
+
+WHAT IS NOT IN PHASE 0
+
+- Creating, editing, searching, or listing stone materials.
+- Stone variants, images, stock quantities, warehouses, or movements.
+- Suppliers, customers, projects, RFQs, quotations, orders, deliveries, or
+  invoices.
+
+Those are business features and begin with Phase 1: Stone Catalog.
+
+FINAL VERIFICATION STILL NEEDED
+
+The code and Docker configuration were created, but this workspace did not
+have Docker, Node/npm, or Maven installed. Run the following on a machine with
+Docker to verify the final Phase 0 checklist:
+
+  cp .env.example .env
+  docker compose up --build
+
+Then open http://localhost:5173, log in, navigate between sections, log out,
+and confirm that http://localhost:8080/actuator/health reports UP.

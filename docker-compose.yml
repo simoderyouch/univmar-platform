@@ -1,59 +1,43 @@
 services:
-  postgres:
+  db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: univmar
-      POSTGRES_USER: univmar
-      POSTGRES_PASSWORD: univmar
+      POSTGRES_DB: ${POSTGRES_DB:-univmar}
+      POSTGRES_USER: ${POSTGRES_USER:-univmar}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-univmar_local_password}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U univmar -d univmar"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 10
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+
   api:
     build: ./backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/univmar
-      SPRING_DATASOURCE_USERNAME: univmar
-      SPRING_DATASOURCE_PASSWORD: univmar
-      UNIVMAR_STORAGE_ROOT: /app/data/uploads
-      UNIVMAR_PUBLIC_API_URL: http://localhost:8080/api/v1
-      UNIVMAR_INITIAL_ADMIN_EMAIL: ${UNIVMAR_INITIAL_ADMIN_EMAIL:-}
-      UNIVMAR_INITIAL_ADMIN_PASSWORD: ${UNIVMAR_INITIAL_ADMIN_PASSWORD:-}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-univmar}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-univmar}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-univmar_local_password}
+      UNIVMAR_JWT_SECRET: ${UNIVMAR_JWT_SECRET:-local-development-secret-change-before-production-2026}
+      UNIVMAR_INITIAL_ADMIN_EMAIL: ${UNIVMAR_INITIAL_ADMIN_EMAIL:-admin@univmar.local}
+      UNIVMAR_INITIAL_ADMIN_PASSWORD: ${UNIVMAR_INITIAL_ADMIN_PASSWORD:-ChangeMe123!}
+      UNIVMAR_CORS_ALLOWED_ORIGINS: ${UNIVMAR_CORS_ALLOWED_ORIGINS:-http://localhost:5173}
     ports:
       - "8080:8080"
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
-    volumes:
-      - platform_media:/app/data/uploads
+
   web:
     build: ./frontend
     ports:
       - "5173:80"
-    volumes:
-      # Shared brand asset only. Product and project media remain private to
-      # the landing service and are never copied into the dashboard image.
-      - ./landing/private-assets/site/brand:/usr/share/nginx/html/brand:ro
     depends_on:
-      - api
-  landing:
-    build: ./landing
-    environment:
-      UNIVMAR_API_URL: http://api:8080/api/v1
-      NEXT_PUBLIC_SITE_URL: http://localhost:3000
-    ports:
-      - "3000:3000"
-    volumes:
-      # Private local media is mounted only when the site runs. It is neither
-      # committed to Git nor copied into the public landing image.
-      - ./landing/private-assets:/app/public:ro
-    depends_on:
-      - api
+      api:
+        condition: service_started
+
 volumes:
   postgres_data:
-  platform_media:

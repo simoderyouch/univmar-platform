@@ -1,72 +1,53 @@
 package com.univmar.user.domain;
 
-import com.univmar.shared.domain.BaseEntity;
 import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.UUID;
 
 @Entity
-@Table(name = "app_users")
-public class User extends BaseEntity {
+@Table(name = "app_user")
+public class User {
+    @Id
+    private UUID id;
+
     @Column(nullable = false, unique = true, length = 320)
     private String email;
-    @Column(nullable = false)
-    private String passwordHash;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 32)
-    private Role role;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 32)
-    private AccountStatus status = AccountStatus.ACTIVE;
 
-    protected User() {
-    }
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 40)
+    private Role role;
+
+    @Column(nullable = false)
+    private boolean active = true;
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    protected User() { }
 
     public User(String email, String passwordHash, Role role) {
+        this.id = UUID.randomUUID();
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
+        this.active = true;
     }
 
-    public String getEmail() {
-        return email;
-    }
+    @PrePersist
+    void onCreate() { createdAt = updatedAt = Instant.now(); }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
+    @PreUpdate
+    void onUpdate() { updatedAt = Instant.now(); }
 
-    public Role getRole() {
-        return role;
-    }
-
-    public AccountStatus getStatus() {
-        return status;
-    }
-
-    public void disable() {
-        status = AccountStatus.DISABLED;
-    }
-
-    public void enable() {
-        status = AccountStatus.ACTIVE;
-    }
-
-    public void markPending() {
-        status = AccountStatus.PENDING;
-    }
-
-    public void lock() {
-        status = AccountStatus.LOCKED;
-    }
-
-    public void updateStatus(AccountStatus status) {
-        this.status = status;
-    }
-
-    public void changeRole(Role role) {
-        this.role = role;
-    }
-
-    public void changePassword(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
+    public UUID getId() { return id; }
+    public String getEmail() { return email; }
+    public String getPasswordHash() { return passwordHash; }
+    public Role getRole() { return role; }
+    public boolean isActive() { return active; }
 }
