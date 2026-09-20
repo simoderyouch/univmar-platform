@@ -36,7 +36,9 @@ public class InventoryService {
     public LocationResponse createLocation(UUID warehouseId, LocationInput input) { Warehouse warehouse = warehouseEntity(warehouseId); String code = upper(input.code()); locations.findByWarehouseIdAndCodeIgnoreCase(warehouseId, code).ifPresent(existing -> { throw conflict("DUPLICATE_LOCATION_CODE", "This warehouse already has a location with this code."); }); return location(locations.save(new WarehouseLocation(warehouse, code, trim(input.zone())))); }
     public LocationResponse updateLocation(UUID warehouseId, UUID locationId, LocationInput input) { WarehouseLocation location = locationEntity(warehouseId, locationId); String code = upper(input.code()); locations.findByWarehouseIdAndCodeIgnoreCase(warehouseId, code).filter(existing -> !existing.getId().equals(locationId)).ifPresent(existing -> { throw conflict("DUPLICATE_LOCATION_CODE", "This warehouse already has a location with this code."); }); location.update(code, trim(input.zone())); return location(location); }
 
-    public InventorySummary receive(ReceiptInput input) {
+    public InventorySummary receive(ReceiptInput input) { return receive(input, null, null); }
+    public InventorySummary receivePurchaseOrder(ReceiptInput input, String purchaseOrderNumber, String supplierName) { return receive(input, purchaseOrderNumber, supplierName); }
+    private InventorySummary receive(ReceiptInput input, String purchaseOrderNumber, String receiptSupplierName) {
         StoneVariant variant = variants.findById(input.variantId()).orElseThrow(() -> notFound("VARIANT_NOT_FOUND", "Material variant was not found."));
         Warehouse warehouse = warehouseEntity(input.warehouseId());
         WarehouseLocation location = locationEntity(warehouse.getId(), input.locationId());
@@ -50,7 +52,7 @@ public class InventoryService {
         }
         item.receive(input.quantityM2());
         items.save(item);
-        movements.save(new StockMovement(item, type, input.quantityM2(), type == MovementType.INITIAL_STOCK ? "Initial stock recorded" : "Stock received", trim(input.comment()), Instant.now()));
+        movements.save(new StockMovement(item, type, input.quantityM2(), type == MovementType.INITIAL_STOCK ? "Initial stock recorded" : "Stock received", trim(input.comment()), Instant.now(), purchaseOrderNumber, receiptSupplierName));
         return inventory(item);
     }
 
@@ -98,7 +100,7 @@ public class InventoryService {
     private WarehouseResponse warehouse(Warehouse item) { return new WarehouseResponse(item.getId(), item.getCode(), item.getName(), item.isActive()); }
     private LocationResponse location(WarehouseLocation item) { return new LocationResponse(item.getId(), item.getWarehouse().getId(), item.getCode(), item.getZone(), item.isActive()); }
     private InventorySummary inventory(InventoryItem item) { StoneVariant variant = item.getVariant(); var material = variant.getMaterial(); return new InventorySummary(item.getId(), variant.getId(), material.getId(), material.getName(), material.getSku(), material.getMainImageUrl(), variant.getThicknessMm(), variant.getFinish(), variant.getFormat(), item.getLotNumber(), item.getBundleNumber(), warehouse(item.getWarehouse()), location(item.getLocation()), item.getOnHandM2(), item.getReservedM2(), item.getDamagedM2(), item.getAvailableM2(), item.getCostPerM2(), item.getSupplierName(), item.getArrivalDate()); }
-    private MovementResponse movement(StockMovement item) { return new MovementResponse(item.getId(), item.getType(), item.getQuantityM2(), item.getReason(), item.getComment(), item.getOccurredAt()); }
+    private MovementResponse movement(StockMovement item) { return new MovementResponse(item.getId(), item.getType(), item.getQuantityM2(), item.getReason(), item.getComment(), item.getOccurredAt(), item.getSourceReference(), item.getSourceSupplier()); }
     private ApiException notFound(String code, String message) { return new ApiException(HttpStatus.NOT_FOUND, code, message); }
     private ApiException conflict(String code, String message) { return new ApiException(HttpStatus.CONFLICT, code, message); }
     private String trim(String value) { return value == null || value.isBlank() ? null : value.trim(); }
