@@ -6,5 +6,7 @@ public enum MovementType {
     ADJUSTMENT_IN,
     ADJUSTMENT_OUT,
     DAMAGE,
-    RETURN
+    RETURN,
+    ORDER_RESERVATION,
+    ORDER_RESERVATION_RELEASE
 }

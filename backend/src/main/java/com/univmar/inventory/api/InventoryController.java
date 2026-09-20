@@ -30,5 +30,6 @@ public class InventoryController {
     @GetMapping("/inventory/{id}") public ApiResponse<InventoryDetail> detail(@PathVariable UUID id, HttpServletRequest request) { return ok(inventory.detail(id), request); }
     @PostMapping("/inventory/{id}/adjustments") public ApiResponse<InventorySummary> adjust(@PathVariable UUID id, @Valid @RequestBody AdjustmentInput input, HttpServletRequest request) { return ok(inventory.adjust(id, input), request); }
     @GetMapping("/inventory/material-summary") public ApiResponse<List<MaterialInventorySummary>> materialSummary(@RequestParam UUID materialId, HttpServletRequest request) { return ok(inventory.materialSummary(materialId), request); }
+    @GetMapping("/inventory/variant-availability") public ApiResponse<java.math.BigDecimal> variantAvailability(@RequestParam UUID variantId, HttpServletRequest request) { return ok(inventory.availableForVariant(variantId), request); }
     private <T> ApiResponse<T> ok(T data, HttpServletRequest request) { return ApiResponse.of(data, (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)); }
 }
