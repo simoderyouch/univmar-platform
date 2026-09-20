@@ -1,0 +1,4 @@
+create table customer (id uuid primary key,type varchar(20) not null,name varchar(180) not null,company_name varchar(180),email varchar(180),phone varchar(60),notes text,active boolean not null default true,created_at timestamp with time zone not null,updated_at timestamp with time zone not null);
+create index idx_customer_name on customer(name); create index idx_customer_type on customer(type);
+create table customer_contact (id uuid primary key,customer_id uuid not null references customer(id),name varchar(160) not null,role varchar(120),email varchar(180),phone varchar(60));
+create table customer_address (id uuid primary key,customer_id uuid not null references customer(id),label varchar(40) not null,line1 varchar(160) not null,line2 varchar(160),city varchar(100),country varchar(100),postal_code varchar(30));
