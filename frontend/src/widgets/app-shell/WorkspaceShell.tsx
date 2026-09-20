@@ -7,6 +7,7 @@ import { CustomersPage } from "../../features/customer";
 import { DashboardPage } from "../../features/dashboard";
 import { InventoryPage } from "../../features/inventory";
 import { PurchasingPage } from "../../features/purchasing";
+import { ProjectsPage } from "../../features/project";
 import { PlaceholderPage } from "../../features/workspace";
 import { workspaceNavigation, type NavigationEntry } from "./navigation";
 
@@ -48,6 +49,8 @@ export function WorkspaceShell() {
           ? <PurchasingPage />
           : path === "/customers"
             ? <CustomersPage />
+            : path === "/projects"
+              ? <ProjectsPage />
         : <PlaceholderPage title={title} />;
 
   const sidebar = (

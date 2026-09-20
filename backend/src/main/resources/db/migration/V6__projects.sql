@@ -1,0 +1,2 @@
+create table customer_project (id uuid primary key,customer_id uuid not null references customer(id),name varchar(180) not null,location varchar(180),project_type varchar(80),description text,estimated_value numeric(14,2),start_date date,required_delivery_date date,assigned_sales_agent varchar(180),status varchar(20) not null,notes text,created_at timestamp with time zone not null,updated_at timestamp with time zone not null);
+create index idx_project_customer on customer_project(customer_id); create index idx_project_status on customer_project(status);
