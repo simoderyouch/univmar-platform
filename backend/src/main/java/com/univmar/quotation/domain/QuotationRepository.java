@@ -1,0 +1,1 @@
+package com.univmar.quotation.domain; import java.util.*; import org.springframework.data.jpa.repository.*; public interface QuotationRepository extends JpaRepository<Quotation,UUID>,JpaSpecificationExecutor<Quotation>{}

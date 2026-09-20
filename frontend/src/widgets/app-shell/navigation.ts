@@ -13,6 +13,7 @@ export const workspaceNavigation: NavigationEntry[] = [
   { label: "Customers", to: "/customers", icon: Users },
   { label: "Projects", to: "/projects", icon: FolderKanban },
   { label: "RFQs", to: "/rfqs", icon: ScrollText },
+  { label: "Quotations", to: "/quotations", icon: FileText },
   { label: "Suppliers", to: "/suppliers", icon: Handshake },
   { label: "Sales", to: "/sales", icon: FileText },
   { label: "Orders", to: "/orders", icon: ClipboardList },
