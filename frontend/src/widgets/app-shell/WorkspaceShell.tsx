@@ -3,9 +3,11 @@ import { Bell, ChevronRight, LogOut, Menu, X } from "lucide-react";
 import { Redirect, useRouter } from "../../app/providers/router";
 import { useAuth } from "../../features/auth/AuthProvider";
 import { CatalogPage } from "../../features/catalog";
+import { CustomersPage } from "../../features/customer";
 import { DashboardPage } from "../../features/dashboard";
 import { InventoryPage } from "../../features/inventory";
 import { PurchasingPage } from "../../features/purchasing";
+import { ProjectsPage } from "../../features/project";
 import { PlaceholderPage } from "../../features/workspace";
 import { workspaceNavigation, type NavigationEntry } from "./navigation";
 
@@ -45,7 +47,11 @@ export function WorkspaceShell() {
         ? <InventoryPage />
         : path === "/suppliers"
           ? <PurchasingPage />
-          : <PlaceholderPage title={title} />;
+          : path === "/customers"
+            ? <CustomersPage />
+            : path === "/projects"
+              ? <ProjectsPage />
+        : <PlaceholderPage title={title} />;
 
   const sidebar = (
     <>
