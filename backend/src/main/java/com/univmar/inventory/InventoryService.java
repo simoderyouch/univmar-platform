@@ -85,6 +85,7 @@ public class InventoryService {
 
     @Transactional(readOnly = true) public InventoryDetail detail(UUID id) { InventoryItem item = item(id); return new InventoryDetail(inventory(item), movements.findAllByInventoryItemIdOrderByOccurredAtDesc(id).stream().map(this::movement).toList()); }
     @Transactional(readOnly = true) public List<MaterialInventorySummary> materialSummary(UUID materialId) { return items.findAll().stream().filter(item -> item.getVariant().getMaterial().getId().equals(materialId)).collect(java.util.stream.Collectors.groupingBy(InventoryItem::getVariant)).entrySet().stream().map(entry -> new MaterialInventorySummary(entry.getKey().getId(), entry.getKey().getThicknessMm(), entry.getKey().getFinish(), entry.getKey().getFormat(), entry.getValue().stream().map(InventoryItem::getAvailableM2).reduce(BigDecimal.ZERO, BigDecimal::add))).sorted(Comparator.comparing(MaterialInventorySummary::thicknessMm)).toList(); }
+    @Transactional(readOnly = true) public BigDecimal availableForVariant(UUID variantId) { return items.findAll().stream().filter(item -> item.getVariant().getId().equals(variantId)).map(InventoryItem::getAvailableM2).reduce(BigDecimal.ZERO, BigDecimal::add); }
 
     private Specification<InventoryItem> specification(String search, String lot, String bundle, UUID warehouseId) { return (root, query, cb) -> {
         List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
