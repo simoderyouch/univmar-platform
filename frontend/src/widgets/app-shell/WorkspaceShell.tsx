@@ -5,6 +5,7 @@ import { useAuth } from "../../features/auth/AuthProvider";
 import { CatalogPage } from "../../features/catalog";
 import { DashboardPage } from "../../features/dashboard";
 import { InventoryPage } from "../../features/inventory";
+import { PurchasingPage } from "../../features/purchasing";
 import { PlaceholderPage } from "../../features/workspace";
 import { workspaceNavigation, type NavigationEntry } from "./navigation";
 
@@ -42,7 +43,9 @@ export function WorkspaceShell() {
       ? <CatalogPage />
       : path === "/inventory"
         ? <InventoryPage />
-        : <PlaceholderPage title={title} />;
+        : path === "/suppliers"
+          ? <PurchasingPage />
+          : <PlaceholderPage title={title} />;
 
   const sidebar = (
     <>
