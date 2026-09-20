@@ -1,12 +1,13 @@
 export type Finish = "POLISHED" | "HONED" | "BRUSHED" | "LEATHERED" | "FLAMED" | "SANDBLASTED" | "OTHER";
-export type MovementType = "INITIAL_STOCK" | "PURCHASE_RECEIPT" | "ADJUSTMENT_IN" | "ADJUSTMENT_OUT" | "DAMAGE" | "RETURN";
+export type MovementType = "INITIAL_STOCK" | "PURCHASE_RECEIPT" | "ADJUSTMENT_IN" | "ADJUSTMENT_OUT" | "DAMAGE" | "RETURN" | "ORDER_RESERVATION" | "ORDER_RESERVATION_RELEASE";
 export type Warehouse = { id: string; code: string; name: string; active: boolean };
 export type ReceiptType = "INITIAL_STOCK" | "PURCHASE_RECEIPT";
 export type Location = { id: string; warehouseId: string; code: string; zone?: string; active: boolean };
 export type Totals = { onHandM2: number; reservedM2: number; damagedM2: number; availableM2: number };
 export type InventoryItem = { id: string; variantId: string; materialId: string; materialName: string; materialSku: string; mainImageUrl?: string; thicknessMm: number; finish: Finish; format?: string; lotNumber?: string; bundleNumber?: string; warehouse: Warehouse; location: Location; onHandM2: number; reservedM2: number; damagedM2: number; availableM2: number; costPerM2?: number; supplierName?: string; arrivalDate?: string };
 export type StockMovement = { id: string; type: MovementType; quantityM2: number; reason: string; comment?: string; occurredAt: string; sourceReference?: string; sourceSupplier?: string };
-export type InventoryDetail = { inventory: InventoryItem; movements: StockMovement[] };
+export type ActiveReservation = { id: string; orderNumber: string; quantityM2: number };
+export type InventoryDetail = { inventory: InventoryItem; movements: StockMovement[]; reservations: ActiveReservation[] };
 export type InventoryPageResult = { content: InventoryItem[]; page: number; size: number; totalElements: number; totalPages: number; totals: Totals };
 export type MaterialVariant = { id: string; thicknessMm: number; finish: Finish; format?: string; active: boolean };
 export type Material = { id: string; name: string; sku: string; variants: MaterialVariant[] };

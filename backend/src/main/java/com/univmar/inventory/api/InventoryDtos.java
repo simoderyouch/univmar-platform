@@ -23,7 +23,8 @@ public final class InventoryDtos {
     public record AdjustmentInput(@NotNull MovementType type, @NotNull @DecimalMin(value = "0.001") BigDecimal quantityM2, @NotBlank @Size(max = 500) String reason, @Size(max = 2000) String comment) { }
     public record InventorySummary(UUID id, UUID variantId, UUID materialId, String materialName, String materialSku, String mainImageUrl, BigDecimal thicknessMm, Finish finish, String format, String lotNumber, String bundleNumber, WarehouseResponse warehouse, LocationResponse location, BigDecimal onHandM2, BigDecimal reservedM2, BigDecimal damagedM2, BigDecimal availableM2, BigDecimal costPerM2, String supplierName, LocalDate arrivalDate) { }
     public record MovementResponse(UUID id, MovementType type, BigDecimal quantityM2, String reason, String comment, Instant occurredAt, String sourceReference, String sourceSupplier) { }
-    public record InventoryDetail(InventorySummary inventory, List<MovementResponse> movements) { }
+    public record ActiveReservation(UUID id, String orderNumber, BigDecimal quantityM2) { }
+    public record InventoryDetail(InventorySummary inventory, List<MovementResponse> movements, List<ActiveReservation> reservations) { }
     public record Totals(BigDecimal onHandM2, BigDecimal reservedM2, BigDecimal damagedM2, BigDecimal availableM2) { }
     public record InventoryPage(List<InventorySummary> content, int page, int size, long totalElements, int totalPages, Totals totals) {
         public static InventoryPage from(Page<InventorySummary> page, Totals totals) { return new InventoryPage(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages(), totals); }

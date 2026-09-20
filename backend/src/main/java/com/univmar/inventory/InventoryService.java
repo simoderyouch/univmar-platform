@@ -5,6 +5,8 @@ import com.univmar.catalog.domain.StoneVariantRepository;
 import com.univmar.common.api.ApiException;
 import com.univmar.inventory.api.InventoryDtos.*;
 import com.univmar.inventory.domain.*;
+import com.univmar.order.domain.InventoryReservationRepository;
+import com.univmar.order.domain.ReservationStatus;
 import jakarta.persistence.criteria.Join;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -24,9 +26,10 @@ public class InventoryService {
     private final InventoryItemRepository items;
     private final StockMovementRepository movements;
     private final StoneVariantRepository variants;
+    private final InventoryReservationRepository reservations;
 
-    public InventoryService(WarehouseRepository warehouses, WarehouseLocationRepository locations, InventoryItemRepository items, StockMovementRepository movements, StoneVariantRepository variants) {
-        this.warehouses = warehouses; this.locations = locations; this.items = items; this.movements = movements; this.variants = variants;
+    public InventoryService(WarehouseRepository warehouses, WarehouseLocationRepository locations, InventoryItemRepository items, StockMovementRepository movements, StoneVariantRepository variants, InventoryReservationRepository reservations) {
+        this.warehouses = warehouses; this.locations = locations; this.items = items; this.movements = movements; this.variants = variants; this.reservations = reservations;
     }
 
     @Transactional(readOnly = true) public List<WarehouseResponse> warehouses() { return warehouses.findAll().stream().sorted(Comparator.comparing(Warehouse::getName)).map(this::warehouse).toList(); }
@@ -83,7 +86,7 @@ public class InventoryService {
         return InventoryPage.from(page, new Totals(onHand, reserved, damaged, available));
     }
 
-    @Transactional(readOnly = true) public InventoryDetail detail(UUID id) { InventoryItem item = item(id); return new InventoryDetail(inventory(item), movements.findAllByInventoryItemIdOrderByOccurredAtDesc(id).stream().map(this::movement).toList()); }
+    @Transactional(readOnly = true) public InventoryDetail detail(UUID id) { InventoryItem item = item(id); return new InventoryDetail(inventory(item), movements.findAllByInventoryItemIdOrderByOccurredAtDesc(id).stream().map(this::movement).toList(), reservations.findAllByInventoryItemIdAndStatus(id, ReservationStatus.ACTIVE).stream().map(reservation -> new ActiveReservation(reservation.getId(), reservation.getOrderItem().getOrder().getNumber(), reservation.getQuantityM2())).toList()); }
     @Transactional(readOnly = true) public List<MaterialInventorySummary> materialSummary(UUID materialId) { return items.findAll().stream().filter(item -> item.getVariant().getMaterial().getId().equals(materialId)).collect(java.util.stream.Collectors.groupingBy(InventoryItem::getVariant)).entrySet().stream().map(entry -> new MaterialInventorySummary(entry.getKey().getId(), entry.getKey().getThicknessMm(), entry.getKey().getFinish(), entry.getKey().getFormat(), entry.getValue().stream().map(InventoryItem::getAvailableM2).reduce(BigDecimal.ZERO, BigDecimal::add))).sorted(Comparator.comparing(MaterialInventorySummary::thicknessMm)).toList(); }
     @Transactional(readOnly = true) public BigDecimal availableForVariant(UUID variantId) { return items.findAll().stream().filter(item -> item.getVariant().getId().equals(variantId)).map(InventoryItem::getAvailableM2).reduce(BigDecimal.ZERO, BigDecimal::add); }
 
