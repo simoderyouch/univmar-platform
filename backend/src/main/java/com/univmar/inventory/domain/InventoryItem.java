@@ -39,6 +39,10 @@ public class InventoryItem {
         if (reservedM2.compareTo(quantity) < 0) throw new IllegalArgumentException("Reservation release exceeds reserved quantity.");
         reservedM2 = reservedM2.subtract(quantity);
     }
+    public void deliverReserved(BigDecimal quantity) {
+        if (reservedM2.compareTo(quantity) < 0 || onHandM2.compareTo(quantity) < 0) throw new IllegalArgumentException("Delivery exceeds reserved stock.");
+        onHandM2 = onHandM2.subtract(quantity); reservedM2 = reservedM2.subtract(quantity);
+    }
     private void requireAvailable(BigDecimal quantity) { if (availableM2().compareTo(quantity) < 0) throw new IllegalArgumentException("Insufficient available quantity."); }
     public BigDecimal availableM2() { return onHandM2.subtract(reservedM2).subtract(damagedM2); }
     @PrePersist void createTimestamp() { createdAt = updatedAt = Instant.now(); }

@@ -35,6 +35,9 @@ public class SalesOrder {
     public void addItem(SalesOrderItem item) { items.add(item); }
     public void event(String type, String message) { events.add(new OrderEvent(this, type, message)); }
     public void confirm() { status = OrderStatus.CONFIRMED; confirmedAt = Instant.now(); event("ORDER_CONFIRMED", "Order confirmed"); }
+    public void preparing() { if (status == OrderStatus.CONFIRMED) { status = OrderStatus.PREPARING; event("ORDER_PREPARING", "Order preparation started"); } }
+    public void partiallyDelivered() { if (status != OrderStatus.DELIVERED && status != OrderStatus.CANCELLED) { status = OrderStatus.PARTIALLY_DELIVERED; event("ORDER_PARTIALLY_DELIVERED", "Part of the order has been dispatched"); } }
+    public void delivered() { status = OrderStatus.DELIVERED; event("ORDER_DELIVERED", "All order stock delivered"); }
     public void cancel() { status = OrderStatus.CANCELLED; cancelledAt = Instant.now(); event("ORDER_CANCELLED", "Order cancelled and active stock reservations released"); }
     @PrePersist void timestamp() { createdAt = Instant.now(); }
     public UUID getId() { return id; } public String getNumber() { return number; } public Quotation getQuotation() { return quotation; } public Customer getCustomer() { return customer; } public Project getProject() { return project; } public OrderStatus getStatus() { return status; } public BigDecimal getSubtotal() { return subtotal; } public BigDecimal getTaxTotal() { return taxTotal; } public BigDecimal getTransport() { return transport; } public BigDecimal getGrandTotal() { return grandTotal; } public Instant getCreatedAt() { return createdAt; } public Instant getConfirmedAt() { return confirmedAt; } public Instant getCancelledAt() { return cancelledAt; } public List<SalesOrderItem> getItems() { return items; } public List<OrderEvent> getEvents() { return events; }
