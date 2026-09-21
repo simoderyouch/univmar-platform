@@ -1,5 +1,5 @@
 export type Finish = "POLISHED" | "HONED" | "BRUSHED" | "LEATHERED" | "FLAMED" | "SANDBLASTED" | "OTHER";
-export type MovementType = "INITIAL_STOCK" | "PURCHASE_RECEIPT" | "ADJUSTMENT_IN" | "ADJUSTMENT_OUT" | "DAMAGE" | "RETURN" | "ORDER_RESERVATION" | "ORDER_RESERVATION_RELEASE";
+export type MovementType = "INITIAL_STOCK" | "PURCHASE_RECEIPT" | "ADJUSTMENT_IN" | "ADJUSTMENT_OUT" | "DAMAGE" | "RETURN" | "ORDER_RESERVATION" | "ORDER_RESERVATION_RELEASE" | "ORDER_DELIVERY";
 export type Warehouse = { id: string; code: string; name: string; active: boolean };
 export type ReceiptType = "INITIAL_STOCK" | "PURCHASE_RECEIPT";
 export type Location = { id: string; warehouseId: string; code: string; zone?: string; active: boolean };
