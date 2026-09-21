@@ -14,4 +14,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, UU
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select i from InventoryItem i where i.variant.id = :variantId order by i.createdAt, i.id")
     List<InventoryItem> findAllByVariantIdForUpdate(UUID variantId);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select i from InventoryItem i where i.id = :id")
+    Optional<InventoryItem> findByIdForUpdate(UUID id);
 }

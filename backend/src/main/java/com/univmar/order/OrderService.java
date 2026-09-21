@@ -1,6 +1,7 @@
 package com.univmar.order;
 
 import com.univmar.common.api.ApiException;
+import com.univmar.delivery.domain.DeliveryRepository;
 import com.univmar.inventory.domain.*;
 import com.univmar.order.api.OrderDtos.*;
 import com.univmar.order.domain.*;
@@ -16,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class OrderService {
-    private final SalesOrderRepository orders; private final QuotationRepository quotations; private final InventoryItemRepository inventory; private final InventoryReservationRepository reservations; private final StockMovementRepository movements;
-    public OrderService(SalesOrderRepository orders, QuotationRepository quotations, InventoryItemRepository inventory, InventoryReservationRepository reservations, StockMovementRepository movements) { this.orders = orders; this.quotations = quotations; this.inventory = inventory; this.reservations = reservations; this.movements = movements; }
+    private final SalesOrderRepository orders; private final QuotationRepository quotations; private final InventoryItemRepository inventory; private final InventoryReservationRepository reservations; private final StockMovementRepository movements; private final DeliveryRepository deliveries;
+    public OrderService(SalesOrderRepository orders, QuotationRepository quotations, InventoryItemRepository inventory, InventoryReservationRepository reservations, StockMovementRepository movements, DeliveryRepository deliveries) { this.orders = orders; this.quotations = quotations; this.inventory = inventory; this.reservations = reservations; this.movements = movements; this.deliveries = deliveries; }
 
     public Response acceptQuotation(UUID quotationId) {
         Quotation quote = quotations.findByIdForUpdate(quotationId).orElseThrow(() -> notFound("QUOTATION_NOT_FOUND", "Quotation was not found."));
@@ -36,7 +37,7 @@ public class OrderService {
     }
 
     public Response confirm(UUID id) { SalesOrder order = entity(id); if (order.getStatus() != OrderStatus.PENDING) throw conflict("ORDER_NOT_PENDING", "Only a pending order can be confirmed."); order.confirm(); return response(order); }
-    public Response cancel(UUID id) { SalesOrder order = entity(id); if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw conflict("ORDER_NOT_CANCELLABLE", "This order cannot be cancelled."); for (SalesOrderItem line : order.getItems()) for (InventoryReservation reservation : line.getReservations()) if (reservation.getStatus() == ReservationStatus.ACTIVE) { InventoryItem item = reservation.getInventoryItem(); item.releaseReservation(reservation.getQuantityM2()); reservation.release(); movements.save(new StockMovement(item, MovementType.ORDER_RESERVATION_RELEASE, reservation.getQuantityM2(), "Order reservation released", null, Instant.now(), order.getNumber(), null)); } order.cancel(); return response(order); }
+    public Response cancel(UUID id) { SalesOrder order = entity(id); if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw conflict("ORDER_NOT_CANCELLABLE", "This order cannot be cancelled."); for (SalesOrderItem line : order.getItems()) for (InventoryReservation reservation : line.getReservations()) if (reservation.getStatus() == ReservationStatus.ACTIVE) { BigDecimal remaining = reservation.getRemainingM2(); InventoryItem item = reservation.getInventoryItem(); item.releaseReservation(remaining); reservation.release(); movements.save(new StockMovement(item, MovementType.ORDER_RESERVATION_RELEASE, remaining, "Order reservation released", null, Instant.now(), order.getNumber(), null)); } order.cancel(); return response(order); }
     @Transactional(readOnly = true) public Response detail(UUID id) { return response(entity(id)); }
     @Transactional(readOnly = true) public PageResult list(OrderStatus status, Pageable pageable) { Page<SalesOrder> page = status == null ? orders.findAll(pageable) : orders.findAll(org.springframework.data.jpa.domain.Specification.where((root, query, cb) -> cb.equal(root.get("status"), status)), pageable); return PageResult.from(page.map(this::response)); }
 
@@ -53,7 +54,7 @@ public class OrderService {
         }
     }
     private SalesOrder entity(UUID id) { return orders.findById(id).orElseThrow(() -> notFound("ORDER_NOT_FOUND", "Order was not found.")); }
-    private Response response(SalesOrder order) { return new Response(order.getId(), order.getNumber(), order.getQuotation().getId(), order.getQuotation().getNumber(), order.getCustomer().getId(), order.getCustomer().getName(), order.getProject().getId(), order.getProject().getName(), order.getStatus(), order.getSubtotal(), order.getTaxTotal(), order.getTransport(), order.getGrandTotal(), order.getCreatedAt(), order.getConfirmedAt(), order.getCancelledAt(), order.getItems().stream().map(line -> new Item(line.getId(), line.getVariantId(), line.getMaterialName(), line.getVariantLabel(), line.getQuantityM2(), line.getUnitPrice(), line.getLineTotal(), line.getReservations().stream().map(this::reservation).toList())).toList(), order.getEvents().stream().sorted(Comparator.comparing(OrderEvent::getOccurredAt)).map(event -> new Event(event.getId(), event.getType(), event.getMessage(), event.getOccurredAt())).toList()); }
+    private Response response(SalesOrder order) { return new Response(order.getId(), order.getNumber(), order.getQuotation().getId(), order.getQuotation().getNumber(), order.getCustomer().getId(), order.getCustomer().getName(), order.getProject().getId(), order.getProject().getName(), order.getStatus(), order.getSubtotal(), order.getTaxTotal(), order.getTransport(), order.getGrandTotal(), order.getCreatedAt(), order.getConfirmedAt(), order.getCancelledAt(), order.getItems().stream().map(line -> new Item(line.getId(), line.getVariantId(), line.getMaterialName(), line.getVariantLabel(), line.getQuantityM2(), line.getUnitPrice(), line.getLineTotal(), line.getReservations().stream().map(this::reservation).toList())).toList(), deliveries.findAllByOrderId(order.getId()).stream().map(delivery -> new Delivery(delivery.getId(), delivery.getNumber(), delivery.getStatus(), delivery.getScheduledDate())).toList(), order.getEvents().stream().sorted(Comparator.comparing(OrderEvent::getOccurredAt)).map(event -> new Event(event.getId(), event.getType(), event.getMessage(), event.getOccurredAt())).toList()); }
     private Reservation reservation(InventoryReservation item) { InventoryItem stock = item.getInventoryItem(); return new Reservation(item.getId(), stock.getId(), stock.getVariant().getMaterial().getName(), stock.getWarehouse().getName(), stock.getLocation().getCode(), stock.getLotNumber(), stock.getBundleNumber(), item.getQuantityM2(), item.getStatus()); }
     private String nextNumber() { return "ORD-" + LocalDate.now().toString().replace("-", "") + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase(Locale.ROOT); }
     private ApiException notFound(String code, String message) { return new ApiException(HttpStatus.NOT_FOUND, code, message); }
