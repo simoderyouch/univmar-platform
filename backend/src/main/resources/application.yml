@@ -33,6 +33,8 @@ management:
       probes:
         enabled: true
 univmar:
+  qr:
+    scan-base-url: ${UNIVMAR_QR_SCAN_BASE_URL:http://localhost:5173/scan}
   security:
     jwt-secret: ${UNIVMAR_JWT_SECRET:change-this-development-secret-to-a-32-byte-minimum-value}
     access-token-minutes: 30
