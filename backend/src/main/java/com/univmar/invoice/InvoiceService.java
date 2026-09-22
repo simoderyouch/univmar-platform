@@ -1,6 +1,8 @@
 package com.univmar.invoice;
 
+import com.univmar.audit.AuditService;
 import com.univmar.common.api.ApiException;
+import com.univmar.document.domain.DocumentTargetType;
 import com.univmar.invoice.api.InvoiceDtos.*;
 import com.univmar.invoice.domain.*;
 import com.univmar.order.domain.*;
@@ -15,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class InvoiceService {
-    private final CustomerInvoiceRepository invoices; private final SalesOrderRepository orders;
-    public InvoiceService(CustomerInvoiceRepository invoices, SalesOrderRepository orders) { this.invoices = invoices; this.orders = orders; }
+    private final CustomerInvoiceRepository invoices; private final SalesOrderRepository orders; private final AuditService audit;
+    public InvoiceService(CustomerInvoiceRepository invoices, SalesOrderRepository orders, AuditService audit) { this.invoices = invoices; this.orders = orders; this.audit = audit; }
 
     public Response create(UUID orderId, CreateInput input) {
         SalesOrder order = orders.findByIdForUpdate(orderId).orElseThrow(() -> notFound("ORDER_NOT_FOUND", "Order was not found."));
@@ -24,12 +26,12 @@ public class InvoiceService {
         if (invoices.findByOrderId(orderId).isPresent()) throw conflict("ORDER_ALREADY_INVOICED", "This order already has an invoice.");
         CustomerInvoice invoice = new CustomerInvoice(nextNumber(), order, input.dueDate(), trim(input.notes()));
         order.event("INVOICE_CREATED", "Invoice " + invoice.getNumber() + " created as draft");
-        return response(invoices.save(invoice));
+        CustomerInvoice saved = invoices.save(invoice); audit.record(DocumentTargetType.INVOICE, saved.getId(), "INVOICE_CREATED", "Invoice created as draft"); return response(saved);
     }
     public Response issue(UUID id) {
         CustomerInvoice invoice = entityForUpdate(id);
         if (invoice.getStatus() != InvoiceStatus.DRAFT) throw conflict("INVOICE_NOT_DRAFT", "Only a draft invoice can be issued.");
-        invoice.issue(LocalDate.now()); invoice.getOrder().event("INVOICE_ISSUED", "Invoice " + invoice.getNumber() + " issued");
+        invoice.issue(LocalDate.now()); invoice.getOrder().event("INVOICE_ISSUED", "Invoice " + invoice.getNumber() + " issued"); audit.record(DocumentTargetType.INVOICE, invoice.getId(), "INVOICE_ISSUED", "Invoice issued");
         return response(invoice);
     }
     public Response recordPayment(UUID id, PaymentInput input) {
@@ -37,14 +39,14 @@ public class InvoiceService {
         if (invoice.getStatus() == InvoiceStatus.DRAFT || invoice.getStatus() == InvoiceStatus.VOID) throw conflict("INVOICE_NOT_PAYABLE", "Payments can only be recorded against an issued invoice.");
         if (input.amount().compareTo(invoice.outstandingTotal()) > 0) throw conflict("PAYMENT_EXCEEDS_BALANCE", "The payment exceeds the invoice's outstanding balance.");
         invoice.addPayment(new InvoicePayment(invoice, input.paymentDate(), input.amount(), input.method(), trim(input.reference()), trim(input.notes())));
-        invoice.getOrder().event("PAYMENT_RECORDED", "Payment of " + input.amount() + " recorded for invoice " + invoice.getNumber());
+        invoice.getOrder().event("PAYMENT_RECORDED", "Payment of " + input.amount() + " recorded for invoice " + invoice.getNumber()); audit.record(DocumentTargetType.INVOICE, invoice.getId(), "PAYMENT_RECORDED", "Payment of " + input.amount() + " MAD recorded");
         return response(invoice);
     }
     public Response voidInvoice(UUID id) {
         CustomerInvoice invoice = entityForUpdate(id);
         if (invoice.getStatus() == InvoiceStatus.VOID) throw conflict("INVOICE_ALREADY_VOID", "This invoice is already void.");
         if (invoice.paidTotal().signum() > 0) throw conflict("INVOICE_HAS_PAYMENTS", "A paid or partially paid invoice cannot be voided.");
-        invoice.voidInvoice(); invoice.getOrder().event("INVOICE_VOIDED", "Invoice " + invoice.getNumber() + " voided");
+        invoice.voidInvoice(); invoice.getOrder().event("INVOICE_VOIDED", "Invoice " + invoice.getNumber() + " voided"); audit.record(DocumentTargetType.INVOICE, invoice.getId(), "INVOICE_VOIDED", "Invoice voided");
         return response(invoice);
     }
     @Transactional(readOnly = true) public Response detail(UUID id) { return response(entity(id)); }

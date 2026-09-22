@@ -23,6 +23,7 @@ Local planning documents, generated build output, uploaded media, IDE settings, 
 - Internal invoice drafts and issuance, linked one-to-one with customer orders
 - Manual payment ledger for cash, bank transfer, cheque, card, and other received payments
 - Outstanding balance, partial-payment, paid, overdue, and void invoice tracking
+- Documents workspace with record-linked files and activity history
 
 ## Financial tracking
 

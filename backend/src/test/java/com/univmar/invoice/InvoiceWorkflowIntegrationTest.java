@@ -5,12 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.univmar.catalog.CatalogService;
 import com.univmar.catalog.api.CatalogDtos.*;
 import com.univmar.catalog.domain.*;
+import com.univmar.audit.AuditService;
 import com.univmar.customer.CustomerService;
 import com.univmar.customer.api.CustomerDtos.*;
 import com.univmar.customer.domain.CustomerType;
 import com.univmar.inventory.InventoryService;
 import com.univmar.inventory.api.InventoryDtos.*;
 import com.univmar.inventory.domain.MovementType;
+import com.univmar.document.DocumentService;
+import com.univmar.document.domain.*;
 import com.univmar.invoice.api.InvoiceDtos.*;
 import com.univmar.invoice.domain.*;
 import com.univmar.order.OrderService;
@@ -36,6 +39,8 @@ class InvoiceWorkflowIntegrationTest {
     @Autowired private QuotationService quotations;
     @Autowired private OrderService orders;
     @Autowired private InvoiceService invoices;
+    @Autowired private DocumentService documents;
+    @Autowired private AuditService audit;
 
     @Test
     void tracks_manual_partial_and_full_payment_against_an_issued_invoice() {
@@ -64,5 +69,8 @@ class InvoiceWorkflowIntegrationTest {
         assertThat(paid.status()).isEqualTo(InvoiceStatus.PAID);
         assertThat(paid.outstandingTotal()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(invoices.forOrder(order.id()).payments()).hasSize(2);
+        documents.create(new com.univmar.document.api.DocumentDtos.CreateInput(DocumentTargetType.INVOICE, paid.id(), DocumentType.INVOICE, "invoice.pdf", "http://localhost/files/invoice.pdf", "application/pdf", 512));
+        assertThat(documents.list(DocumentTargetType.INVOICE, paid.id())).extracting(item -> item.fileName()).containsExactly("invoice.pdf");
+        assertThat(audit.list(DocumentTargetType.INVOICE, paid.id())).extracting(item -> item.eventType()).contains("INVOICE_CREATED", "INVOICE_ISSUED", "PAYMENT_RECORDED", "DOCUMENT_ATTACHED");
     }
 }
