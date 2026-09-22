@@ -5,6 +5,7 @@ import com.univmar.delivery.api.DeliveryDtos.*;
 import com.univmar.delivery.domain.*;
 import com.univmar.inventory.domain.*;
 import com.univmar.order.domain.*;
+import com.univmar.slab.SlabService;
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
@@ -16,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class DeliveryService {
-    private final DeliveryRepository deliveries; private final SalesOrderRepository orders; private final InventoryReservationRepository reservations; private final InventoryItemRepository inventory; private final StockMovementRepository movements;
-    public DeliveryService(DeliveryRepository deliveries, SalesOrderRepository orders, InventoryReservationRepository reservations, InventoryItemRepository inventory, StockMovementRepository movements) { this.deliveries = deliveries; this.orders = orders; this.reservations = reservations; this.inventory = inventory; this.movements = movements; }
+    private final DeliveryRepository deliveries; private final SalesOrderRepository orders; private final InventoryReservationRepository reservations; private final InventoryItemRepository inventory; private final StockMovementRepository movements; private final SlabService slabs;
+    public DeliveryService(DeliveryRepository deliveries, SalesOrderRepository orders, InventoryReservationRepository reservations, InventoryItemRepository inventory, StockMovementRepository movements, SlabService slabs) { this.deliveries = deliveries; this.orders = orders; this.reservations = reservations; this.inventory = inventory; this.movements = movements; this.slabs = slabs; }
 
     public Response create(CreateInput input) {
         SalesOrder order = orderForUpdate(input.orderId()); ensurePlannable(order);
@@ -35,7 +36,7 @@ public class DeliveryService {
         delivery.dispatch(); order.partiallyDelivered(); order.event("DELIVERY_DISPATCHED", "Delivery " + delivery.getNumber() + " dispatched");
         return response(delivery);
     }
-    public Response confirmDelivered(UUID id) { Delivery delivery = deliveryForUpdate(id); if (delivery.getStatus() != DeliveryStatus.DISPATCHED) throw conflict("DELIVERY_NOT_DISPATCHED", "Only a dispatched delivery can be confirmed delivered."); SalesOrder order = orderForUpdate(delivery.getOrder().getId()); delivery.confirmDelivered(); order.event("DELIVERY_CONFIRMED", "Delivery " + delivery.getNumber() + " confirmed delivered"); if (allReservationsConsumed(order)) order.delivered(); else order.partiallyDelivered(); return response(delivery); }
+    public Response confirmDelivered(UUID id) { Delivery delivery = deliveryForUpdate(id); if (delivery.getStatus() != DeliveryStatus.DISPATCHED) throw conflict("DELIVERY_NOT_DISPATCHED", "Only a dispatched delivery can be confirmed delivered."); SalesOrder order = orderForUpdate(delivery.getOrder().getId()); delivery.confirmDelivered(); order.event("DELIVERY_CONFIRMED", "Delivery " + delivery.getNumber() + " confirmed delivered"); if (allReservationsConsumed(order)) { slabs.sellForOrder(order.getId()); order.delivered(); } else order.partiallyDelivered(); return response(delivery); }
     public Response cancel(UUID id) { Delivery delivery = deliveryForUpdate(id); if (delivery.getStatus() != DeliveryStatus.PLANNED && delivery.getStatus() != DeliveryStatus.PREPARING) throw conflict("DELIVERY_NOT_CANCELLABLE", "A dispatched or delivered delivery cannot be cancelled."); delivery.cancel(); delivery.getOrder().event("DELIVERY_CANCELLED", "Delivery " + delivery.getNumber() + " cancelled"); return response(delivery); }
     public Response fail(UUID id) { Delivery delivery = deliveryForUpdate(id); if (delivery.getStatus() != DeliveryStatus.PLANNED && delivery.getStatus() != DeliveryStatus.PREPARING) throw conflict("DELIVERY_NOT_FAILABLE", "Only a planned or preparing delivery can be marked failed."); delivery.fail(); delivery.getOrder().event("DELIVERY_FAILED", "Delivery " + delivery.getNumber() + " failed before dispatch"); return response(delivery); }
     @Transactional(readOnly = true) public Response detail(UUID id) { return response(entity(id)); }

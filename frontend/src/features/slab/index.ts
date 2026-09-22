@@ -1,0 +1,1 @@
+export { SlabsPage } from "./SlabsPage";
