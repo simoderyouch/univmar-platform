@@ -1,6 +1,6 @@
 # UNIVMAR
 
-UNIVMAR is a stone-company management platform. This repository currently contains the Phase 0 foundation and the completed Phase 1 stone catalog vertical slice.
+UNIVMAR is a stone-company management platform. The workspace currently covers catalog, inventory, customers, projects, RFQs, quotations, orders, deliveries, and Phase 10 internal customer receivables.
 
 ## Repository layout
 
@@ -19,6 +19,14 @@ Local planning documents, generated build output, uploaded media, IDE settings, 
 - Stone variants: thickness, finish, optional format, archive/reactivate
 - Local JPEG, PNG, and WebP uploads up to 10 MiB
 - Separate catalog and inventory boundaries
+- Customer orders with stock reservation and delivery dispatch workflows
+- Internal invoice drafts and issuance, linked one-to-one with customer orders
+- Manual payment ledger for cash, bank transfer, cheque, card, and other received payments
+- Outstanding balance, partial-payment, paid, overdue, and void invoice tracking
+
+## Financial tracking
+
+The Invoices workspace tracks money owed by customers; it does not process online payments. Create an invoice from a confirmed or fulfilled order, issue it, then record payments once they are received through the business's normal channels. Payment entries cannot exceed the invoice's remaining balance, and paid invoices cannot be voided.
 
 ## Run locally without Docker
 
