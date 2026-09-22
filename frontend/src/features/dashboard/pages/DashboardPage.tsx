@@ -1,49 +1,24 @@
-const workspaceAreas = [
-  ["Material library", "Manage stone materials and variants", "Catalog"],
-  ["Inventory", "Warehouse quantities and movements", "In setup"],
-  ["Customers", "Companies, contacts, and projects", "In setup"],
-  ["Orders", "Accepted quotations and fulfilment", "In setup"],
-] as const;
+import { useEffect, useState, type ReactNode } from "react";
+import { ArrowUpRight, Banknote, Boxes, CalendarDays, CircleDollarSign, ClipboardList, PackageSearch, ReceiptText, TriangleAlert, Truck } from "lucide-react";
+import { useRouter } from "../../../app/providers/router";
+import { api } from "../../../shared/api/client";
 
-const nextSteps = [
-  ["Add a material", "Create the commercial identity for each stone."],
-  ["Configure variants", "Record each thickness and finish combination."],
-  ["Connect inventory", "Track physical quantities when warehouse records are ready."],
-] as const;
+type Overview = { salesValue: number; orderCount: number; averageOrderValue: number; collected: number; outstanding: number; availableM2: number; reservedM2: number; damagedM2: number; quotations: { drafts: number; sent: number; accepted: number; expiringSoon: number; activeValue: number }; fulfillment: { confirmedOrders: number; preparingOrders: number; partiallyDeliveredOrders: number; plannedDeliveries: number; dispatchedDeliveries: number }; upcomingDeliveries: { number: string; customerName: string; projectName: string; scheduledDate: string; status: string }[]; stockAlerts: { materialName: string; variantLabel: string; warehouseName: string; locationCode: string; availableM2: number }[]; receivables: { number: string; customerName: string; dueDate?: string; status: string; outstandingTotal: number }[] };
+
+const money = (value: number) => `${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MAD`;
+const quantity = (value: number) => `${Number(value).toLocaleString(undefined, { maximumFractionDigits: 3 })} m²`;
+const label = (value: string) => value.replaceAll("_", " ").toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase());
 
 export function DashboardPage() {
-  return (
-    <section className="mx-auto max-w-[1520px] px-4 py-8 sm:px-7 lg:px-10">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#21140f]">Dashboard</h1>
-          <p className="mt-1 text-sm text-[#786961]">A concise view of the operational areas your team can access.</p>
-        </div>
-        <span className="inline-flex rounded-md border border-[#e3d8d1] bg-white px-3 py-2 text-sm font-medium text-[#4b3328]">Catalog ready</span>
-      </div>
-      <div className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {workspaceAreas.map(([title, detail, status]) => (
-          <article key={title} className="rounded-lg border border-[#e3d8d1] bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-[#21140f]">{title}</p>
-            <p className="mt-2 text-sm leading-6 text-[#786961]">{detail}</p>
-            <span className="mt-5 inline-flex rounded-full bg-[#f4ece8] px-2.5 py-1 text-xs font-medium text-[#4b3328]">{status}</span>
-          </article>
-        ))}
-      </div>
-      <section className="mt-6 rounded-lg border border-[#e3d8d1] bg-white shadow-sm">
-        <div className="border-b border-[#f0e8e4] px-5 py-4">
-          <h2 className="font-semibold text-[#21140f]">Getting started</h2>
-          <p className="mt-1 text-sm text-[#786961]">Build a clean commercial record before connecting stock and sales activity.</p>
-        </div>
-        <div className="grid divide-y divide-[#f0e8e4] px-5 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {nextSteps.map(([title, detail]) => (
-            <div key={title} className="py-5 sm:px-5 first:pl-0 last:pr-0">
-              <p className="text-sm font-semibold text-[#21140f]">{title}</p>
-              <p className="mt-1 text-sm leading-6 text-[#786961]">{detail}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </section>
-  );
+  const [data, setData] = useState<Overview | null>(null); const [error, setError] = useState(""); const { navigate } = useRouter();
+  useEffect(() => { void api<Overview>("/dashboard/overview").then(setData).catch(cause => setError((cause as Error).message)); }, []);
+  if (error) return <section className="mx-auto max-w-7xl px-4 py-8 sm:px-7"><p className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">{error}</p></section>;
+  if (!data) return <section className="grid min-h-72 place-items-center text-sm text-[#786961]">Loading operational dashboard…</section>;
+  return <section className="mx-auto max-w-7xl px-4 py-7 sm:px-7"><header className="flex flex-wrap items-end justify-between gap-4 border-b border-[#d8ccc4] pb-6"><div><p className="text-xs font-semibold tracking-[0.16em] text-[#806f65]">UNIVMAR OPERATIONS DESK</p><h1 className="mt-2 font-serif text-4xl tracking-tight">Today’s commercial picture</h1><p className="mt-2 max-w-2xl text-sm text-[#786961]">Live signals from orders, stock, deliveries, and customer collections.</p></div><button type="button" onClick={() => navigate("/orders")} className="inline-flex items-center gap-2 rounded-md border border-[#d8ccc4] bg-white px-3 py-2 text-sm font-medium text-[#4b3328] hover:bg-[#fcfaf8]">Open orders <ArrowUpRight size={15} /></button></header><section className="mt-6 grid gap-px overflow-hidden rounded-xl border border-[#d8ccc4] bg-[#d8ccc4] sm:grid-cols-2 xl:grid-cols-4"><Metric icon={<ClipboardList size={17} />} label="Order value" value={money(data.salesValue)} detail={`${data.orderCount} live order${data.orderCount === 1 ? "" : "s"} · average ${money(data.averageOrderValue)}`} action={() => navigate("/orders")} /><Metric icon={<Banknote size={17} />} label="Collected" value={money(data.collected)} detail="Payments recorded against invoices" action={() => navigate("/invoices")} /><Metric icon={<CircleDollarSign size={17} />} label="Outstanding" value={money(data.outstanding)} detail="Customer balance still to collect" action={() => navigate("/invoices")} /><Metric icon={<Boxes size={17} />} label="Available stock" value={quantity(data.availableM2)} detail={`${quantity(data.reservedM2)} reserved · ${quantity(data.damagedM2)} damaged`} action={() => navigate("/inventory")} /></section><div className="mt-7 grid gap-5 xl:grid-cols-[1.3fr_.9fr]"><section className="overflow-hidden rounded-xl border border-[#d8ccc4] bg-white"><header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e9dfd9] px-5 py-4"><div><h2 className="font-serif text-xl">Commercial pipeline</h2><p className="mt-1 text-xs text-[#786961]">Proposals and fulfilment waiting for action.</p></div><button type="button" onClick={() => navigate("/quotations")} className="text-sm font-medium text-[#765847] hover:underline">Review quotations</button></header><div className="grid gap-px bg-[#e9dfd9] sm:grid-cols-3"><Signal label="Draft quotations" value={data.quotations.drafts} note="Still being priced" /><Signal label="Sent quotations" value={data.quotations.sent} note={`${money(data.quotations.activeValue)} active value`} /><Signal label="Expiring in 7 days" value={data.quotations.expiringSoon} note="Follow up before expiry" /></div><div className="border-t border-[#e9dfd9] px-5 py-5"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#806f65]">Order fulfilment</p><div className="mt-4 grid gap-3 sm:grid-cols-3"><Fulfilment label="Confirmed" value={data.fulfillment.confirmedOrders} /><Fulfilment label="Preparing" value={data.fulfillment.preparingOrders} /><Fulfilment label="Part-delivered" value={data.fulfillment.partiallyDeliveredOrders} /></div></div></section><section className="overflow-hidden rounded-xl border border-[#d8ccc4] bg-[#21140f] text-white"><header className="border-b border-white/10 px-5 py-4"><p className="text-xs font-semibold tracking-[0.14em] text-[#dbb882]">NEXT 7 DAYS</p><h2 className="mt-2 font-serif text-2xl">Delivery horizon</h2></header>{data.upcomingDeliveries.length ? <div className="divide-y divide-white/10">{data.upcomingDeliveries.map(delivery => <button key={delivery.number} type="button" onClick={() => navigate("/deliveries")} className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-white/5"><CalendarDays size={17} className="text-[#dbb882]" /><div className="min-w-0 flex-1"><p className="font-medium">{delivery.customerName}</p><p className="mt-1 truncate text-xs text-white/55">{delivery.number} · {delivery.projectName}</p></div><div className="text-right"><p className="text-sm font-medium">{delivery.scheduledDate}</p><p className="mt-1 text-xs text-[#dbb882]">{label(delivery.status)}</p></div></button>)}</div> : <Empty dark icon={<Truck size={24} />} text="No delivery is scheduled in the next seven days." />}</section></div><div className="mt-5 grid gap-5 xl:grid-cols-2"><section className="overflow-hidden rounded-xl border border-[#d8ccc4] bg-white"><PanelHeader icon={<TriangleAlert size={17} />} title="Stock guardrail" detail="Items with 5 m² or less available stock." action="Open inventory" onClick={() => navigate("/inventory")} />{data.stockAlerts.length ? <div className="divide-y divide-[#eee6e1]">{data.stockAlerts.map((item, index) => <div key={`${item.materialName}-${item.locationCode}-${index}`} className="flex items-center gap-4 px-5 py-4"><div className="grid size-9 place-items-center rounded-md bg-[#fff3e5] text-[#a86c31]"><PackageSearch size={18} /></div><div className="min-w-0 flex-1"><p className="font-medium">{item.materialName}</p><p className="mt-1 text-xs text-[#786961]">{item.variantLabel} · {item.warehouseName} / {item.locationCode}</p></div><b className="font-serif text-lg text-[#a35d2e]">{quantity(item.availableM2)}</b></div>)}</div> : <Empty icon={<Boxes size={24} />} text="No low-stock alerts. Available inventory is above the 5 m² guardrail." />}</section><section className="overflow-hidden rounded-xl border border-[#d8ccc4] bg-white"><PanelHeader icon={<ReceiptText size={17} />} title="Receivables to follow up" detail="Open invoices ordered by their due date." action="Open invoices" onClick={() => navigate("/invoices")} />{data.receivables.length ? <div className="divide-y divide-[#eee6e1]">{data.receivables.map(invoice => <button key={invoice.number} type="button" onClick={() => navigate("/invoices")} className="flex w-full items-center gap-4 px-5 py-4 text-left hover:bg-[#fcfaf8]"><div className="grid size-9 place-items-center rounded-md bg-[#fbf2e7] text-[#a4764d]"><ReceiptText size={18} /></div><div className="min-w-0 flex-1"><p className="font-medium">{invoice.customerName}</p><p className="mt-1 text-xs text-[#786961]">{invoice.number} · {invoice.dueDate ?? "No due date"} · {label(invoice.status)}</p></div><b className="font-serif text-lg">{money(invoice.outstandingTotal)}</b></button>)}</div> : <Empty icon={<ReceiptText size={24} />} text="No open receivables. Create and issue invoices to track collection." />}</section></div></section>;
 }
+
+function Metric({ icon, label: title, value, detail, action }: { icon: ReactNode; label: string; value: string; detail: string; action: () => void }) { return <button type="button" onClick={action} className="bg-white px-5 py-4 text-left transition-colors hover:bg-[#fcfaf8]"><div className="flex items-center gap-2 text-[#806f65]">{icon}<p className="text-[11px] font-semibold uppercase tracking-[0.12em]">{title}</p></div><p className="mt-3 font-serif text-2xl">{value}</p><p className="mt-1 text-xs text-[#786961]">{detail}</p></button>; }
+function Signal({ label: title, value, note }: { label: string; value: number; note: string }) { return <article className="bg-white px-5 py-5"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#806f65]">{title}</p><p className="mt-3 font-serif text-3xl">{value}</p><p className="mt-1 text-xs text-[#786961]">{note}</p></article>; }
+function Fulfilment({ label: title, value }: { label: string; value: number }) { return <div className="rounded-md bg-[#faf7f5] px-4 py-3"><p className="text-xs text-[#786961]">{title}</p><p className="mt-1 font-serif text-2xl">{value}</p></div>; }
+function PanelHeader({ icon, title, detail, action, onClick }: { icon: ReactNode; title: string; detail: string; action: string; onClick: () => void }) { return <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e9dfd9] px-5 py-4"><div><div className="flex items-center gap-2 text-[#765847]">{icon}<h2 className="font-serif text-xl text-black">{title}</h2></div><p className="mt-1 text-xs text-[#786961]">{detail}</p></div><button type="button" onClick={onClick} className="text-sm font-medium text-[#765847] hover:underline">{action}</button></header>; }
+function Empty({ icon, text, dark = false }: { icon: ReactNode; text: string; dark?: boolean }) { return <div className={`px-5 py-14 text-center ${dark ? "text-white/60" : "text-[#786961]"}`}><div className={`mx-auto w-fit ${dark ? "text-[#dbb882]" : "text-[#b39a85]"}`}>{icon}</div><p className="mx-auto mt-3 max-w-sm text-sm">{text}</p></div>; }

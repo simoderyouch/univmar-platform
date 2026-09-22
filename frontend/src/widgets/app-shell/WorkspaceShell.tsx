@@ -14,6 +14,7 @@ import { OrdersPage } from "../../features/order";
 import { DeliveriesPage } from "../../features/delivery";
 import { InvoicesPage } from "../../features/invoice";
 import { DocumentsPage } from "../../features/document";
+import { SlabsPage } from "../../features/slab";
 import { PlaceholderPage } from "../../features/workspace";
 import { workspaceNavigation, type NavigationEntry } from "./navigation";
 
@@ -51,6 +52,8 @@ export function WorkspaceShell() {
       ? <CatalogPage />
       : path === "/inventory"
         ? <InventoryPage />
+        : path === "/slabs"
+          ? <SlabsPage />
         : path === "/suppliers"
           ? <PurchasingPage />
           : path === "/customers"
