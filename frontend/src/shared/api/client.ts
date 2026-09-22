@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
+export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
 export const accessTokenKey = "univmar.access-token";
 
 type ApiEnvelope<T> = { data: T };
@@ -14,7 +14,7 @@ export class RequestError extends Error {
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem(accessTokenKey);
   const isFormData = init.body instanceof FormData;
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(`${apiBaseUrl}${path}`, {
     ...init,
     headers: {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
