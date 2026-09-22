@@ -37,3 +37,11 @@ export async function uploadImage(file: File): Promise<string> {
   body.append("file", file);
   return (await api<{ url: string }>("/uploads/images", { method: "POST", body })).url;
 }
+
+export type UploadedDocument = { url: string; originalFilename: string; contentType: string; size: number };
+
+export async function uploadDocument(file: File): Promise<UploadedDocument> {
+  const body = new FormData();
+  body.append("file", file);
+  return api<UploadedDocument>("/uploads/documents", { method: "POST", body });
+}

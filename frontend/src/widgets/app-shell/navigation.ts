@@ -1,4 +1,4 @@
-import { Boxes, ClipboardList, FileText, FolderKanban, Handshake, LayoutDashboard, Package, ScrollText, Truck, Users, type LucideIcon } from "lucide-react";
+import { Boxes, ClipboardList, FileText, FolderKanban, Handshake, LayoutDashboard, Package, Paperclip, ReceiptText, ScrollText, Truck, Users, type LucideIcon } from "lucide-react";
 
 export type NavigationEntry = {
   label: string;
@@ -15,7 +15,8 @@ export const workspaceNavigation: NavigationEntry[] = [
   { label: "RFQs", to: "/rfqs", icon: ScrollText },
   { label: "Quotations", to: "/quotations", icon: FileText },
   { label: "Suppliers", to: "/suppliers", icon: Handshake },
-  { label: "Sales", to: "/sales", icon: FileText },
+  { label: "Invoices", to: "/invoices", icon: ReceiptText },
+  { label: "Documents", to: "/documents", icon: Paperclip },
   { label: "Orders", to: "/orders", icon: ClipboardList },
   { label: "Deliveries", to: "/deliveries", icon: Truck },
 ];
