@@ -12,9 +12,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Service
-public class LocalImageStorage {
+@ConditionalOnProperty(name = "univmar.storage.provider", havingValue = "local", matchIfMissing = true)
+public class LocalImageStorage implements ImageStorage {
     private static final Map<String, String> EXTENSIONS = Map.of(
         "image/jpeg", "jpg", "image/png", "png", "image/webp", "webp"
     );
@@ -45,5 +47,4 @@ public class LocalImageStorage {
         }
     }
 
-    public record UploadedImage(String url, String originalFilename) { }
 }

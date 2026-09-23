@@ -44,8 +44,17 @@ univmar:
     zone-id: Africa/Casablanca
     currency: MAD
   storage:
+    provider: ${UNIVMAR_STORAGE_PROVIDER:local}
     root: ${UNIVMAR_STORAGE_ROOT:./data/uploads}
     public-api-url: ${UNIVMAR_PUBLIC_API_URL:http://localhost:8080/api/v1}
+    s3:
+      endpoint: ${UNIVMAR_STORAGE_S3_ENDPOINT:http://localhost:9000}
+      region: ${UNIVMAR_STORAGE_S3_REGION:us-east-1}
+      bucket: ${UNIVMAR_STORAGE_S3_BUCKET:univmar}
+      access-key: ${UNIVMAR_STORAGE_S3_ACCESS_KEY:minioadmin}
+      secret-key: ${UNIVMAR_STORAGE_S3_SECRET_KEY:minioadmin}
+      public-url: ${UNIVMAR_STORAGE_S3_PUBLIC_URL:http://localhost:9000/univmar}
+      base-gallery-source: ${UNIVMAR_BASE_GALLERY_SOURCE:../base-gallery}
   bootstrap-admin:
     email: ${UNIVMAR_INITIAL_ADMIN_EMAIL:}
     password: ${UNIVMAR_INITIAL_ADMIN_PASSWORD:}

@@ -4,7 +4,9 @@ export const accessTokenKey = "univmar.access-token";
 /** Resolve imported local asset paths after the catalog gallery was moved. */
 export function resolveImageUrl(url?: string | null): string | undefined {
   if (!url) return undefined;
-  return url.replace(/\/images\//g, "/base-gallery/");
+  const normalized = url.replace(/\/images\//g, "/base-gallery/");
+  const assetBase = (import.meta.env.VITE_ASSET_BASE_URL as string | undefined)?.replace(/\/$/, "");
+  return assetBase && normalized.startsWith("/") ? `${assetBase}${normalized}` : normalized;
 }
 
 type ApiEnvelope<T> = { data: T };
