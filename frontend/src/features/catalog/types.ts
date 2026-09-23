@@ -6,6 +6,8 @@ export type MaterialVariant = {
   thicknessMm: number;
   finish: Finish;
   format?: string;
+  mainImageUrl?: string;
+  galleryImageUrls: string[];
   active: boolean;
 };
 
@@ -17,16 +19,15 @@ export type MaterialSummary = {
   stoneType: StoneType;
   origin?: string;
   color?: string;
-  mainImageUrl?: string;
   active: boolean;
   variantCount: number;
+  mainImageUrl?: string;
 };
 
 export type Material = Omit<MaterialSummary, "variantCount"> & {
   pattern?: string;
   description?: string;
   applications?: string;
-  galleryImageUrls: string[];
   variants: MaterialVariant[];
 };
 
@@ -47,6 +48,4 @@ export type MaterialFormValues = {
   pattern: string;
   description: string;
   applications: string;
-  mainImageUrl: string;
-  gallery: string;
 };

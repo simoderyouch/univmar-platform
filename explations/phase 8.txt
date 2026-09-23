@@ -1,0 +1,51 @@
+UNIVMAR — PHASE 8: ORDERS & STOCK RESERVATION
+
+STATUS
+
+Phase 8 is complete. It is the point at which an accepted quotation becomes a
+real customer order and physical stock is committed.
+
+PURPOSE
+
+The reservation workflow prevents the company from promising the same slabs or
+stock quantity to more than one customer.
+
+ORDER RECORD
+
+An order is created once from an accepted quotation. It copies the customer,
+project, commercial totals, and material lines, then records stock-reservation
+allocations for each order item.
+
+ORDER STATUSES
+
+- PENDING
+- CONFIRMED
+- PREPARING
+- PARTIALLY_DELIVERED
+- DELIVERED
+- CANCELLED
+
+RESERVATION STATUSES
+
+- ACTIVE
+- RELEASED
+- CONSUMED
+
+ATOMIC ACCEPTANCE FLOW
+
+1. Validate that the quotation is sent and not expired.
+2. Prevent a second order from the same quotation.
+3. Lock relevant inventory rows and check available stock.
+4. Allocate/reserve the needed quantity across inventory records.
+5. Create the order and its audit events.
+6. Mark the quotation ACCEPTED.
+
+If any check fails, the transaction fails as a whole; no incomplete order or
+partial reservation is left behind. Cancelling an eligible order releases its
+active reservations. Delivery consumes reservations later in Phase 9.
+
+INTERFACE AND DATA
+
+The Orders workspace exposes overview, items, reservations, delivery, invoice,
+and history tabs. Migration V11 creates orders, order lines, reservation
+records, and order events.

@@ -31,31 +31,24 @@ public class StoneMaterial {
     private String description;
     @Column(columnDefinition = "text")
     private String applications;
-    @Column(name = "main_image_url", length = 1000)
-    private String mainImageUrl;
     @Column(nullable = false)
     private boolean active = true;
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-    @ElementCollection
-    @CollectionTable(name = "stone_material_image", joinColumns = @JoinColumn(name = "material_id"))
-    @Column(name = "image_url", nullable = false, length = 1000)
-    @OrderColumn(name = "position")
-    private final List<String> galleryImageUrls = new ArrayList<>();
     @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<StoneVariant> variants = new ArrayList<>();
 
     protected StoneMaterial() {
     }
 
-    public StoneMaterial(String name, String commercialName, String sku, StoneType stoneType, String origin, String color, String pattern, String description, String applications, String mainImageUrl, List<String> galleryImageUrls) {
+    public StoneMaterial(String name, String commercialName, String sku, StoneType stoneType, String origin, String color, String pattern, String description, String applications) {
         this.id = UUID.randomUUID();
-        update(name, commercialName, sku, stoneType, origin, color, pattern, description, applications, mainImageUrl, galleryImageUrls);
+        update(name, commercialName, sku, stoneType, origin, color, pattern, description, applications);
     }
 
-    public void update(String name, String commercialName, String sku, StoneType stoneType, String origin, String color, String pattern, String description, String applications, String mainImageUrl, List<String> galleryImageUrls) {
+    public void update(String name, String commercialName, String sku, StoneType stoneType, String origin, String color, String pattern, String description, String applications) {
         this.name = name;
         this.commercialName = commercialName;
         this.sku = sku;
@@ -65,9 +58,6 @@ public class StoneMaterial {
         this.pattern = pattern;
         this.description = description;
         this.applications = applications;
-        this.mainImageUrl = mainImageUrl;
-        this.galleryImageUrls.clear();
-        if (galleryImageUrls != null) this.galleryImageUrls.addAll(galleryImageUrls);
     }
 
     public void addVariant(StoneVariant variant) {
@@ -124,20 +114,12 @@ public class StoneMaterial {
         return applications;
     }
 
-    public String getMainImageUrl() {
-        return mainImageUrl;
-    }
-
     public boolean isActive() {
         return active;
     }
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public List<String> getGalleryImageUrls() {
-        return List.copyOf(galleryImageUrls);
     }
 
     public List<StoneVariant> getVariants() {

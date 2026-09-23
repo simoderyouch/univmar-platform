@@ -1,0 +1,48 @@
+UNIVMAR — PHASE 6: RFQ (REQUEST FOR QUOTATION)
+
+STATUS
+
+Phase 6 is complete. It records customer material requirements before pricing
+or stock commitment.
+
+PURPOSE
+
+An RFQ is the sales team's starting point for a possible stone sale. It records
+what the customer needs, for which project, and by when, without reserving any
+physical inventory.
+
+RFQ RECORD
+
+An RFQ has a generated number, customer, project, requested date, delivery
+location, notes, a creator, and one or more material lines. Each line captures
+the material/variant description, requested quantity, dimensions or processing
+notes where required.
+
+STATUSES
+
+- DRAFT
+- SUBMITTED
+- UNDER_REVIEW
+- QUOTED
+- CANCELLED
+
+WORKFLOW
+
+1. Choose a customer and one of that customer's projects.
+2. Add the requested material lines and quantities.
+3. Save a draft or submit it for commercial review.
+4. Create a quotation from a submitted RFQ.
+5. The RFQ becomes QUOTED when a quotation is created.
+
+INVENTORY RULE
+
+The RFQ screen can show available material information for the sales team, but
+an RFQ never reserves stock. Reservation happens only after a quotation is
+accepted and becomes an order in Phase 8.
+
+INTERFACE AND DATA
+
+The RFQs workspace provides a list, status filtering, draft/submission flow,
+details, requested-material lines, attachments, and an event timeline.
+Migrations V7 and V8 create RFQ records, their item/attachment relationships,
+and their event history.

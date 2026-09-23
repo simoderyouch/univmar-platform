@@ -1,0 +1,53 @@
+UNIVMAR — PHASE 3: SUPPLIERS & PURCHASING
+
+Purpose
+
+Phase 3 connects inventory to the commercial procurement process. Stock no longer appears without a source: it is received from a supplier through a purchase order and recorded in the Phase 2 warehouse ledger.
+
+Supplier management
+
+The system stores supplier records with company name, contact person, country, email, phone, address, supplied materials, payment terms, lead time, notes, and active status.
+
+The backend provides supplier creation, update, detail, search, country/status filtering, and activation state. The frontend provides a supplier directory and a create/edit supplier form.
+
+Purchase-order lifecycle
+
+Each purchase order belongs to exactly one active supplier and has a generated number in the form PO-YYYY-####. It contains one or more material-variant lines, each with an ordered square-metre quantity, optional unit cost, and notes.
+
+Allowed statuses:
+
+- DRAFT — can be edited.
+- SENT — supplier-facing order; can be confirmed or cancelled.
+- CONFIRMED — goods may be received.
+- PARTIALLY_RECEIVED — at least one receipt exists but quantity remains.
+- RECEIVED — every order line is completely received.
+- CANCELLED — order closed without receiving goods.
+
+Only draft orders can be updated. An order with received goods cannot be cancelled. The API rejects a receipt whose quantity exceeds the unreceived quantity on that line.
+
+Goods-receipt flow
+
+1. A user creates a supplier.
+2. The user creates a purchase-order draft and adds active material variants.
+3. The draft is sent or confirmed.
+4. On arrival, the user chooses a remaining order line, warehouse, location, lot, bundle, received quantity, optional cost, and receipt note.
+5. The API validates that the order is confirmed and that the quantity does not exceed the line’s remaining quantity.
+6. In the same transaction, the system creates a Phase 2 PURCHASE_RECEIPT inventory movement, increases warehouse stock, updates the purchase-order line’s received quantity, records a goods receipt, and updates the purchase-order status.
+7. Inventory history shows the source PO number and supplier name for the receipt.
+
+Frontend
+
+The Suppliers workspace contains two operational tabs:
+
+- Suppliers: directory and supplier create/edit form.
+- Purchase orders: order list, draft form, detail view, send, confirm, cancel, and receive-goods modal.
+
+The receive-goods modal uses the existing warehouse and location records from Phase 2. It is intentionally a controlled inventory handoff rather than a separate manual stock update.
+
+Data and auditability
+
+Phase 3 adds Supplier, PurchaseOrder, PurchaseOrderItem, and GoodsReceipt records. Migration V4 also adds source reference and source supplier fields to stock movements. This lets inventory staff identify where received stone came from without duplicating supplier data on material records.
+
+Validation
+
+Backend package compilation passed. Flyway V4 was applied successfully while the Spring application context started. Frontend TypeScript and Vite production builds passed.

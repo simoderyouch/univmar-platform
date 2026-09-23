@@ -1,0 +1,35 @@
+UNIVMAR — PHASE 12: DASHBOARD & REPORTING
+
+STATUS
+
+Phase 12 is complete. The dashboard now turns existing commercial and
+operational data into a live management view.
+
+LIVE METRICS
+
+The dashboard calculates, from the database:
+
+- Live order value, order count, and average order value.
+- Collected payments and outstanding customer receivables.
+- Available, reserved, and damaged inventory in square metres.
+- Draft, sent, accepted, and soon-expiring quotations.
+- Confirmed, preparing, and partially delivered orders.
+- Planned and dispatched deliveries.
+
+OPERATIONAL FOLLOW-UP
+
+The dashboard also highlights delivery work scheduled in the next seven days,
+inventory records with 5 m² or less available, and open customer invoices
+ordered by due date. Each signal links to the relevant operational workspace.
+
+DESIGN PRINCIPLE
+
+No chart uses invented values. Every dashboard number is calculated from the
+same orders, quotations, invoices, deliveries, and inventory records that the
+team works with elsewhere in UNIVMAR.
+
+DATA
+
+The reporting module is read-only. It introduces no new business tables; its
+DashboardService composes a consistent snapshot from existing modules and
+exposes GET /api/v1/dashboard/overview.

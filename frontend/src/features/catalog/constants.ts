@@ -13,8 +13,6 @@ export const emptyMaterialForm: MaterialFormValues = {
   pattern: "",
   description: "",
   applications: "",
-  mainImageUrl: "",
-  gallery: "",
 };
 
 export function formatCatalogLabel(value: string) {

@@ -19,7 +19,7 @@ import { ScanPage } from "../../features/scan";
 import { RemnantsPage } from "../../features/remnant";
 import { FabricationPage } from "../../features/fabrication";
 import { PlaceholderPage } from "../../features/workspace";
-import { workspaceNavigation, type NavigationEntry } from "./navigation";
+import { workspaceNavigation, workspaceNavigationGroups, type NavigationEntry } from "./navigation";
 
 function NavigationItem({ item, onNavigate }: { item: NavigationEntry; onNavigate: () => void }) {
   const { path, navigate } = useRouter();
@@ -43,7 +43,7 @@ export function WorkspaceShell() {
   const { path, navigate } = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  if (loading) return <main className="grid min-h-screen place-items-center bg-[#f7f3f0] text-sm text-[#786961]">Loading workspace…</main>;
+  if (loading) return <main className="grid min-h-screen place-items-center bg-white text-sm text-[#786961]">Loading workspace…</main>;
   if (!user) return <Redirect to="/login" />;
 
   const current = workspaceNavigation.find((item) => item.to === path);
@@ -85,32 +85,45 @@ export function WorkspaceShell() {
 
   const sidebar = (
     <>
-      <div className="flex h-16 items-center justify-center py-12 border-b border-white/10 px-3">
+      <div className="flex h-16 shrink-0 items-center justify-center border-b border-white/10  py-12">
         <img src="/univmar-logo-w.png" alt="Univmar Marble" className="h-auto w-[11rem] object-contain object-left" />
         <button type="button" className="ml-auto p-2 lg:hidden" onClick={closeMenu} aria-label="Close navigation"><X size={18} /></button>
       </div>
-      <nav className="grid pt-6 gap-1">{workspaceNavigation.map((item) => <NavigationItem key={item.to} item={item} onNavigate={closeMenu} />)}</nav>
-      <div className="mt-auto border-t border-white/10 p-3">
-        <p className="truncate text-xs font-medium text-white/80">{user.email}</p>
-        <p className="mt-1 text-[10px] tracking-wider text-white/40">{user.role.replaceAll("_", " ")}</p>
-        <button type="button" onClick={() => { logout(); navigate("/login"); }} className="mt-4 flex items-center gap-2 text-xs text-white/60 hover:text-white"><LogOut size={15} /> Sign out</button>
+      <nav aria-label="Workspace navigation" className="workspace-nav-scroll min-h-0 flex-1 space-y-6 overflow-y-auto px-1 py-6 pl-3 pr-2">
+        {workspaceNavigationGroups.map((group) => (
+          <section key={group.label} aria-label={group.label}>
+            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/35">{group.label}</p>
+            <div className="grid gap-1">
+              {group.items.map((item) => <NavigationItem key={item.to} item={item} onNavigate={closeMenu} />)}
+            </div>
+          </section>
+        ))}
+      </nav>
+      <div className="shrink-0 border-t border-white/10 px-3 pt-4">
+        <div className="flex items-center gap-2">
+          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#c99b68] text-xs font-bold text-[#110703]">{user.email[0]?.toUpperCase()}</span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs font-medium text-white/90">{user.email}</p>
+            <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-white/40">{user.role.replaceAll("_", " ")}</p>
+          </div>
+          <button type="button" onClick={() => { logout(); navigate("/login"); }} className="inline-flex shrink-0 items-center justify-center text-white/60 transition-colors hover:text-white" aria-label="Sign out" title="Sign out"><LogOut size={15} /></button>
+        </div>
       </div>
     </>
   );
 
   return (
-    <div className="min-h-screen bg-[#f7f3f0] text-black">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[272px] flex-col bg-[#110703] px-3 py-5 text-white lg:flex">{sidebar}</aside>
+    <div className="min-h-screen bg-white text-black">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[272px] flex-col bg-[#110703]  py-5 text-white lg:flex">{sidebar}</aside>
       {menuOpen && <>
         <button type="button" aria-label="Close navigation" className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={closeMenu} />
         <aside className="fixed inset-y-0 left-0 z-50 flex w-[272px] flex-col bg-[#110703] px-3 py-5 text-white lg:hidden">{sidebar}</aside>
       </>}
       <main className="min-h-screen lg:ml-[272px]">
-        <header className="flex h-[68px] items-center border-b border-[#e3d8d1] bg-[#f7f3f0] px-4 md:px-8">
+        <header className="flex h-[68px] items-center border-b border-[#e3d8d1] bg-white px-4 md:px-8">
           <button type="button" aria-label="Open navigation" className="mr-3 rounded-md p-2 text-[#786961] lg:hidden" onClick={() => setMenuOpen(true)}><Menu size={19} /></button>
           <div className="hidden items-center gap-2 text-xs text-[#806f65] sm:flex"><span>Workspace</span><ChevronRight size={14} /><b className="font-semibold text-black">{title}</b></div>
           <button type="button" aria-label="Notifications" className="ml-auto rounded-md p-2 text-[#786961]"><Bell size={18} /></button>
-          <span className="ml-3 grid size-8 place-items-center rounded-full bg-[#c99b68] text-xs font-bold text-black">{user.email[0]?.toUpperCase()}</span>
         </header>
         {content}
       </main>

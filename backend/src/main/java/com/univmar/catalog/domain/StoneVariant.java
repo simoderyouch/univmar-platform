@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -21,6 +23,13 @@ public class StoneVariant {
     private Finish finish;
     @Column(name = "format_description", length = 160)
     private String format;
+    @Column(name = "main_image_url", length = 1000)
+    private String mainImageUrl;
+    @ElementCollection
+    @CollectionTable(name = "stone_variant_image", joinColumns = @JoinColumn(name = "variant_id"))
+    @Column(name = "image_url", nullable = false, length = 1000)
+    @OrderColumn(name = "position")
+    private final List<String> galleryImageUrls = new ArrayList<>();
     @Column(nullable = false)
     private boolean active = true;
     @Column(name = "created_at", nullable = false)
@@ -31,16 +40,19 @@ public class StoneVariant {
     protected StoneVariant() {
     }
 
-    public StoneVariant(StoneMaterial material, BigDecimal thicknessMm, Finish finish, String format) {
+    public StoneVariant(StoneMaterial material, BigDecimal thicknessMm, Finish finish, String format, String mainImageUrl, List<String> galleryImageUrls) {
         this.id = UUID.randomUUID();
         this.material = material;
-        update(thicknessMm, finish, format);
+        update(thicknessMm, finish, format, mainImageUrl, galleryImageUrls);
     }
 
-    public void update(BigDecimal thicknessMm, Finish finish, String format) {
+    public void update(BigDecimal thicknessMm, Finish finish, String format, String mainImageUrl, List<String> galleryImageUrls) {
         this.thicknessMm = thicknessMm;
         this.finish = finish;
         this.format = format;
+        this.mainImageUrl = mainImageUrl;
+        this.galleryImageUrls.clear();
+        if (galleryImageUrls != null) this.galleryImageUrls.addAll(galleryImageUrls);
     }
 
     @PrePersist
@@ -71,6 +83,14 @@ public class StoneVariant {
 
     public String getFormat() {
         return format;
+    }
+
+    public String getMainImageUrl() {
+        return mainImageUrl;
+    }
+
+    public List<String> getGalleryImageUrls() {
+        return List.copyOf(galleryImageUrls);
     }
 
     public boolean isActive() {

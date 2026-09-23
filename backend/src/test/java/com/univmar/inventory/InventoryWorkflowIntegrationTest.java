@@ -36,7 +36,9 @@ class InventoryWorkflowIntegrationTest {
                 "Atlas Ivory", null, "TEST-ATLAS-IVORY", StoneType.MARBLE,
                 "Morocco", "Ivory", null, null, null, null, List.of()));
         VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(
-                new BigDecimal("20.000"), Finish.HONED, "Slab"));
+                new BigDecimal("20.000"), Finish.HONED, "Slab", "/uploads/atlas-ivory-honed.jpg", List.of("/uploads/atlas-ivory-honed-detail.jpg")));
+        assertThat(variant.mainImageUrl()).isEqualTo("/uploads/atlas-ivory-honed.jpg");
+        assertThat(variant.galleryImageUrls()).containsExactly("/uploads/atlas-ivory-honed-detail.jpg");
         WarehouseResponse warehouse = inventory.createWarehouse(new WarehouseInput("CASA", "Casablanca Warehouse"));
         LocationResponse location = inventory.createLocation(warehouse.id(), new LocationInput("A-01", "A"));
 
@@ -46,6 +48,7 @@ class InventoryWorkflowIntegrationTest {
                 LocalDate.of(2026, 9, 17), MovementType.INITIAL_STOCK, "Opening balance"));
         assertThat(received.onHandM2()).isEqualByComparingTo("20.000");
         assertThat(received.availableM2()).isEqualByComparingTo("20.000");
+        assertThat(received.mainImageUrl()).isEqualTo("/uploads/atlas-ivory-honed.jpg");
 
         InventorySummary adjusted = inventory.adjust(received.id(), new AdjustmentInput(
                 MovementType.DAMAGE, new BigDecimal("3.000"), "Cracked during handling", null));

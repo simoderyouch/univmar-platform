@@ -34,12 +34,12 @@ export function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen bg-[#f7f3f0] lg:grid-cols-[1.1fr_0.9fr]">
+    <main className="grid min-h-screen bg-white lg:grid-cols-[1.1fr_0.9fr]">
       <section className="hidden bg-[#110703] p-12 text-white lg:flex lg:flex-col">
         <img src="/univmar-logo-w.png" alt="Univmar Marble" className="h-auto w-48 object-contain object-left" />
         <div className="my-auto max-w-md">
           <p className="text-[10px] font-bold tracking-[0.16em] text-[#d0ad7d]">STONE COMPANY MANAGEMENT</p>
-          <h1 className="mt-5 font-serif text-5xl leading-tight">One place for the work behind remarkable stone.</h1>
+          <h1 className="mt-5 font-sans text-5xl leading-tight">One place for the work behind remarkable stone.</h1>
           <p className="mt-6 text-sm leading-6 text-white/60">A secure workspace for your catalogue, inventory, customers, orders, and deliveries.</p>
         </div>
         <p className="text-xs text-white/35">Secure company workspace</p>
@@ -47,7 +47,7 @@ export function LoginPage() {
       <section className="grid place-items-center p-6 sm:p-10">
         <form onSubmit={submit} className="w-full max-w-sm">
           <p className="text-[10px] font-extrabold tracking-[0.16em] text-[#856958]">ADMIN WORKSPACE</p>
-          <h2 className="mt-2 font-serif text-4xl tracking-tight">Sign in</h2>
+          <h2 className="mt-2 font-sans text-4xl tracking-tight">Sign in</h2>
           <p className="mt-2 text-sm leading-6 text-[#786961]">Use the administrator account configured for this environment.</p>
           <div className="mt-8 grid gap-4">
             <TextField label="Email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} error={errors.email} placeholder="admin@univmar.local" required />

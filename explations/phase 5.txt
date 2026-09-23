@@ -1,0 +1,46 @@
+UNIVMAR — PHASE 5: PROJECT MANAGEMENT
+
+STATUS
+
+Phase 5 is complete. It introduces customer projects as the commercial
+container for RFQs, quotations, orders, deliveries, and invoices.
+
+PURPOSE
+
+A customer can run more than one construction or renovation project. Project
+records prevent commercial and operational information from being mixed across
+those jobs.
+
+PROJECT RECORD
+
+Each project belongs to one customer and stores its name, location, type,
+description, estimated value, start date, required delivery date, assigned
+sales agent, notes, and lifecycle status.
+
+STATUSES
+
+- LEAD
+- ACTIVE
+- ON_HOLD
+- COMPLETED
+- CANCELLED
+
+WORKFLOW
+
+1. Create or select a customer.
+2. Create a project for that customer.
+3. Use the project when creating RFQs and quotations.
+4. Orders, deliveries, and invoices keep the project reference, giving the
+   team a consistent view of the job throughout its lifecycle.
+
+INTERFACE
+
+The Projects workspace provides a list, search/filter controls, project
+creation, editing, and a detail view. Customer details also expose the projects
+that belong to that customer.
+
+DATA
+
+Migration V6 creates the customer_project table. Every project references a
+customer, so the system prevents a commercial record from being linked to a
+project owned by a different customer.

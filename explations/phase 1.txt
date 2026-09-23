@@ -1,0 +1,330 @@
+UNIVMAR — PHASE 1 IMPLEMENTATION
+STONE CATALOG
+
+STATUS
+
+Phase 1 is complete. This phase delivers the first usable business feature: the stone catalog. Administrators can create materials, upload their images, manage variants, search and filter the catalog, edit records, view details, and archive/reactivate materials or variants.
+
+The catalog is intentionally separate from inventory. A material defines what UNIVMAR sells; it does not contain stock quantities, warehouse locations, lots, bundles, or reservations. Those belong to Phase 2.
+
+==================================================
+BACKEND IMPLEMENTATION
+==================================================
+
+1. CATALOG DOMAIN AND DATABASE
+
+A Flyway migration creates the catalog data model:
+
+- stone_material
+  Stores the commercial material record.
+
+  Fields:
+  - id
+  - name
+  - commercial_name
+  - sku
+  - stone_type
+  - origin
+  - color
+  - pattern
+  - description
+  - applications
+  - main_image_url
+  - active
+  - created_at / updated_at
+
+- stone_material_image
+  Stores gallery image URLs and their position for a material.
+
+- stone_variant
+  Stores material variants.
+
+  Fields:
+  - id
+  - material_id
+  - thickness_mm
+  - finish
+  - format_description
+  - active
+  - created_at / updated_at
+
+Indexes were added for material name, common catalog filters, and variant lookups by material.
+
+2. CATALOG BUSINESS OBJECTS
+
+Implemented objects:
+
+- StoneMaterial
+- StoneVariant
+- StoneType
+- Finish
+
+Supported stone types:
+
+- Marble
+- Granite
+- Travertine
+- Limestone
+- Quartzite
+- Onyx
+- Other
+
+A material can have multiple variants. Each variant records thickness, finish, optional format, and active/archive status.
+
+3. MATERIAL API
+
+The catalog controller is available at:
+
+/api/v1/materials
+
+Implemented endpoints:
+
+- GET /api/v1/materials
+  Lists materials with server-side pagination.
+
+  Supported query parameters:
+  - search: searches name, commercial name, and SKU
+  - type: filters by stone type
+  - origin: filters by origin
+  - color: filters by color
+  - active: filters active or archived records
+  - page and size: pagination controls
+
+- POST /api/v1/materials
+  Creates a material.
+
+- GET /api/v1/materials/{id}
+  Returns full material details, including gallery URLs and variants.
+
+- PUT /api/v1/materials/{id}
+  Updates a material in a controlled way.
+
+- PATCH /api/v1/materials/{id}/active
+  Activates or archives a material without deleting it.
+
+4. VARIANT API
+
+- POST /api/v1/materials/{id}/variants
+  Creates a variant for a material.
+
+- PUT /api/v1/materials/{materialId}/variants/{variantId}
+  Updates a variant.
+
+- PATCH /api/v1/materials/{materialId}/variants/{variantId}/active
+  Activates or archives a variant.
+
+5. VALIDATION AND BUSINESS RULES
+
+The backend validates the catalog rules:
+
+- Material name is required.
+- SKU is required and unique, case-insensitively.
+- Stone type is required.
+- Variant thickness must be positive.
+- Duplicate variants are rejected when thickness, finish, and format already exist for the same material.
+- Optional text values are trimmed before storage.
+- Catalog errors use the standard API error response so the frontend can show useful field-level feedback.
+
+6. IMAGE STORAGE API
+
+Image upload is separate from material creation.
+
+Endpoint:
+
+POST /api/v1/uploads/images
+
+How it works:
+
+1. The frontend sends a selected image as multipart form data.
+2. The backend checks that it is JPEG, PNG, or WebP and no larger than 10 MB.
+3. The file receives a unique UUID filename.
+4. It is stored locally in backend/data/uploads/images.
+5. The API returns the public image URL.
+6. The frontend saves that URL in the material's main image or gallery list through the material API.
+
+Uploaded image URLs can be read publicly. Uploading an image still requires an authenticated user.
+
+The local storage root and public API URL are configurable with:
+
+- UNIVMAR_STORAGE_ROOT
+- UNIVMAR_PUBLIC_API_URL
+
+This design allows a later move to S3, Cloudflare R2, MinIO, or another bucket without mixing storage logic into material creation.
+
+==================================================
+FRONTEND IMPLEMENTATION
+==================================================
+
+1. FRONTEND ORGANIZATION
+
+The frontend was reorganized as a maintainable React + TypeScript application.
+
+- src/app
+  Application composition, router provider, toast provider.
+
+- src/features/auth
+  Authentication provider, login page, and user types.
+
+- src/features/catalog
+  Catalog page, material types, form values, constants, and public exports.
+
+- src/features/dashboard
+  Dashboard page.
+
+- src/features/workspace
+  Placeholder pages for future business areas.
+
+- src/shared/api
+  Typed API client, standard request errors, token handling, and image upload function.
+
+- src/shared/ui
+  Reusable Shadcn-style Button, TextField, Modal, DataTable, and class-name utility.
+
+- src/widgets/app-shell
+  Protected workspace shell, sidebar navigation, and header.
+
+The application entry point is intentionally small: it only mounts React. Feature code is no longer concentrated in main.tsx.
+
+2. CATALOG LIST PAGE
+
+The Catalog page consumes live backend data through GET /api/v1/materials.
+
+It displays:
+
+- Main image or a clear missing-image placeholder
+- Material name
+- SKU and color
+- Stone type
+- Commercial name
+- Origin
+- Variant count
+- Active or archived status
+
+Available actions:
+
+- View material details
+- Edit material
+- Archive an active material
+- Reactivate an archived material
+
+Available filters:
+
+- Search by name, commercial name, or SKU
+- Stone type
+- Origin
+- Color
+- Active/archived status
+
+The list uses real server pagination. It shows the current result range, current page, total pages, and Previous/Next controls.
+
+3. CREATE AND EDIT MATERIAL FORM
+
+The create and edit screens use the real POST and PUT material endpoints.
+
+Form sections:
+
+- Commercial identity
+  - Material name
+  - SKU
+  - Commercial name
+  - Stone type
+
+- Appearance and provenance
+  - Origin
+  - Color
+  - Pattern / veining
+  - Description
+  - Recommended applications
+
+- Product imagery
+  - Primary image upload
+  - Multiple gallery image upload
+
+Image experience:
+
+- Users select files from their computer instead of pasting URLs.
+- The primary image is previewed before saving.
+- Gallery files are queued and can be removed before upload.
+- Client-side validation accepts JPEG, PNG, and WebP up to 10 MB.
+- On save, each selected file uploads first. The returned URLs are then sent in the material request.
+
+Server validation errors are shown in the form. For example, a duplicate SKU can be displayed to the user instead of failing silently.
+
+4. MATERIAL DETAILS PAGE
+
+The detail page consumes GET /api/v1/materials/{id}.
+
+It shows:
+
+- Large primary image
+- Gallery image count
+- SKU, stone type, and origin
+- Color
+- Pattern / veining
+- Description
+- Recommended applications
+- Active/archive status
+- Available material variants
+
+It does not show fake stock. It clearly explains that warehouse availability and allocation are managed separately when inventory is connected in Phase 2.
+
+5. VARIANT MANAGEMENT
+
+Variants are managed from the material details page.
+
+Administrators can:
+
+- Add a variant
+- Set thickness in millimetres
+- Set the finish
+- Add an optional format
+- Edit a variant
+- Archive a variant
+- Reactivate a variant
+
+6. DESIGN AND USABILITY
+
+The catalog interface uses:
+
+- The Univmar Marble logo
+- Primary brand color #110703
+- Tailwind CSS
+- Shadcn-style reusable UI primitives
+- Responsive layouts for desktop and mobile navigation
+- Loading, empty, error, and success states
+- Border-only input focus styling, without an input focus ring
+
+There is no Phase 1 or roadmap wording in the normal application interface.
+
+==================================================
+INTEGRATION AND VERIFICATION
+==================================================
+
+Verified during implementation:
+
+- Backend health endpoint returns UP.
+- Authentication works for an administrator account.
+- Authenticated catalog listing works.
+- The API accepts the color and page query parameters and returns the expected paginated response structure.
+- Vite successfully transformed all updated TypeScript modules.
+- git diff --check passed without whitespace errors.
+
+END-TO-END USER FLOW
+
+An administrator can now:
+
+1. Sign in.
+2. Open Catalog.
+3. Create Carrara White or another material.
+4. Enter its commercial information and characteristics.
+5. Upload a primary image and optional gallery images.
+6. Save the material.
+7. Open its details page.
+8. Add one or more variants, such as 20 mm / Honed and 30 mm / Polished.
+9. Edit the material or variants later.
+10. Search, filter by color/type/origin/status, and move through catalog pages.
+11. Archive or reactivate records when needed.
+
+PHASE 1 RESULT
+
+UNIVMAR now has a usable, authenticated stone catalog that provides the product foundation required before inventory, quotations, and orders are implemented in later phases.

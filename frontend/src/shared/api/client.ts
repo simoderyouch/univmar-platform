@@ -1,6 +1,12 @@
 export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
 export const accessTokenKey = "univmar.access-token";
 
+/** Resolve imported local asset paths after the catalog gallery was moved. */
+export function resolveImageUrl(url?: string | null): string | undefined {
+  if (!url) return undefined;
+  return url.replace(/\/images\//g, "/base-gallery/");
+}
+
 type ApiEnvelope<T> = { data: T };
 type ApiFailure = { message?: string; fields?: Record<string, string> };
 

@@ -26,13 +26,13 @@ public class CatalogService {
 
     public MaterialDetail create(MaterialInput input) {
         ensureUniqueSku(input.sku(), null);
-        return detail(materials.save(new StoneMaterial(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), input.stoneType(), trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()), trim(input.mainImageUrl()), input.galleryImageUrls())));
+        return detail(materials.save(new StoneMaterial(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), input.stoneType(), trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()))));
     }
 
     public MaterialDetail update(UUID id, MaterialInput input) {
         StoneMaterial material = material(id);
         ensureUniqueSku(input.sku(), id);
-        material.update(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), input.stoneType(), trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()), trim(input.mainImageUrl()), input.galleryImageUrls());
+        material.update(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), input.stoneType(), trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()));
         return detail(material);
     }
 
@@ -67,7 +67,7 @@ public class CatalogService {
     public VariantResponse createVariant(UUID materialId, VariantInput input) {
         StoneMaterial material = material(materialId);
         ensureUniqueVariant(materialId, input, null);
-        StoneVariant variant = new StoneVariant(material, input.thicknessMm(), input.finish(), trim(input.format()));
+        StoneVariant variant = new StoneVariant(material, input.thicknessMm(), input.finish(), trim(input.format()), trim(input.mainImageUrl()), input.galleryImageUrls());
         material.addVariant(variant);
         return variant(variant);
     }
@@ -75,7 +75,7 @@ public class CatalogService {
     public VariantResponse updateVariant(UUID materialId, UUID variantId, VariantInput input) {
         StoneVariant item = variant(materialId, variantId);
         ensureUniqueVariant(materialId, input, variantId);
-        item.update(input.thicknessMm(), input.finish(), trim(input.format()));
+        item.update(input.thicknessMm(), input.finish(), trim(input.format()), trim(input.mainImageUrl()), input.galleryImageUrls());
         return variant(item);
     }
 
@@ -106,15 +106,20 @@ public class CatalogService {
     }
 
     private MaterialSummary summary(StoneMaterial item) {
-        return new MaterialSummary(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getStoneType(), item.getOrigin(), item.getColor(), item.getMainImageUrl(), item.isActive(), item.getVariants().size());
+        String mainImageUrl = item.getVariants().stream()
+                .map(StoneVariant::getMainImageUrl)
+                .filter(url -> url != null && !url.isBlank())
+                .findFirst()
+                .orElse(null);
+        return new MaterialSummary(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getStoneType(), item.getOrigin(), item.getColor(), item.isActive(), item.getVariants().size(), mainImageUrl);
     }
 
     private MaterialDetail detail(StoneMaterial item) {
-        return new MaterialDetail(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getStoneType(), item.getOrigin(), item.getColor(), item.getPattern(), item.getDescription(), item.getApplications(), item.getMainImageUrl(), item.getGalleryImageUrls(), item.isActive(), item.getVariants().stream().map(this::variant).toList());
+        return new MaterialDetail(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getStoneType(), item.getOrigin(), item.getColor(), item.getPattern(), item.getDescription(), item.getApplications(), item.isActive(), item.getVariants().stream().map(this::variant).toList());
     }
 
     private VariantResponse variant(StoneVariant item) {
-        return new VariantResponse(item.getId(), item.getThicknessMm(), item.getFinish(), item.getFormat(), item.isActive());
+        return new VariantResponse(item.getId(), item.getThicknessMm(), item.getFinish(), item.getFormat(), item.getMainImageUrl(), item.getGalleryImageUrls(), item.isActive());
     }
 
     private String normalizeSku(String value) {
