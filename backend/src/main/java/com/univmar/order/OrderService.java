@@ -7,6 +7,7 @@ import com.univmar.order.api.OrderDtos.*;
 import com.univmar.order.domain.*;
 import com.univmar.quotation.domain.*;
 import com.univmar.slab.SlabService;
+import com.univmar.remnant.RemnantService;
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
@@ -18,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class OrderService {
-    private final SalesOrderRepository orders; private final QuotationRepository quotations; private final InventoryItemRepository inventory; private final InventoryReservationRepository reservations; private final StockMovementRepository movements; private final DeliveryRepository deliveries; private final SlabService slabs;
-    public OrderService(SalesOrderRepository orders, QuotationRepository quotations, InventoryItemRepository inventory, InventoryReservationRepository reservations, StockMovementRepository movements, DeliveryRepository deliveries, SlabService slabs) { this.orders = orders; this.quotations = quotations; this.inventory = inventory; this.reservations = reservations; this.movements = movements; this.deliveries = deliveries; this.slabs = slabs; }
+    private final SalesOrderRepository orders; private final QuotationRepository quotations; private final InventoryItemRepository inventory; private final InventoryReservationRepository reservations; private final StockMovementRepository movements; private final DeliveryRepository deliveries; private final SlabService slabs; private final RemnantService remnants;
+    public OrderService(SalesOrderRepository orders, QuotationRepository quotations, InventoryItemRepository inventory, InventoryReservationRepository reservations, StockMovementRepository movements, DeliveryRepository deliveries, SlabService slabs, RemnantService remnants) { this.orders = orders; this.quotations = quotations; this.inventory = inventory; this.reservations = reservations; this.movements = movements; this.deliveries = deliveries; this.slabs = slabs; this.remnants = remnants; }
 
     public Response acceptQuotation(UUID quotationId) {
         Quotation quote = quotations.findByIdForUpdate(quotationId).orElseThrow(() -> notFound("QUOTATION_NOT_FOUND", "Quotation was not found."));
@@ -38,7 +39,7 @@ public class OrderService {
     }
 
     public Response confirm(UUID id) { SalesOrder order = entity(id); if (order.getStatus() != OrderStatus.PENDING) throw conflict("ORDER_NOT_PENDING", "Only a pending order can be confirmed."); order.confirm(); return response(order); }
-    public Response cancel(UUID id) { SalesOrder order = entity(id); if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw conflict("ORDER_NOT_CANCELLABLE", "This order cannot be cancelled."); for (SalesOrderItem line : order.getItems()) for (InventoryReservation reservation : line.getReservations()) if (reservation.getStatus() == ReservationStatus.ACTIVE) { BigDecimal remaining = reservation.getRemainingM2(); InventoryItem item = reservation.getInventoryItem(); item.releaseReservation(remaining); reservation.release(); movements.save(new StockMovement(item, MovementType.ORDER_RESERVATION_RELEASE, remaining, "Order reservation released", null, Instant.now(), order.getNumber(), null)); } slabs.releaseForOrder(order.getId()); order.cancel(); return response(order); }
+    public Response cancel(UUID id) { SalesOrder order = entity(id); if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw conflict("ORDER_NOT_CANCELLABLE", "This order cannot be cancelled."); for (SalesOrderItem line : order.getItems()) for (InventoryReservation reservation : line.getReservations()) if (reservation.getStatus() == ReservationStatus.ACTIVE) { BigDecimal remaining = reservation.getRemainingM2(); InventoryItem item = reservation.getInventoryItem(); item.releaseReservation(remaining); reservation.release(); movements.save(new StockMovement(item, MovementType.ORDER_RESERVATION_RELEASE, remaining, "Order reservation released", null, Instant.now(), order.getNumber(), null)); } slabs.releaseForOrder(order.getId()); remnants.releaseForOrder(order.getId()); order.cancel(); return response(order); }
     @Transactional(readOnly = true) public Response detail(UUID id) { return response(entity(id)); }
     @Transactional(readOnly = true) public PageResult list(OrderStatus status, Pageable pageable) { Page<SalesOrder> page = status == null ? orders.findAll(pageable) : orders.findAll(org.springframework.data.jpa.domain.Specification.where((root, query, cb) -> cb.equal(root.get("status"), status)), pageable); return PageResult.from(page.map(this::response)); }
 
