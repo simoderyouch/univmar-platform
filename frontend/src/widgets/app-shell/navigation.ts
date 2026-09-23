@@ -1,4 +1,4 @@
-import { Boxes, ClipboardList, FileText, FolderKanban, Grid3X3, Handshake, LayoutDashboard, Package, Paperclip, QrCode, ReceiptText, Scissors, ScrollText, Truck, Users, type LucideIcon } from "lucide-react";
+import { Boxes, ClipboardList, Factory, FileText, FolderKanban, Grid3X3, Handshake, LayoutDashboard, Package, Paperclip, QrCode, ReceiptText, Scissors, ScrollText, Truck, Users, type LucideIcon } from "lucide-react";
 
 export type NavigationEntry = {
   label: string;
@@ -12,6 +12,7 @@ export const workspaceNavigation: NavigationEntry[] = [
   { label: "Inventory", to: "/inventory", icon: Boxes },
   { label: "Slabs", to: "/slabs", icon: Grid3X3 },
   { label: "Offcuts", to: "/remnants", icon: Scissors },
+  { label: "Fabrication", to: "/fabrication", icon: Factory },
   { label: "Scan labels", to: "/scan", icon: QrCode },
   { label: "Customers", to: "/customers", icon: Users },
   { label: "Projects", to: "/projects", icon: FolderKanban },

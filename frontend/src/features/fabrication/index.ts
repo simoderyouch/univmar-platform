@@ -1,0 +1,1 @@
+export { FabricationPage } from "./FabricationPage";
