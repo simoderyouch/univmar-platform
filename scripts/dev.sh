@@ -1,23 +1,22 @@
 #!/usr/bin/env bash
-# Starts the complete development stack: PostgreSQL, MinIO, API, and web.
-# Set UNIVMAR_DEV_MODE=local to use the H2/local-filesystem fallback.
+# Usage: ./scripts/dev.sh [local|container|h2]
+# local (default): Docker PostgreSQL + MinIO, native Spring Boot + Vite.
+# container: full Docker stack. h2: native API + Vite with in-memory fallback.
 set -euo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+mode="${1:-local}"
 
-if [ "${UNIVMAR_DEV_MODE:-docker}" = "local" ]; then
-  exec "$project_root/scripts/dev-local.sh"
-fi
-
-command -v docker >/dev/null 2>&1 || { echo "Docker is required for MinIO development mode. Use UNIVMAR_DEV_MODE=local ./scripts/dev.sh for the H2 fallback." >&2; exit 1; }
-docker compose version >/dev/null 2>&1 || { echo "Docker Compose is required." >&2; exit 1; }
-
-cd "$project_root"
-docker compose up --build -d
-
-echo "UNIVMAR development stack started."
-echo "Web:    http://localhost:5173"
-echo "API:    http://localhost:8080"
-echo "MinIO:  http://localhost:9001 (minioadmin / minioadmin)"
-echo "Login:  admin@univmar.local / ChangeMe123!"
-echo "Stop:   ./scripts/dev-stop.sh"
+case "$mode" in
+  local) exec "$project_root/scripts/dev-local.sh" ;;
+  h2) exec "$project_root/scripts/dev-h2.sh" ;;
+  container)
+    command -v docker >/dev/null 2>&1 || { echo "Docker is required for container mode." >&2; exit 1; }
+    cd "$project_root"
+    docker compose up --build -d
+    mkdir -p "$project_root/.run"
+    echo container >"$project_root/.run/mode"
+    echo "Container stack started. Web: http://localhost:5173 · API: http://localhost:8080 · MinIO: http://localhost:9001"
+    ;;
+  *) echo "Unknown mode: $mode. Use local, container, or h2." >&2; exit 1 ;;
+esac

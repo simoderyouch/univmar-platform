@@ -35,7 +35,7 @@ Install Java 17+, Maven, and Node.js 20+. Then run:
 
 ```sh
 chmod +x scripts/dev*.sh
-./scripts/dev.sh
+./scripts/dev.sh local
 ```
 
 Open `http://localhost:5173` and sign in with the local development account:
@@ -45,7 +45,9 @@ admin@univmar.local
 ChangeMe123!
 ```
 
-The API runs at `http://localhost:8080`. Use `./scripts/dev-stop.sh` to stop the stack, or `./scripts/dev-restart.sh` to restart it. Docker mode uses PostgreSQL and MinIO. To use the H2/local-filesystem fallback instead, run `UNIVMAR_DEV_MODE=local ./scripts/dev.sh`.
+The default `local` mode runs PostgreSQL and MinIO in Docker but runs Spring Boot and Vite directly on your machine for fast reloads. Use `./scripts/dev-stop.sh local` to stop it, or `./scripts/dev-restart.sh local` to restart it.
+
+Use `./scripts/dev.sh container` when you want the complete Docker stack, or `./scripts/dev.sh h2` for the in-memory H2/local-filesystem fallback.
 
 ## Media storage
 
