@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
-# Stops the local servers created by dev.sh.
+# Stops the development stack created by dev.sh.
 set -euo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 run_dir="$project_root/.run"
+
+if [ "${UNIVMAR_DEV_MODE:-docker}" != "local" ]; then
+  cd "$project_root"
+  docker compose down
+  exit 0
+fi
 
 for service in api web; do
   pid_file="$run_dir/$service.pid"

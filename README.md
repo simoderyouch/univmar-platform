@@ -29,7 +29,7 @@ Local planning documents, generated build output, uploaded media, IDE settings, 
 
 The Invoices workspace tracks money owed by customers; it does not process online payments. Create an invoice from a confirmed or fulfilled order, issue it, then record payments once they are received through the business's normal channels. Payment entries cannot exceed the invoice's remaining balance, and paid invoices cannot be voided.
 
-## Run locally without Docker
+## Run the development stack
 
 Install Java 17+, Maven, and Node.js 20+. Then run:
 
@@ -45,7 +45,7 @@ admin@univmar.local
 ChangeMe123!
 ```
 
-The API runs at `http://localhost:8080`. Use `./scripts/dev-stop.sh` to stop the local services, or `./scripts/dev-restart.sh` to restart them. The local H2 development database resets when the backend stops.
+The API runs at `http://localhost:8080`. Use `./scripts/dev-stop.sh` to stop the stack, or `./scripts/dev-restart.sh` to restart it. Docker mode uses PostgreSQL and MinIO. To use the H2/local-filesystem fallback instead, run `UNIVMAR_DEV_MODE=local ./scripts/dev.sh`.
 
 ## Media storage
 
