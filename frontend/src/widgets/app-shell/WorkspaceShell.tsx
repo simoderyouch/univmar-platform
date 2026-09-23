@@ -17,6 +17,7 @@ import { DocumentsPage } from "../../features/document";
 import { SlabsPage } from "../../features/slab";
 import { ScanPage } from "../../features/scan";
 import { RemnantsPage } from "../../features/remnant";
+import { FabricationPage } from "../../features/fabrication";
 import { PlaceholderPage } from "../../features/workspace";
 import { workspaceNavigation, type NavigationEntry } from "./navigation";
 
@@ -58,6 +59,8 @@ export function WorkspaceShell() {
           ? <SlabsPage />
           : path === "/remnants"
             ? <RemnantsPage />
+            : path === "/fabrication"
+              ? <FabricationPage />
           : path === "/scan"
             ? <ScanPage />
         : path === "/suppliers"
