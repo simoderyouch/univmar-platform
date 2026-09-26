@@ -4,6 +4,7 @@
 
 data/
 backend/data/
+base-gallery/
 backend/target/
 frontend/dist/
 frontend/node_modules/

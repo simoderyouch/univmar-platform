@@ -65,7 +65,7 @@ The Docker development stack uses MinIO automatically. Start it with:
 docker compose up --build
 ```
 
-MinIO is available at `http://localhost:9001` and the object API is at `http://localhost:9000`. The API creates the `univmar` bucket, imports the repository `base-gallery` on first startup, and stores new uploaded images in the same bucket. Do not expose either MinIO port in production.
+MinIO is available at `http://localhost:9001` and the object API is at `http://localhost:9000`. The API creates the `univmar` bucket and stores uploaded images there. Catalogue and portfolio media must be uploaded through the ERP or preloaded into private S3 storage before production deployment. Do not expose either MinIO port in production.
 
 To switch to AWS S3 or another S3-compatible provider, set:
 
