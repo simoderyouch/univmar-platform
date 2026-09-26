@@ -13,4 +13,5 @@ import org.springframework.web.bind.annotation.*;
 public class AuditController {
     private final AuditService audit; public AuditController(AuditService audit) { this.audit = audit; }
     @GetMapping public ApiResponse<List<Response>> list(@RequestParam DocumentTargetType targetType, @RequestParam UUID targetId, HttpServletRequest request) { return ApiResponse.of(audit.list(targetType, targetId), (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)); }
+    @GetMapping("/access-denials") public ApiResponse<List<Response>> accessDenials(HttpServletRequest request) { return ApiResponse.of(audit.accessDenials(), (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)); }
 }

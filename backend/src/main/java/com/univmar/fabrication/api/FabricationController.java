@@ -21,5 +21,6 @@ public class FabricationController {
     @PostMapping("/{id}/operations") public ApiResponse<Response> addOperation(@PathVariable UUID id, @Valid @RequestBody OperationInput input, HttpServletRequest request) { return ok(fabrication.addOperation(id, input), request); }
     @PostMapping("/{id}/operations/{operationId}/complete") public ApiResponse<Response> completeOperation(@PathVariable UUID id, @PathVariable UUID operationId, HttpServletRequest request) { return ok(fabrication.completeOperation(id, operationId), request); }
     @PostMapping("/{id}/materials") public ApiResponse<Response> material(@PathVariable UUID id, @Valid @RequestBody MaterialInput input, HttpServletRequest request) { return ok(fabrication.assignMaterial(id, input), request); }
+    @PostMapping("/{id}/cancel") public ApiResponse<Response> cancel(@PathVariable UUID id, HttpServletRequest request) { return ok(fabrication.cancel(id), request); }
     private <T> ApiResponse<T> ok(T data, HttpServletRequest request) { return ApiResponse.of(data, (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)); }
 }

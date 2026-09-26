@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/deliveries")
 public class DeliveryController {
     private final DeliveryService deliveries; public DeliveryController(DeliveryService deliveries) { this.deliveries = deliveries; }
-    @GetMapping public ApiResponse<PageResult> list(@RequestParam(required = false) DeliveryStatus status, @PageableDefault(size = 20, sort = "createdAt") Pageable page, HttpServletRequest request) { return ok(deliveries.list(status, page), request); }
+    @GetMapping public ApiResponse<PageResult> list(@RequestParam(required = false) DeliveryStatus status, @RequestParam(required = false) String search, @PageableDefault(size = 20, sort = "createdAt") Pageable page, HttpServletRequest request) { return ok(deliveries.list(status, search, page), request); }
     @PostMapping public ResponseEntity<ApiResponse<Response>> create(@Valid @RequestBody CreateInput input, HttpServletRequest request) { return ResponseEntity.status(HttpStatus.CREATED).body(ok(deliveries.create(input), request)); }
     @GetMapping("/{id}") public ApiResponse<Response> detail(@PathVariable UUID id, HttpServletRequest request) { return ok(deliveries.detail(id), request); }
     @PostMapping("/{id}/items") public ApiResponse<Response> addItems(@PathVariable UUID id, @Valid @RequestBody List<@Valid ItemInput> input, HttpServletRequest request) { return ok(deliveries.addItems(id, input), request); }

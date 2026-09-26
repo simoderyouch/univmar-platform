@@ -5,7 +5,7 @@ UNIVMAR is a stone-company management platform. The workspace currently covers c
 ## Repository layout
 
 ```text
-backend/    Spring Boot REST API, Flyway migrations, authentication, catalog, and local image storage
+backend/    Spring Boot REST API, Flyway migrations, authentication, catalog, and provider-based media storage
 frontend/   React + TypeScript workspace built with Vite, Tailwind, and reusable UI components
 scripts/    Local development start, stop, and restart commands
 ```
@@ -29,13 +29,13 @@ Local planning documents, generated build output, uploaded media, IDE settings, 
 
 The Invoices workspace tracks money owed by customers; it does not process online payments. Create an invoice from a confirmed or fulfilled order, issue it, then record payments once they are received through the business's normal channels. Payment entries cannot exceed the invoice's remaining balance, and paid invoices cannot be voided.
 
-## Run locally without Docker
+## Run the development stack
 
 Install Java 17+, Maven, and Node.js 20+. Then run:
 
 ```sh
 chmod +x scripts/dev*.sh
-./scripts/dev.sh
+./scripts/dev.sh local
 ```
 
 Open `http://localhost:5173` and sign in with the local development account:
@@ -45,8 +45,36 @@ admin@univmar.local
 ChangeMe123!
 ```
 
-The API runs at `http://localhost:8080`. Use `./scripts/dev-stop.sh` to stop the local services, or `./scripts/dev-restart.sh` to restart them. The local H2 development database resets when the backend stops.
+The default `local` mode runs PostgreSQL and MinIO in Docker but runs Spring Boot and Vite directly on your machine for fast reloads. Use `./scripts/dev-stop.sh local` to stop it, or `./scripts/dev-restart.sh local` to restart it.
+
+Use `./scripts/dev.sh container` when you want the complete Docker stack, or `./scripts/dev.sh h2` for the in-memory H2/local-filesystem fallback.
 
 ## Media storage
 
-In local development, uploaded catalog images are stored at `backend/data/uploads/images`. Set `UNIVMAR_STORAGE_ROOT` and `UNIVMAR_PUBLIC_API_URL` when moving media to managed storage.
+Storage is provider-based so the application can switch between local files and S3-compatible object storage without changing catalog code. The object bucket is private: uploaded catalog images are delivered through the ERP's public image route, and supporting documents require a staff session.
+
+The default non-Docker profile uses local files at `backend/data/uploads/images`:
+
+```sh
+UNIVMAR_STORAGE_PROVIDER=local
+```
+
+The Docker development stack uses MinIO automatically. Start it with:
+
+```sh
+docker compose up --build
+```
+
+MinIO is available at `http://localhost:9001` and the object API is at `http://localhost:9000`. The API creates the `univmar` bucket and stores uploaded images there. Catalogue and portfolio media must be uploaded through the ERP or preloaded into private S3 storage before production deployment. Do not expose either MinIO port in production.
+
+To switch to AWS S3 or another S3-compatible provider, set:
+
+```sh
+UNIVMAR_STORAGE_PROVIDER=s3
+UNIVMAR_STORAGE_S3_ENDPOINT=https://s3.amazonaws.com
+UNIVMAR_STORAGE_S3_REGION=eu-west-1
+UNIVMAR_STORAGE_S3_BUCKET=your-bucket
+UNIVMAR_STORAGE_S3_ACCESS_KEY=...
+UNIVMAR_STORAGE_S3_SECRET_KEY=...
+UNIVMAR_PUBLIC_API_URL=https://erp.example.com/api/v1
+```

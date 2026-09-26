@@ -6,19 +6,26 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
+    private static final String DEVELOPMENT_DEFAULT_SECRET = "change-this-development-secret-to-a-32-byte-minimum-value";
     private final SecretKey key;
     private final long accessTokenMinutes;
 
     public JwtService(@Value("${univmar.security.jwt-secret}") String secret,
-                      @Value("${univmar.security.access-token-minutes:30}") long accessTokenMinutes) {
+                      @Value("${univmar.security.access-token-minutes:30}") long accessTokenMinutes,
+                      Environment environment) {
         if (secret.length() < 32) throw new IllegalStateException("UNIVMAR_JWT_SECRET must be at least 32 characters.");
+        if (Arrays.asList(environment.getActiveProfiles()).contains("production") && DEVELOPMENT_DEFAULT_SECRET.equals(secret)) {
+            throw new IllegalStateException("UNIVMAR_JWT_SECRET must be explicitly configured in production.");
+        }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessTokenMinutes = accessTokenMinutes;
     }
@@ -26,7 +33,7 @@ public class JwtService {
     public String createAccessToken(User user) {
         Instant now = Instant.now();
         return Jwts.builder().subject(user.getId().toString()).claim("email", user.getEmail())
-                .claim("role", user.getRole().name()).issuedAt(Date.from(now))
+                .claim("role", user.getRole().name()).claim("credentialsVersion", user.getCredentialsVersion()).issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(accessTokenMinutes * 60))).signWith(key).compact();
     }
 

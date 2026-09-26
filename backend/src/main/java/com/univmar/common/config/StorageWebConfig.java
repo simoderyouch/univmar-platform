@@ -15,6 +15,6 @@ public class StorageWebConfig implements WebMvcConfigurer {
     }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/api/v1/uploads/**").addResourceLocations(storageLocation);
+        registry.addResourceHandler("/api/v1/uploads/documents/**").addResourceLocations(storageLocation + "documents/");
     }
 }

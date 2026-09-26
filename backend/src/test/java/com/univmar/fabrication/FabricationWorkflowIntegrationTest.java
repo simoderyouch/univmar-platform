@@ -37,7 +37,7 @@ class FabricationWorkflowIntegrationTest {
     void tracks_an_order_from_measurement_to_ready_with_assigned_material_and_operations() {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         MaterialDetail material = catalog.create(new com.univmar.catalog.api.CatalogDtos.MaterialInput("Workshop Stone " + suffix, null, "FAB-" + suffix, StoneType.MARBLE, "Morocco", "White", null, null, null, null, List.of()));
-        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), Finish.POLISHED, "Slab"));
+        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), "Polished", "Slab"));
         WarehouseResponse warehouse = inventory.createWarehouse(new WarehouseInput("F" + suffix, "Fabrication warehouse"));
         LocationResponse location = inventory.createLocation(warehouse.id(), new LocationInput("F-01", "Workshop rack"));
         InventorySummary received = inventory.receive(new ReceiptInput(variant.id(), warehouse.id(), location.id(), "LOT-F", null, new BigDecimal("5.000"), null, null, LocalDate.now(), MovementType.INITIAL_STOCK, null));
@@ -47,13 +47,21 @@ class FabricationWorkflowIntegrationTest {
         com.univmar.quotation.api.QuotationDtos.Response quote = quotations.send(quotations.create(quotation).id());
         Response order = orders.acceptQuotation(quote.id());
 
+        var cancelledJob = fabrication.create(new CreateInput(order.id(), "Cancelled material allocation", FabricationPriority.NORMAL, null, null, null, null, List.of()));
+        fabrication.assignMaterial(cancelledJob.id(), new com.univmar.fabrication.api.FabricationDtos.MaterialInput(FabricationMaterialType.INVENTORY_ITEM, received.id(), new BigDecimal("2.000"), null));
+        assertThat(inventory.detail(received.id()).inventory().reservedM2()).isEqualByComparingTo("4.000");
+        var competingJob = fabrication.create(new CreateInput(order.id(), "Competing material allocation", FabricationPriority.NORMAL, null, null, null, null, List.of()));
+        assertThatThrownBy(() -> fabrication.assignMaterial(competingJob.id(), new com.univmar.fabrication.api.FabricationDtos.MaterialInput(FabricationMaterialType.INVENTORY_ITEM, received.id(), new BigDecimal("1.000"), null))).isInstanceOf(ApiException.class);
+        assertThat(fabrication.cancel(cancelledJob.id()).status()).isEqualTo(FabricationStatus.CANCELLED);
+        assertThat(inventory.detail(received.id()).inventory().reservedM2()).isEqualByComparingTo("2.000");
+
         com.univmar.fabrication.api.FabricationDtos.Response job = fabrication.create(new CreateInput(order.id(), "Lobby vanity tops", FabricationPriority.HIGH, LocalDate.now().plusDays(5), "Verify sink-centre dimensions", "https://example.test/drawing.pdf", null, List.of(new OperationInput(FabricationOperationType.CUTTING, null), new OperationInput(FabricationOperationType.POLISHING, null), new OperationInput(FabricationOperationType.QUALITY_CHECK, null))));
         assertThat(job.status()).isEqualTo(FabricationStatus.MEASUREMENT);
         assertThatThrownBy(() -> fabrication.advance(job.id(), new AdvanceInput(FabricationStatus.CUTTING))).isInstanceOf(ApiException.class);
 
         fabrication.advance(job.id(), new AdvanceInput(FabricationStatus.DRAWING));
         fabrication.advance(job.id(), new AdvanceInput(FabricationStatus.MATERIAL_ALLOCATED));
-        fabrication.assignMaterial(job.id(), new com.univmar.fabrication.api.FabricationDtos.MaterialInput(FabricationMaterialType.INVENTORY_ITEM, received.id(), "Reserved selection"));
+        fabrication.assignMaterial(job.id(), new com.univmar.fabrication.api.FabricationDtos.MaterialInput(FabricationMaterialType.INVENTORY_ITEM, received.id(), new BigDecimal("2.000"), "Reserved selection"));
         fabrication.advance(job.id(), new AdvanceInput(FabricationStatus.CUTTING));
         for (Operation operation : fabrication.detail(job.id()).operations()) fabrication.completeOperation(job.id(), operation.id());
         fabrication.advance(job.id(), new AdvanceInput(FabricationStatus.FINISHING));
@@ -62,6 +70,9 @@ class FabricationWorkflowIntegrationTest {
 
         assertThat(ready.status()).isEqualTo(FabricationStatus.READY);
         assertThat(ready.readyAt()).isNotNull();
+        assertThat(inventory.detail(received.id()).inventory().onHandM2()).isEqualByComparingTo("3.000");
+        assertThat(inventory.detail(received.id()).inventory().reservedM2()).isEqualByComparingTo("2.000");
+        assertThat(inventory.detail(received.id()).movements()).extracting(movement -> movement.type()).contains(MovementType.FABRICATION_CONSUMPTION);
         assertThat(ready.materials()).singleElement().satisfies(assigned -> assertThat(assigned.materialType()).isEqualTo(FabricationMaterialType.INVENTORY_ITEM));
         assertThat(ready.operations()).allSatisfy(operation -> assertThat(operation.status()).isEqualTo(FabricationOperationStatus.COMPLETED));
     }

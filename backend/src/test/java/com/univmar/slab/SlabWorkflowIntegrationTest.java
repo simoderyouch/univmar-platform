@@ -7,7 +7,6 @@ import com.univmar.catalog.api.CatalogDtos.MaterialDetail;
 import com.univmar.catalog.api.CatalogDtos.MaterialInput;
 import com.univmar.catalog.api.CatalogDtos.VariantInput;
 import com.univmar.catalog.api.CatalogDtos.VariantResponse;
-import com.univmar.catalog.domain.Finish;
 import com.univmar.catalog.domain.StoneType;
 import com.univmar.customer.CustomerService;
 import com.univmar.customer.api.CustomerDtos.CustomerInput;
@@ -32,6 +31,7 @@ import com.univmar.quotation.api.QuotationDtos.Input;
 import com.univmar.quotation.api.QuotationDtos.Item;
 import com.univmar.slab.api.SlabDtos.CreateInput;
 import com.univmar.slab.api.SlabDtos.ReserveInput;
+import com.univmar.slab.api.SlabDtos.UpdateInput;
 import com.univmar.slab.domain.SlabStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -55,7 +55,7 @@ class SlabWorkflowIntegrationTest {
     void reserves_the_exact_slab_for_an_eligible_order_line_and_releases_it_with_the_order() {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         MaterialDetail material = catalog.create(new MaterialInput("Slab Ivory " + suffix, null, "SLB-" + suffix, StoneType.MARBLE, "Morocco", "Ivory", null, null, null, null, List.of()));
-        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), Finish.HONED, "Slab"));
+        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), "Honed", "Slab"));
         WarehouseResponse warehouse = inventory.createWarehouse(new WarehouseInput("S" + suffix, "Slab warehouse"));
         LocationResponse location = inventory.createLocation(warehouse.id(), new LocationInput("S-01", "Slab rack"));
         InventorySummary received = inventory.receive(new ReceiptInput(variant.id(), warehouse.id(), location.id(), "LOT-S", null, new BigDecimal("2.000"), null, null, LocalDate.now(), MovementType.INITIAL_STOCK, null));
@@ -66,10 +66,14 @@ class SlabWorkflowIntegrationTest {
         Response order = orders.acceptQuotation(quote.id());
 
         com.univmar.slab.api.SlabDtos.Response slab = slabs.create(new CreateInput("SLAB-" + suffix, received.id(), new BigDecimal("1000"), new BigDecimal("900"), null, new BigDecimal("1000"), "First choice piece"));
+        com.univmar.slab.api.SlabDtos.Response edited = slabs.update(slab.id(), new UpdateInput("SLAB-EDITED-" + suffix, new BigDecimal("1100"), new BigDecimal("900"), "/base-gallery/slabs/edited.jpg", new BigDecimal("1200"), "Updated inspection note"));
+        assertThat(edited.slabNumber()).isEqualTo("SLAB-EDITED-" + suffix.toUpperCase());
+        assertThat(edited.surfaceAreaM2()).isEqualByComparingTo("0.990");
+        assertThat(edited.photoUrl()).isEqualTo("/base-gallery/slabs/edited.jpg");
         com.univmar.slab.api.SlabDtos.Response reserved = slabs.reserve(slab.id(), new ReserveInput(order.items().get(0).id()));
 
         assertThat(reserved.status()).isEqualTo(SlabStatus.RESERVED);
-        assertThat(reserved.surfaceAreaM2()).isEqualByComparingTo("0.900");
+        assertThat(reserved.surfaceAreaM2()).isEqualByComparingTo("0.990");
         assertThat(reserved.reservedOrderNumber()).isEqualTo(order.number());
 
         orders.cancel(order.id());

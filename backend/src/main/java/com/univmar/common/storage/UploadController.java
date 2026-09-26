@@ -13,12 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1/uploads")
 public class UploadController {
-    private final LocalImageStorage storage;
+    private final ImageStorage storage;
     private final LocalDocumentStorage documents;
-    public UploadController(LocalImageStorage storage, LocalDocumentStorage documents) { this.storage = storage; this.documents = documents; }
+    public UploadController(ImageStorage storage, LocalDocumentStorage documents) { this.storage = storage; this.documents = documents; }
 
     @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<LocalImageStorage.UploadedImage> uploadImage(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+    public ApiResponse<ImageStorage.UploadedImage> uploadImage(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         return ApiResponse.of(storage.store(file), (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE));
     }
 

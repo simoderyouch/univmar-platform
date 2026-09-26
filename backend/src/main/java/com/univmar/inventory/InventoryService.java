@@ -74,6 +74,32 @@ public class InventoryService {
         return inventory(item);
     }
 
+    public InventorySummary recount(UUID id, PhysicalRecountInput input) {
+        InventoryItem item = items.findByIdForUpdate(id).orElseThrow(() -> notFound("INVENTORY_NOT_FOUND", "Inventory was not found."));
+        BigDecimal previous = item.getOnHandM2();
+        try { item.recountOnHand(input.countedOnHandM2()); } catch (IllegalArgumentException exception) { throw conflict("RECOUNT_BELOW_PROTECTED_STOCK", "A physical count cannot be lower than active reservations and damaged stock."); }
+        BigDecimal difference = input.countedOnHandM2().subtract(previous);
+        if (difference.signum() != 0) movements.save(new StockMovement(item, difference.signum() > 0 ? MovementType.PHYSICAL_RECOUNT_IN : MovementType.PHYSICAL_RECOUNT_OUT, difference.abs(), required(input.reason()), trim(input.comment()), Instant.now()));
+        return inventory(item);
+    }
+
+    public TransferResponse transfer(UUID id, TransferInput input) {
+        InventoryItem source = items.findByIdForUpdate(id).orElseThrow(() -> notFound("INVENTORY_NOT_FOUND", "Inventory was not found."));
+        Warehouse destinationWarehouse = warehouseEntity(input.destinationWarehouseId());
+        WarehouseLocation destinationLocation = locationEntity(destinationWarehouse.getId(), input.destinationLocationId());
+        if (!destinationWarehouse.isActive() || !destinationLocation.isActive()) throw conflict("INACTIVE_REFERENCE", "Stock can only be transferred to an active warehouse location.");
+        if (source.getLocation().getId().equals(destinationLocation.getId())) throw conflict("TRANSFER_SAME_LOCATION", "Choose a different destination location for the transfer.");
+        try { source.adjustOut(input.quantityM2()); } catch (IllegalArgumentException exception) { throw conflict("INSUFFICIENT_AVAILABLE_STOCK", "A transfer can use only available stock; reserved and damaged stock cannot be moved."); }
+        InventoryItem destination = items.findByPositionForUpdate(source.getVariant().getId(), destinationWarehouse.getId(), destinationLocation.getId(), source.getLotNumber(), source.getBundleNumber())
+            .orElseGet(() -> new InventoryItem(source.getVariant(), destinationWarehouse, destinationLocation, source.getLotNumber(), source.getBundleNumber(), source.getCostPerM2(), source.getSupplierName(), source.getArrivalDate()));
+        destination.adjustIn(input.quantityM2()); items.save(destination);
+        String reference = "TRF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
+        String reason = required(input.reason());
+        movements.save(new StockMovement(source, MovementType.LOCATION_TRANSFER_OUT, input.quantityM2(), reason, trim(input.comment()), Instant.now(), reference, null));
+        movements.save(new StockMovement(destination, MovementType.LOCATION_TRANSFER_IN, input.quantityM2(), reason, trim(input.comment()), Instant.now(), reference, null));
+        return new TransferResponse(reference, inventory(source), inventory(destination));
+    }
+
     @Transactional(readOnly = true)
     public InventoryPage list(String search, String lot, String bundle, UUID warehouseId, Pageable pageable) {
         Specification<InventoryItem> spec = specification(search, lot, bundle, warehouseId);
@@ -87,7 +113,7 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = true) public InventoryDetail detail(UUID id) { InventoryItem item = item(id); return new InventoryDetail(inventory(item), movements.findAllByInventoryItemIdOrderByOccurredAtDesc(id).stream().map(this::movement).toList(), reservations.findAllByInventoryItemIdAndStatus(id, ReservationStatus.ACTIVE).stream().map(reservation -> new ActiveReservation(reservation.getId(), reservation.getOrderItem().getOrder().getNumber(), reservation.getRemainingM2())).toList()); }
-    @Transactional(readOnly = true) public List<MaterialInventorySummary> materialSummary(UUID materialId) { return items.findAll().stream().filter(item -> item.getVariant().getMaterial().getId().equals(materialId)).collect(java.util.stream.Collectors.groupingBy(InventoryItem::getVariant)).entrySet().stream().map(entry -> new MaterialInventorySummary(entry.getKey().getId(), entry.getKey().getThicknessMm(), entry.getKey().getFinish(), entry.getKey().getFormat(), entry.getValue().stream().map(InventoryItem::getAvailableM2).reduce(BigDecimal.ZERO, BigDecimal::add))).sorted(Comparator.comparing(MaterialInventorySummary::thicknessMm)).toList(); }
+    @Transactional(readOnly = true) public List<MaterialInventorySummary> materialSummary(UUID materialId) { return items.findAll().stream().filter(item -> item.getVariant().getMaterial().getId().equals(materialId)).collect(java.util.stream.Collectors.groupingBy(InventoryItem::getVariant)).entrySet().stream().map(entry -> new MaterialInventorySummary(entry.getKey().getId(), entry.getKey().getThicknessMm(), entry.getKey().getVariantName(), entry.getKey().getFormat(), entry.getValue().stream().map(InventoryItem::getAvailableM2).reduce(BigDecimal.ZERO, BigDecimal::add))).sorted(Comparator.comparing(MaterialInventorySummary::thicknessMm)).toList(); }
     @Transactional(readOnly = true) public BigDecimal availableForVariant(UUID variantId) { return items.findAll().stream().filter(item -> item.getVariant().getId().equals(variantId)).map(InventoryItem::getAvailableM2).reduce(BigDecimal.ZERO, BigDecimal::add); }
 
     private Specification<InventoryItem> specification(String search, String lot, String bundle, UUID warehouseId) { return (root, query, cb) -> {
@@ -103,7 +129,7 @@ public class InventoryService {
     private InventoryItem item(UUID id) { return items.findById(id).orElseThrow(() -> notFound("INVENTORY_NOT_FOUND", "Inventory item was not found.")); }
     private WarehouseResponse warehouse(Warehouse item) { return new WarehouseResponse(item.getId(), item.getCode(), item.getName(), item.isActive()); }
     private LocationResponse location(WarehouseLocation item) { return new LocationResponse(item.getId(), item.getWarehouse().getId(), item.getCode(), item.getZone(), item.isActive()); }
-    private InventorySummary inventory(InventoryItem item) { StoneVariant variant = item.getVariant(); var material = variant.getMaterial(); return new InventorySummary(item.getId(), variant.getId(), material.getId(), material.getName(), material.getSku(), material.getMainImageUrl(), variant.getThicknessMm(), variant.getFinish(), variant.getFormat(), item.getLotNumber(), item.getBundleNumber(), warehouse(item.getWarehouse()), location(item.getLocation()), item.getOnHandM2(), item.getReservedM2(), item.getDamagedM2(), item.getAvailableM2(), item.getCostPerM2(), item.getSupplierName(), item.getArrivalDate()); }
+    private InventorySummary inventory(InventoryItem item) { StoneVariant variant = item.getVariant(); var material = variant.getMaterial(); return new InventorySummary(item.getId(), variant.getId(), material.getId(), material.getName(), material.getSku(), variant.getVariantName(), variant.getMainImageUrl(), variant.getThicknessMm(), variant.getFormat(), item.getLotNumber(), item.getBundleNumber(), warehouse(item.getWarehouse()), location(item.getLocation()), item.getOnHandM2(), item.getReservedM2(), item.getDamagedM2(), item.getAvailableM2(), item.getCostPerM2(), item.getSupplierName(), item.getArrivalDate()); }
     private MovementResponse movement(StockMovement item) { return new MovementResponse(item.getId(), item.getType(), item.getQuantityM2(), item.getReason(), item.getComment(), item.getOccurredAt(), item.getSourceReference(), item.getSourceSupplier()); }
     private ApiException notFound(String code, String message) { return new ApiException(HttpStatus.NOT_FOUND, code, message); }
     private ApiException conflict(String code, String message) { return new ApiException(HttpStatus.CONFLICT, code, message); }

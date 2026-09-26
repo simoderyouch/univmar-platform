@@ -1,1 +1,1 @@
-package com.univmar.project.domain; import java.util.UUID; import org.springframework.data.jpa.repository.*; public interface ProjectRepository extends JpaRepository<Project,UUID>,JpaSpecificationExecutor<Project>{}
+package com.univmar.project.domain; import java.util.UUID; import org.springframework.data.jpa.repository.*; public interface ProjectRepository extends JpaRepository<Project,UUID>,JpaSpecificationExecutor<Project>{ boolean existsByCustomerId(UUID customerId); }

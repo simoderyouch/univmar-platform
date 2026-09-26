@@ -1,0 +1,18 @@
+node_modules/
+.next/
+out/
+dist/
+.vercel/
+.seo-cache/
+*.log
+.env*
+!.env.example
+
+# Local source assets are large design files. Keep only app-ready public assets.
+*.pdf
+*.docx
+/*.png
+/*.jpg
+/*.jpeg
+!public/
+old/

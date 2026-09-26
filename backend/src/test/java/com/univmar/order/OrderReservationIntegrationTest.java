@@ -11,6 +11,10 @@ import com.univmar.customer.CustomerService;
 import com.univmar.customer.api.CustomerDtos.CustomerInput;
 import com.univmar.customer.api.CustomerDtos.CustomerResponse;
 import com.univmar.customer.domain.CustomerType;
+import com.univmar.delivery.DeliveryService;
+import com.univmar.delivery.api.DeliveryDtos.CreateInput;
+import com.univmar.delivery.api.DeliveryDtos.ItemInput;
+import com.univmar.delivery.domain.DeliveryStatus;
 import com.univmar.inventory.InventoryService;
 import com.univmar.inventory.api.InventoryDtos.*;
 import com.univmar.inventory.domain.MovementType;
@@ -38,12 +42,13 @@ class OrderReservationIntegrationTest {
     @Autowired private InventoryService inventory;
     @Autowired private QuotationService quotations;
     @Autowired private OrderService orders;
+    @Autowired private DeliveryService deliveries;
 
     @Test
     void accepts_a_quotation_atomically_reserves_stock_and_releases_it_on_cancellation() {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         MaterialDetail material = catalog.create(new MaterialInput("Reservation Ivory " + suffix, null, "RES-" + suffix, StoneType.MARBLE, "Morocco", "Ivory", null, null, null, null, List.of()));
-        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), Finish.HONED, "Slab"));
+        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), "Honed", "Slab"));
         WarehouseResponse warehouse = inventory.createWarehouse(new WarehouseInput("W" + suffix, "Reservation warehouse"));
         LocationResponse location = inventory.createLocation(warehouse.id(), new LocationInput("A-01", "A"));
         InventorySummary received = inventory.receive(new ReceiptInput(variant.id(), warehouse.id(), location.id(), "LOT-1", null, new BigDecimal("12.000"), null, null, LocalDate.now(), MovementType.INITIAL_STOCK, null));
@@ -65,8 +70,12 @@ class OrderReservationIntegrationTest {
         assertThat(quotations.detail(insufficient.id()).status()).isEqualTo(QuotationStatus.SENT);
         assertThat(inventory.detail(received.id()).inventory().reservedM2()).isEqualByComparingTo("10.000");
 
+        orders.confirm(order.id());
+        var plannedDelivery = deliveries.create(new CreateInput(order.id(), LocalDate.now().plusDays(1), null, List.of(new ItemInput(order.items().get(0).id(), new BigDecimal("10.000")))));
         Response cancelled = orders.cancel(order.id());
         assertThat(cancelled.status()).isEqualTo(OrderStatus.CANCELLED);
+        assertThat(deliveries.detail(plannedDelivery.id()).status()).isEqualTo(DeliveryStatus.CANCELLED);
+        assertThatThrownBy(() -> deliveries.prepare(plannedDelivery.id())).isInstanceOf(ApiException.class);
         assertThat(inventory.detail(received.id()).inventory().reservedM2()).isEqualByComparingTo("0.000");
     }
 }

@@ -1,8 +1,10 @@
 package com.univmar.remnant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.univmar.catalog.CatalogService;
+import com.univmar.common.api.ApiException;
 import com.univmar.catalog.api.CatalogDtos.*;
 import com.univmar.catalog.domain.*;
 import com.univmar.customer.CustomerService;
@@ -37,7 +39,7 @@ class RemnantWorkflowIntegrationTest {
     void registers_a_reusable_offcut_and_releases_its_exact_reservation_when_an_order_is_cancelled() {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         MaterialDetail material = catalog.create(new MaterialInput("Offcut Stone " + suffix, null, "OFF-" + suffix, StoneType.MARBLE, "Morocco", "Sand", null, null, null, null, List.of()));
-        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), Finish.HONED, "Slab"));
+        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), "Honed", "Slab"));
         WarehouseResponse warehouse = inventory.createWarehouse(new WarehouseInput("R" + suffix, "Remnant warehouse"));
         LocationResponse location = inventory.createLocation(warehouse.id(), new LocationInput("R-01", "Recovered stock"));
         InventorySummary received = inventory.receive(new ReceiptInput(variant.id(), warehouse.id(), location.id(), "LOT-R", null, new BigDecimal("3.000"), null, null, LocalDate.now(), MovementType.INITIAL_STOCK, null));
@@ -49,6 +51,10 @@ class RemnantWorkflowIntegrationTest {
         com.univmar.slab.api.SlabDtos.Response parent = slabs.create(new CreateInput("PARENT-" + suffix, received.id(), new BigDecimal("1200"), new BigDecimal("1000"), null, null, null));
 
         com.univmar.remnant.api.RemnantDtos.Response remnant = remnants.create(new com.univmar.remnant.api.RemnantDtos.CreateInput("OFFCUT-" + suffix, parent.id(), new BigDecimal("900"), new BigDecimal("500"), null, "Recovered after a cut"));
+        assertThat(slabs.detail(parent.id()).remainingSurfaceAreaM2()).isEqualByComparingTo("0.750");
+        assertThatThrownBy(() -> remnants.create(new com.univmar.remnant.api.RemnantDtos.CreateInput("OFFCUT-EXCEED-" + suffix, parent.id(), new BigDecimal("1000"), new BigDecimal("800"), null, null)))
+            .isInstanceOf(ApiException.class).hasMessage("The offcut area exceeds the parent slab's remaining cuttable area.");
+        assertThat(slabs.detail(parent.id()).remainingSurfaceAreaM2()).isEqualByComparingTo("0.750");
         com.univmar.remnant.api.RemnantDtos.Response reserved = remnants.reserve(remnant.id(), new ReserveInput(order.items().get(0).id()));
 
         assertThat(reserved.status()).isEqualTo(RemnantStatus.RESERVED);

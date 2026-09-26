@@ -16,6 +16,7 @@ public class SlabController {
     private final SlabService slabs; public SlabController(SlabService slabs) { this.slabs = slabs; }
     @GetMapping public ApiResponse<List<Response>> list(@RequestParam(required = false) SlabStatus status, @RequestParam(required = false) UUID inventoryItemId, HttpServletRequest request) { return ok(slabs.list(status, inventoryItemId), request); }
     @PostMapping public ResponseEntity<ApiResponse<Response>> create(@Valid @RequestBody CreateInput input, HttpServletRequest request) { return ResponseEntity.status(HttpStatus.CREATED).body(ok(slabs.create(input), request)); }
+    @PutMapping("/{id}") public ApiResponse<Response> update(@PathVariable UUID id, @Valid @RequestBody UpdateInput input, HttpServletRequest request) { return ok(slabs.update(id, input), request); }
     @GetMapping("/{id}") public ApiResponse<Response> detail(@PathVariable UUID id, HttpServletRequest request) { return ok(slabs.detail(id), request); }
     @PostMapping("/{id}/hold") public ApiResponse<Response> hold(@PathVariable UUID id, HttpServletRequest request) { return ok(slabs.hold(id), request); }
     @PostMapping("/{id}/reserve") public ApiResponse<Response> reserve(@PathVariable UUID id, @Valid @RequestBody ReserveInput input, HttpServletRequest request) { return ok(slabs.reserve(id, input), request); }

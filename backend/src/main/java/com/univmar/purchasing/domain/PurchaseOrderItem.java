@@ -9,6 +9,7 @@ import java.util.UUID;
 @Table(name = "purchase_order_item")
 public class PurchaseOrderItem {
     @Id private UUID id;
+    @Version private long version;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "purchase_order_id", nullable = false) private PurchaseOrder purchaseOrder;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "variant_id", nullable = false) private StoneVariant variant;
     @Column(name = "ordered_m2", nullable = false, precision = 14, scale = 3) private BigDecimal orderedM2;

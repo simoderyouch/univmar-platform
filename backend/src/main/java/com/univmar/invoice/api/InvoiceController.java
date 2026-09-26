@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/invoices")
 public class InvoiceController {
     private final InvoiceService invoices; public InvoiceController(InvoiceService invoices) { this.invoices = invoices; }
-    @GetMapping public ApiResponse<PageResult> list(@RequestParam(required = false) InvoiceStatus status, @PageableDefault(size = 20, sort = "createdAt") Pageable page, HttpServletRequest request) { return ok(invoices.list(status, page), request); }
+    @GetMapping public ApiResponse<PageResult> list(@RequestParam(required = false) InvoiceStatus status, @RequestParam(required = false) String search, @PageableDefault(size = 20, sort = "createdAt") Pageable page, HttpServletRequest request) { return ok(invoices.list(status, search, page), request); }
     @PostMapping("/from-order/{orderId}") public ResponseEntity<ApiResponse<Response>> create(@PathVariable UUID orderId, @Valid @RequestBody CreateInput input, HttpServletRequest request) { return ResponseEntity.status(HttpStatus.CREATED).body(ok(invoices.create(orderId, input), request)); }
     @GetMapping("/order/{orderId}") public ApiResponse<Response> forOrder(@PathVariable UUID orderId, HttpServletRequest request) { return ok(invoices.forOrder(orderId), request); }
     @GetMapping("/{id}") public ApiResponse<Response> detail(@PathVariable UUID id, HttpServletRequest request) { return ok(invoices.detail(id), request); }

@@ -1,6 +1,7 @@
 package com.univmar.invoice;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.univmar.catalog.CatalogService;
 import com.univmar.catalog.api.CatalogDtos.*;
@@ -14,6 +15,8 @@ import com.univmar.inventory.api.InventoryDtos.*;
 import com.univmar.inventory.domain.MovementType;
 import com.univmar.document.DocumentService;
 import com.univmar.document.domain.*;
+import com.univmar.common.storage.LocalDocumentStorage;
+import com.univmar.common.api.ApiException;
 import com.univmar.invoice.api.InvoiceDtos.*;
 import com.univmar.invoice.domain.*;
 import com.univmar.order.OrderService;
@@ -29,6 +32,7 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class InvoiceWorkflowIntegrationTest {
@@ -40,13 +44,14 @@ class InvoiceWorkflowIntegrationTest {
     @Autowired private OrderService orders;
     @Autowired private InvoiceService invoices;
     @Autowired private DocumentService documents;
+    @Autowired private LocalDocumentStorage storage;
     @Autowired private AuditService audit;
 
     @Test
     void tracks_manual_partial_and_full_payment_against_an_issued_invoice() {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         MaterialDetail material = catalog.create(new MaterialInput("Invoice Ivory " + suffix, null, "INV-" + suffix, StoneType.MARBLE, "Morocco", "Ivory", null, null, null, null, List.of()));
-        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), Finish.HONED, "Slab"));
+        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), "Honed", "Slab"));
         WarehouseResponse warehouse = inventory.createWarehouse(new WarehouseInput("I" + suffix, "Invoice warehouse"));
         LocationResponse location = inventory.createLocation(warehouse.id(), new LocationInput("A-01", "A"));
         inventory.receive(new ReceiptInput(variant.id(), warehouse.id(), location.id(), "LOT-1", null, new BigDecimal("2.000"), null, null, LocalDate.now(), MovementType.INITIAL_STOCK, null));
@@ -69,8 +74,11 @@ class InvoiceWorkflowIntegrationTest {
         assertThat(paid.status()).isEqualTo(InvoiceStatus.PAID);
         assertThat(paid.outstandingTotal()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(invoices.forOrder(order.id()).payments()).hasSize(2);
-        documents.create(new com.univmar.document.api.DocumentDtos.CreateInput(DocumentTargetType.INVOICE, paid.id(), DocumentType.INVOICE, "invoice.pdf", "http://localhost/files/invoice.pdf", "application/pdf", 512));
+        var uploaded = storage.store(new MockMultipartFile("file", "invoice.pdf", "application/pdf", new byte[]{1, 2, 3}));
+        documents.create(new com.univmar.document.api.DocumentDtos.CreateInput(DocumentTargetType.INVOICE, paid.id(), DocumentType.INVOICE, uploaded.originalFilename(), uploaded.url(), uploaded.contentType(), uploaded.size()));
         assertThat(documents.list(DocumentTargetType.INVOICE, paid.id())).extracting(item -> item.fileName()).containsExactly("invoice.pdf");
+        assertThatThrownBy(() -> documents.create(new com.univmar.document.api.DocumentDtos.CreateInput(DocumentTargetType.INVOICE, paid.id(), DocumentType.INVOICE, "invoice.pdf", "https://attacker.example/collect", "application/pdf", 512)))
+            .isInstanceOf(ApiException.class).hasMessage("Attach a document using the upload endpoint.");
         assertThat(audit.list(DocumentTargetType.INVOICE, paid.id())).extracting(item -> item.eventType()).contains("INVOICE_CREATED", "INVOICE_ISSUED", "PAYMENT_RECORDED", "DOCUMENT_ATTACHED");
     }
 }

@@ -44,13 +44,30 @@ univmar:
     zone-id: Africa/Casablanca
     currency: MAD
   storage:
+    provider: ${UNIVMAR_STORAGE_PROVIDER:local}
     root: ${UNIVMAR_STORAGE_ROOT:./data/uploads}
     public-api-url: ${UNIVMAR_PUBLIC_API_URL:http://localhost:8080/api/v1}
+    s3:
+      endpoint: ${UNIVMAR_STORAGE_S3_ENDPOINT:http://localhost:9000}
+      region: ${UNIVMAR_STORAGE_S3_REGION:us-east-1}
+      bucket: ${UNIVMAR_STORAGE_S3_BUCKET:univmar}
+      access-key: ${UNIVMAR_STORAGE_S3_ACCESS_KEY:minioadmin}
+      secret-key: ${UNIVMAR_STORAGE_S3_SECRET_KEY:minioadmin}
+      base-gallery-source: ${UNIVMAR_BASE_GALLERY_SOURCE:../base-gallery}
   bootstrap-admin:
     email: ${UNIVMAR_INITIAL_ADMIN_EMAIL:}
     password: ${UNIVMAR_INITIAL_ADMIN_PASSWORD:}
   web-lead:
     max-per-minute: ${UNIVMAR_WEB_LEAD_MAX_PER_MINUTE:12}
+  website-email:
+    enabled: ${UNIVMAR_WEBSITE_EMAIL_ENABLED:false}
+    to: ${UNIVMAR_WEBSITE_EMAIL_TO:}
+    from: ${UNIVMAR_WEBSITE_EMAIL_FROM:}
+    retry-delay-ms: ${UNIVMAR_WEBSITE_EMAIL_RETRY_DELAY_MS:60000}
+  quotation-email:
+    enabled: ${UNIVMAR_QUOTATION_EMAIL_ENABLED:false}
+    from: ${UNIVMAR_QUOTATION_EMAIL_FROM:}
+    public-base-url: ${UNIVMAR_QUOTATION_PUBLIC_BASE_URL:http://localhost:3001/fr/quote}
 springdoc:
   api-docs:
     path: /api-docs

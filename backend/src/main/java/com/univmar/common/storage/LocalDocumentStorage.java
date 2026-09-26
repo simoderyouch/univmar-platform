@@ -4,6 +4,7 @@ import com.univmar.common.api.ApiException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
+import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ public class LocalDocumentStorage {
         Map.entry("application/vnd.ms-excel", "xls"), Map.entry("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"), Map.entry("text/csv", "csv"),
         Map.entry("image/jpeg", "jpg"), Map.entry("image/png", "png"), Map.entry("image/webp", "webp")
     );
+    private static final String INTERNAL_DOCUMENT_PREFIX = "/api/v1/uploads/documents/";
+    private static final Pattern STORED_FILENAME = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(pdf|doc|docx|xls|xlsx|csv|jpg|png|webp)$", Pattern.CASE_INSENSITIVE);
     private final Path root; private final String publicApiUrl;
     public LocalDocumentStorage(@Value("${univmar.storage.root}") String root, @Value("${univmar.storage.public-api-url}") String publicApiUrl) { this.root = Path.of(root).toAbsolutePath().normalize(); this.publicApiUrl = publicApiUrl.replaceAll("/$", ""); }
     public UploadedDocument store(MultipartFile file) {
@@ -24,7 +27,32 @@ public class LocalDocumentStorage {
         if (file.getSize() > MAX_BYTES) throw new ApiException(HttpStatus.BAD_REQUEST, "DOCUMENT_TOO_LARGE", "Documents must be 20 MiB or smaller.");
         String contentType = Optional.ofNullable(file.getContentType()).orElse("").toLowerCase(Locale.ROOT); String extension = EXTENSIONS.get(contentType);
         if (extension == null) throw new ApiException(HttpStatus.BAD_REQUEST, "UNSUPPORTED_DOCUMENT", "Upload a PDF, Office document, CSV, JPEG, PNG, or WebP file.");
-        try { Path documents = root.resolve("documents"); Files.createDirectories(documents); String filename = UUID.randomUUID() + "." + extension; Path destination = documents.resolve(filename).normalize(); if (!destination.startsWith(documents)) throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_FILE", "The file name is invalid."); Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING); return new UploadedDocument(publicApiUrl + "/uploads/documents/" + filename, Optional.ofNullable(file.getOriginalFilename()).filter(name -> !name.isBlank()).orElse("document." + extension), contentType, file.getSize()); } catch (IOException exception) { throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "UPLOAD_FAILED", "The document could not be stored."); }
+        try { Path documents = documentsDirectory(); String filename = UUID.randomUUID() + "." + extension; Path destination = documents.resolve(filename).normalize(); if (!destination.startsWith(documents)) throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_FILE", "The file name is invalid."); Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING); return new UploadedDocument(INTERNAL_DOCUMENT_PREFIX + filename, Optional.ofNullable(file.getOriginalFilename()).filter(name -> !name.isBlank()).orElse("document." + extension), contentType, file.getSize()); } catch (IOException exception) { throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "UPLOAD_FAILED", "The document could not be stored."); }
+    }
+
+    /**
+     * Attachments can only point at files this service generated.  Returning a
+     * relative URL also keeps browser downloads on the configured API origin.
+     */
+    public String canonicalManagedUrl(String value) {
+        String url = value == null ? "" : value.trim();
+        String absolutePrefix = publicApiUrl + "/uploads/documents/";
+        String filename = url.startsWith(INTERNAL_DOCUMENT_PREFIX) ? url.substring(INTERNAL_DOCUMENT_PREFIX.length())
+            : url.startsWith(absolutePrefix) ? url.substring(absolutePrefix.length()) : null;
+        if (filename == null || !STORED_FILENAME.matcher(filename).matches()) throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_DOCUMENT_URL", "Attach a document using the upload endpoint.");
+        Path document = documentsDirectory().resolve(filename).normalize();
+        if (!document.startsWith(documentsDirectory()) || !Files.isRegularFile(document)) throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_DOCUMENT_URL", "The uploaded document was not found.");
+        return INTERNAL_DOCUMENT_PREFIX + filename;
+    }
+
+    public boolean isManagedUrl(String value) {
+        try { canonicalManagedUrl(value); return true; } catch (ApiException ignored) { return false; }
+    }
+
+    private Path documentsDirectory() {
+        Path documents = root.resolve("documents").normalize();
+        try { Files.createDirectories(documents); } catch (IOException exception) { throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "UPLOAD_FAILED", "The document storage could not be prepared."); }
+        return documents;
     }
     public record UploadedDocument(String url, String originalFilename, String contentType, long size) { }
 }

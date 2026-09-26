@@ -29,7 +29,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
             try {
                 Claims claims = jwtService.parse(header.substring(7));
-                users.findById(java.util.UUID.fromString(claims.getSubject())).filter(user -> user.isActive()).ifPresent(user -> {
+                Integer tokenCredentialsVersion = claims.get("credentialsVersion", Integer.class);
+                users.findById(java.util.UUID.fromString(claims.getSubject()))
+                    .filter(user -> user.isActive() && (tokenCredentialsVersion == null ? user.getCredentialsVersion() == 0 : tokenCredentialsVersion == user.getCredentialsVersion()))
+                    .ifPresent(user -> {
                     var authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
                     SecurityContextHolder.getContext().setAuthentication(
                         new UsernamePasswordAuthenticationToken(user.getId().toString(), null, List.of(authority)));
