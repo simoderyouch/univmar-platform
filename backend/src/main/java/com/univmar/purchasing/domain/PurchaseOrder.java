@@ -12,6 +12,7 @@ import java.util.UUID;
 @Table(name = "purchase_order")
 public class PurchaseOrder {
     @Id private UUID id;
+    @Version private long version;
     @Column(nullable = false, unique = true, length = 40) private String number;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "supplier_id", nullable = false) private Supplier supplier;
     @Enumerated(EnumType.STRING) @Column(nullable = false, length = 30) private PurchaseOrderStatus status = PurchaseOrderStatus.DRAFT;

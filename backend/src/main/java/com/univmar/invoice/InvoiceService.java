@@ -51,8 +51,8 @@ public class InvoiceService {
     }
     @Transactional(readOnly = true) public Response detail(UUID id) { return response(entity(id)); }
     @Transactional(readOnly = true) public Response forOrder(UUID orderId) { return response(invoices.findByOrderId(orderId).orElseThrow(() -> notFound("INVOICE_NOT_FOUND", "No invoice exists for this order."))); }
-    @Transactional(readOnly = true) public PageResult list(InvoiceStatus status, Pageable pageable) {
-        Page<CustomerInvoice> page = status == null ? invoices.findAll(pageable) : invoices.findAll(org.springframework.data.jpa.domain.Specification.where((root, query, cb) -> cb.equal(root.get("status"), status)), pageable);
+    @Transactional(readOnly = true) public PageResult list(InvoiceStatus status, String search, Pageable pageable) {
+        Page<CustomerInvoice> page = invoices.findAll((root, query, cb) -> { List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>(); if (status != null) predicates.add(cb.equal(root.get("status"), status)); if (search != null && !search.isBlank()) { String term = "%" + search.trim().toLowerCase(Locale.ROOT) + "%"; var order = root.join("order"); predicates.add(cb.or(cb.like(cb.lower(root.get("number")), term), cb.like(cb.lower(order.get("number")), term), cb.like(cb.lower(order.join("customer").get("name")), term), cb.like(cb.lower(order.join("project").get("name")), term))); } return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0])); }, pageable);
         return PageResult.from(page.map(this::response));
     }
 

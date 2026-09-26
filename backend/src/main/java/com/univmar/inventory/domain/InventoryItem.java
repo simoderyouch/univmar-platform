@@ -33,6 +33,7 @@ public class InventoryItem {
     public void receive(BigDecimal quantity) { onHandM2 = onHandM2.add(quantity); }
     public void adjustIn(BigDecimal quantity) { onHandM2 = onHandM2.add(quantity); }
     public void adjustOut(BigDecimal quantity) { requireAvailable(quantity); onHandM2 = onHandM2.subtract(quantity); }
+    public void recountOnHand(BigDecimal countedQuantity) { if (countedQuantity.compareTo(reservedM2.add(damagedM2)) < 0) throw new IllegalArgumentException("Physical count cannot be below reserved and damaged quantities."); onHandM2 = countedQuantity; }
     public void markDamaged(BigDecimal quantity) { requireAvailable(quantity); damagedM2 = damagedM2.add(quantity); }
     public void reserve(BigDecimal quantity) { requireAvailable(quantity); reservedM2 = reservedM2.add(quantity); }
     public void releaseReservation(BigDecimal quantity) {

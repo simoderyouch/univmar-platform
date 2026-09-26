@@ -12,9 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class AuditService {
+    private static final UUID SECURITY_AUDIT_ID = new UUID(0L, 0L);
     private final AuditEventRepository events; private final UserRepository users;
     public AuditService(AuditEventRepository events, UserRepository users) { this.events = events; this.users = users; }
     public void record(DocumentTargetType targetType, UUID targetId, String eventType, String message) { events.save(new AuditEvent(targetType, targetId, eventType, message, actor())); }
     @Transactional(readOnly = true) public List<Response> list(DocumentTargetType targetType, UUID targetId) { return events.findAllByTargetTypeAndTargetIdOrderByOccurredAtDesc(targetType, targetId).stream().map(event -> new Response(event.getId(), event.getEventType(), event.getMessage(), event.getActor(), event.getOccurredAt())).toList(); }
+    public void recordAccessDenied(String principal, String request) { events.save(new AuditEvent(DocumentTargetType.SECURITY, SECURITY_AUDIT_ID, "ACCESS_DENIED", "Denied " + request, principal == null || principal.isBlank() ? "Anonymous" : principal)); }
+    @Transactional(readOnly = true) public List<Response> accessDenials() { return events.findTop100ByTargetTypeAndEventTypeOrderByOccurredAtDesc(DocumentTargetType.SECURITY, "ACCESS_DENIED").stream().map(event -> new Response(event.getId(), event.getEventType(), event.getMessage(), event.getActor(), event.getOccurredAt())).toList(); }
     private String actor() { var authentication = SecurityContextHolder.getContext().getAuthentication(); try { return authentication == null ? "System" : users.findById(UUID.fromString(authentication.getName())).map(user -> user.getEmail()).orElse("System"); } catch (Exception ignored) { return "System"; } }
 }

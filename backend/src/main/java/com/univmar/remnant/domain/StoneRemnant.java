@@ -24,8 +24,12 @@ public class StoneRemnant {
     @Column(name = "updated_at", nullable = false) private Instant updatedAt;
     protected StoneRemnant() { }
     public StoneRemnant(String number, StoneSlab parentSlab, BigDecimal lengthMm, BigDecimal widthMm, String photoUrl, String notes) { id = UUID.randomUUID(); remnantNumber = number; this.parentSlab = parentSlab; this.lengthMm = lengthMm; this.widthMm = widthMm; surfaceAreaM2 = lengthMm.multiply(widthMm).divide(new BigDecimal("1000000"), 3, RoundingMode.HALF_UP); this.photoUrl = photoUrl; this.notes = notes; }
+    public void update(String number, BigDecimal lengthMm, BigDecimal widthMm, String photoUrl, String notes) { remnantNumber = number; this.lengthMm = lengthMm; this.widthMm = widthMm; surfaceAreaM2 = lengthMm.multiply(widthMm).divide(new BigDecimal("1000000"), 3, RoundingMode.HALF_UP); this.photoUrl = photoUrl; this.notes = notes; }
     public void hold() { if (status != RemnantStatus.AVAILABLE) throw new IllegalStateException(); status = RemnantStatus.HELD; }
     public void reserve(SalesOrderItem item) { if (status != RemnantStatus.AVAILABLE && status != RemnantStatus.HELD) throw new IllegalStateException(); reservedOrderItem = item; status = RemnantStatus.RESERVED; }
+    public void allocateForFabrication() { if (status != RemnantStatus.AVAILABLE && status != RemnantStatus.HELD) throw new IllegalStateException(); status = RemnantStatus.IN_FABRICATION; }
+    public void releaseFabrication() { if (status != RemnantStatus.IN_FABRICATION) throw new IllegalStateException(); status = RemnantStatus.AVAILABLE; }
+    public void consumeForFabrication() { if (status != RemnantStatus.IN_FABRICATION) throw new IllegalStateException(); status = RemnantStatus.CONSUMED; }
     public void release() { if (status != RemnantStatus.HELD && status != RemnantStatus.RESERVED) throw new IllegalStateException(); reservedOrderItem = null; status = RemnantStatus.AVAILABLE; }
     public void consume() { if (status != RemnantStatus.RESERVED) throw new IllegalStateException(); status = RemnantStatus.CONSUMED; }
     public void damage() { if (status != RemnantStatus.AVAILABLE && status != RemnantStatus.HELD) throw new IllegalStateException(); status = RemnantStatus.DAMAGED; }

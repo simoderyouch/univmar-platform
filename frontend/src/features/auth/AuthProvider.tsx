@@ -16,15 +16,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const handleAuthenticationLost = () => {
+      localStorage.removeItem(accessTokenKey);
+      setUser(null);
+    };
+    window.addEventListener("univmar:authentication-lost", handleAuthenticationLost);
     if (!localStorage.getItem(accessTokenKey)) {
       setLoading(false);
-      return;
+      return () => window.removeEventListener("univmar:authentication-lost", handleAuthenticationLost);
     }
 
     api<WorkspaceUser>("/auth/me")
       .then(setUser)
-      .catch(() => localStorage.removeItem(accessTokenKey))
+      .catch(handleAuthenticationLost)
       .finally(() => setLoading(false));
+    return () => window.removeEventListener("univmar:authentication-lost", handleAuthenticationLost);
   }, []);
 
   async function login(email: string, password: string) {

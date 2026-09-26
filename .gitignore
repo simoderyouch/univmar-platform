@@ -16,3 +16,5 @@ backend/target-old/
 /phase *.txt
 /univmar_feature_spec
 /univmar_phase_by_phase_roadmap.txt
+/explations
+/docs

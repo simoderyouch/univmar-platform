@@ -2,12 +2,15 @@ package com.univmar.common.storage;
 
 import com.univmar.common.api.ApiException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ public class LocalImageStorage implements ImageStorage {
     private static final Map<String, String> EXTENSIONS = Map.of(
         "image/jpeg", "jpg", "image/png", "png", "image/webp", "webp"
     );
+    private static final Pattern STORED_FILENAME = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(jpg|png|webp)$", Pattern.CASE_INSENSITIVE);
     private final Path root;
     private final String publicApiUrl;
 
@@ -45,6 +49,30 @@ public class LocalImageStorage implements ImageStorage {
         } catch (IOException exception) {
             throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "UPLOAD_FAILED", "The image could not be stored.");
         }
+    }
+
+    @Override
+    public StoredImage load(String filename) {
+        if (filename == null || !STORED_FILENAME.matcher(filename).matches()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "IMAGE_NOT_FOUND", "The image was not found.");
+        }
+        Path image = root.resolve("images").resolve(filename).normalize();
+        if (!image.startsWith(root.resolve("images").normalize())) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "IMAGE_NOT_FOUND", "The image was not found.");
+        }
+        try {
+            InputStream content = Files.newInputStream(image);
+            return new StoredImage(content, contentType(filename));
+        } catch (NoSuchFileException exception) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "IMAGE_NOT_FOUND", "The image was not found.");
+        } catch (IOException exception) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE_READ_FAILED", "The image could not be read.");
+        }
+    }
+
+    private String contentType(String filename) {
+        String lower = filename.toLowerCase(Locale.ROOT);
+        return lower.endsWith(".png") ? "image/png" : lower.endsWith(".webp") ? "image/webp" : "image/jpeg";
     }
 
 }

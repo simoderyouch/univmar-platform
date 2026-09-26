@@ -1,6 +1,7 @@
 package com.univmar.order;
 
 import com.univmar.common.api.ApiException;
+import com.univmar.auth.AccessControlService;
 import com.univmar.delivery.domain.DeliveryRepository;
 import com.univmar.inventory.domain.*;
 import com.univmar.order.api.OrderDtos.*;
@@ -19,11 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class OrderService {
-    private final SalesOrderRepository orders; private final QuotationRepository quotations; private final InventoryItemRepository inventory; private final InventoryReservationRepository reservations; private final StockMovementRepository movements; private final DeliveryRepository deliveries; private final SlabService slabs; private final RemnantService remnants;
-    public OrderService(SalesOrderRepository orders, QuotationRepository quotations, InventoryItemRepository inventory, InventoryReservationRepository reservations, StockMovementRepository movements, DeliveryRepository deliveries, SlabService slabs, RemnantService remnants) { this.orders = orders; this.quotations = quotations; this.inventory = inventory; this.reservations = reservations; this.movements = movements; this.deliveries = deliveries; this.slabs = slabs; this.remnants = remnants; }
+    private final SalesOrderRepository orders; private final QuotationRepository quotations; private final InventoryItemRepository inventory; private final InventoryReservationRepository reservations; private final StockMovementRepository movements; private final DeliveryRepository deliveries; private final SlabService slabs; private final RemnantService remnants; private final AccessControlService access;
+    public OrderService(SalesOrderRepository orders, QuotationRepository quotations, InventoryItemRepository inventory, InventoryReservationRepository reservations, StockMovementRepository movements, DeliveryRepository deliveries, SlabService slabs, RemnantService remnants, AccessControlService access) { this.orders = orders; this.quotations = quotations; this.inventory = inventory; this.reservations = reservations; this.movements = movements; this.deliveries = deliveries; this.slabs = slabs; this.remnants = remnants; this.access = access; }
 
-    public Response acceptQuotation(UUID quotationId) {
+    public Response acceptQuotation(UUID quotationId, AcceptanceInput acceptance) {
         Quotation quote = quotations.findByIdForUpdate(quotationId).orElseThrow(() -> notFound("QUOTATION_NOT_FOUND", "Quotation was not found."));
+        access.requireSalesOwnership(quote.getSalesAgent(), "quotation");
         if (quote.getStatus() != QuotationStatus.SENT) throw conflict("QUOTATION_NOT_ACCEPTABLE", "Only a sent quotation can be accepted.");
         if (quote.getExpiryDate() == null || quote.getExpiryDate().isBefore(LocalDate.now())) throw conflict("QUOTATION_EXPIRED", "An expired quotation cannot be accepted.");
         if (orders.findByQuotationId(quotationId).isPresent()) throw conflict("QUOTATION_ALREADY_CONVERTED", "This quotation already has an order.");
@@ -34,14 +36,18 @@ public class OrderService {
         order.event("ORDER_CREATED", "Order created from quotation " + quote.getNumber());
         reserve(order);
         quote.status(QuotationStatus.ACCEPTED);
+        order.event("CUSTOMER_ACCEPTANCE_RECORDED", "Accepted by " + acceptance.acceptedBy().trim() + " via " + acceptance.method().trim() + ". " + acceptance.note().trim());
         order.event("QUOTATION_ACCEPTED", "Quotation accepted and inventory reserved");
         return response(orders.save(order));
     }
 
-    public Response confirm(UUID id) { SalesOrder order = entity(id); if (order.getStatus() != OrderStatus.PENDING) throw conflict("ORDER_NOT_PENDING", "Only a pending order can be confirmed."); order.confirm(); return response(order); }
-    public Response cancel(UUID id) { SalesOrder order = entity(id); if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw conflict("ORDER_NOT_CANCELLABLE", "This order cannot be cancelled."); for (SalesOrderItem line : order.getItems()) for (InventoryReservation reservation : line.getReservations()) if (reservation.getStatus() == ReservationStatus.ACTIVE) { BigDecimal remaining = reservation.getRemainingM2(); InventoryItem item = reservation.getInventoryItem(); item.releaseReservation(remaining); reservation.release(); movements.save(new StockMovement(item, MovementType.ORDER_RESERVATION_RELEASE, remaining, "Order reservation released", null, Instant.now(), order.getNumber(), null)); } slabs.releaseForOrder(order.getId()); remnants.releaseForOrder(order.getId()); order.cancel(); return response(order); }
+    /** Compatibility path used by existing internal workflow tests and imports. */
+    public Response acceptQuotation(UUID quotationId) { return acceptQuotation(quotationId, new AcceptanceInput("SYSTEM", "System", "Acceptance recorded by an internal workflow.")); }
+
+    public Response confirm(UUID id) { SalesOrder order = entity(id); access.requireSalesOwnership(order.getQuotation().getSalesAgent(), "order"); if (order.getStatus() != OrderStatus.PENDING) throw conflict("ORDER_NOT_PENDING", "Only a pending order can be confirmed."); order.confirm(); return response(order); }
+    public Response cancel(UUID id) { SalesOrder order = entity(id); access.requireSalesOwnership(order.getQuotation().getSalesAgent(), "order"); if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw conflict("ORDER_NOT_CANCELLABLE", "This order cannot be cancelled."); List<com.univmar.delivery.domain.Delivery> orderDeliveries = deliveries.findAllByOrderId(order.getId()); if (orderDeliveries.stream().anyMatch(delivery -> delivery.getStatus() == com.univmar.delivery.domain.DeliveryStatus.DISPATCHED || delivery.getStatus() == com.univmar.delivery.domain.DeliveryStatus.DELIVERED)) throw conflict("ORDER_HAS_DISPATCHED_DELIVERY", "This order has stock already dispatched. Cancel the remaining fulfilment through an order amendment instead."); orderDeliveries.stream().filter(delivery -> delivery.getStatus() == com.univmar.delivery.domain.DeliveryStatus.PLANNED || delivery.getStatus() == com.univmar.delivery.domain.DeliveryStatus.PREPARING).forEach(delivery -> { delivery.cancel(); order.event("DELIVERY_CANCELLED", "Delivery " + delivery.getNumber() + " cancelled because the order was cancelled"); }); for (SalesOrderItem line : order.getItems()) for (InventoryReservation reservation : line.getReservations()) if (reservation.getStatus() == ReservationStatus.ACTIVE) { BigDecimal remaining = reservation.getRemainingM2(); InventoryItem item = reservation.getInventoryItem(); item.releaseReservation(remaining); reservation.release(); movements.save(new StockMovement(item, MovementType.ORDER_RESERVATION_RELEASE, remaining, "Order reservation released", null, Instant.now(), order.getNumber(), null)); } slabs.releaseForOrder(order.getId()); remnants.releaseForOrder(order.getId()); order.cancel(); return response(order); }
     @Transactional(readOnly = true) public Response detail(UUID id) { return response(entity(id)); }
-    @Transactional(readOnly = true) public PageResult list(OrderStatus status, Pageable pageable) { Page<SalesOrder> page = status == null ? orders.findAll(pageable) : orders.findAll(org.springframework.data.jpa.domain.Specification.where((root, query, cb) -> cb.equal(root.get("status"), status)), pageable); return PageResult.from(page.map(this::response)); }
+    @Transactional(readOnly = true) public PageResult list(OrderStatus status, String search, Pageable pageable) { Page<SalesOrder> page = orders.findAll((root, query, cb) -> { List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>(); if (status != null) predicates.add(cb.equal(root.get("status"), status)); if (search != null && !search.isBlank()) { String term = "%" + search.trim().toLowerCase(Locale.ROOT) + "%"; predicates.add(cb.or(cb.like(cb.lower(root.get("number")), term), cb.like(cb.lower(root.join("customer").get("name")), term), cb.like(cb.lower(root.join("project").get("name")), term))); } return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0])); }, pageable); return PageResult.from(page.map(this::response)); }
 
     private void reserve(SalesOrder order) {
         Map<UUID, List<SalesOrderItem>> grouped = new TreeMap<>(Comparator.comparing(UUID::toString));

@@ -23,6 +23,9 @@ public class User {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(name = "credentials_version", nullable = false)
+    private int credentialsVersion;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -37,6 +40,7 @@ public class User {
         this.passwordHash = passwordHash;
         this.role = role;
         this.active = true;
+        this.credentialsVersion = 0;
     }
 
     @PrePersist
@@ -50,4 +54,11 @@ public class User {
     public String getPasswordHash() { return passwordHash; }
     public Role getRole() { return role; }
     public boolean isActive() { return active; }
+    public int getCredentialsVersion() { return credentialsVersion; }
+    public Instant getCreatedAt() { return createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
+    public void changeRole(Role role) { this.role = role; }
+    public void changeActive(boolean active) { this.active = active; }
+    /** Changes the password and invalidates every access token issued before the reset. */
+    public void resetPassword(String passwordHash) { this.passwordHash = passwordHash; this.credentialsVersion++; }
 }

@@ -7,7 +7,6 @@ import com.univmar.catalog.api.CatalogDtos.MaterialDetail;
 import com.univmar.catalog.api.CatalogDtos.MaterialInput;
 import com.univmar.catalog.api.CatalogDtos.VariantInput;
 import com.univmar.catalog.api.CatalogDtos.VariantResponse;
-import com.univmar.catalog.domain.Finish;
 import com.univmar.catalog.domain.StoneType;
 import com.univmar.inventory.InventoryService;
 import com.univmar.inventory.api.InventoryDtos.InventorySummary;
@@ -39,7 +38,7 @@ class LabelWorkflowIntegrationTest {
     void issues_a_stable_qr_label_and_resolves_its_live_inventory_context() {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         MaterialDetail material = catalog.create(new MaterialInput("Label Stone " + suffix, null, "LBL-" + suffix, StoneType.MARBLE, "Morocco", "Sand", null, null, null, null, List.of()));
-        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("30.000"), Finish.POLISHED, "Slab"));
+        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("30.000"), "Polished", "Slab"));
         WarehouseResponse warehouse = inventory.createWarehouse(new WarehouseInput("L" + suffix, "Label warehouse"));
         LocationResponse location = inventory.createLocation(warehouse.id(), new LocationInput("L-01", "Labels"));
         InventorySummary received = inventory.receive(new ReceiptInput(variant.id(), warehouse.id(), location.id(), "LOT-LABEL", "BUNDLE-1", new BigDecimal("4.500"), null, null, LocalDate.now(), MovementType.INITIAL_STOCK, null));

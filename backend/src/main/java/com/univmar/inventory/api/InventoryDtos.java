@@ -1,6 +1,5 @@
 package com.univmar.inventory.api;
 
-import com.univmar.catalog.domain.Finish;
 import com.univmar.inventory.domain.MovementType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -21,13 +20,16 @@ public final class InventoryDtos {
     public record LocationResponse(UUID id, UUID warehouseId, String code, String zone, boolean active) { }
     public record ReceiptInput(@NotNull UUID variantId, @NotNull UUID warehouseId, @NotNull UUID locationId, @Size(max = 80) String lotNumber, @Size(max = 80) String bundleNumber, @NotNull @DecimalMin(value = "0.001") BigDecimal quantityM2, @DecimalMin(value = "0.00") BigDecimal costPerM2, @Size(max = 160) String supplierName, LocalDate arrivalDate, MovementType type, @Size(max = 2000) String comment) { }
     public record AdjustmentInput(@NotNull MovementType type, @NotNull @DecimalMin(value = "0.001") BigDecimal quantityM2, @NotBlank @Size(max = 500) String reason, @Size(max = 2000) String comment) { }
-    public record InventorySummary(UUID id, UUID variantId, UUID materialId, String materialName, String materialSku, String mainImageUrl, BigDecimal thicknessMm, Finish finish, String format, String lotNumber, String bundleNumber, WarehouseResponse warehouse, LocationResponse location, BigDecimal onHandM2, BigDecimal reservedM2, BigDecimal damagedM2, BigDecimal availableM2, BigDecimal costPerM2, String supplierName, LocalDate arrivalDate) { }
+    public record PhysicalRecountInput(@NotNull @DecimalMin(value = "0.000") BigDecimal countedOnHandM2, @NotBlank @Size(max = 500) String reason, @Size(max = 2000) String comment) { }
+    public record TransferInput(@NotNull UUID destinationWarehouseId, @NotNull UUID destinationLocationId, @NotNull @DecimalMin(value = "0.001") BigDecimal quantityM2, @NotBlank @Size(max = 500) String reason, @Size(max = 2000) String comment) { }
+    public record InventorySummary(UUID id, UUID variantId, UUID materialId, String materialName, String materialSku, String variantName, String mainImageUrl, BigDecimal thicknessMm, String format, String lotNumber, String bundleNumber, WarehouseResponse warehouse, LocationResponse location, BigDecimal onHandM2, BigDecimal reservedM2, BigDecimal damagedM2, BigDecimal availableM2, BigDecimal costPerM2, String supplierName, LocalDate arrivalDate) { }
     public record MovementResponse(UUID id, MovementType type, BigDecimal quantityM2, String reason, String comment, Instant occurredAt, String sourceReference, String sourceSupplier) { }
     public record ActiveReservation(UUID id, String orderNumber, BigDecimal quantityM2) { }
     public record InventoryDetail(InventorySummary inventory, List<MovementResponse> movements, List<ActiveReservation> reservations) { }
+    public record TransferResponse(String reference, InventorySummary source, InventorySummary destination) { }
     public record Totals(BigDecimal onHandM2, BigDecimal reservedM2, BigDecimal damagedM2, BigDecimal availableM2) { }
     public record InventoryPage(List<InventorySummary> content, int page, int size, long totalElements, int totalPages, Totals totals) {
         public static InventoryPage from(Page<InventorySummary> page, Totals totals) { return new InventoryPage(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages(), totals); }
     }
-    public record MaterialInventorySummary(UUID variantId, BigDecimal thicknessMm, Finish finish, String format, BigDecimal availableM2) { }
+    public record MaterialInventorySummary(UUID variantId, BigDecimal thicknessMm, String variantName, String format, BigDecimal availableM2) { }
 }

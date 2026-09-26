@@ -5,6 +5,7 @@ import com.univmar.delivery.domain.DeliveryStatus;
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
+import jakarta.validation.constraints.*;
 import org.springframework.data.domain.Page;
 
 public final class OrderDtos {
@@ -13,6 +14,7 @@ public final class OrderDtos {
     public record Item(UUID id, UUID variantId, String materialName, String variantLabel, BigDecimal quantityM2, BigDecimal unitPrice, BigDecimal lineTotal, List<Reservation> reservations) { }
     public record Event(UUID id, String type, String message, Instant occurredAt) { }
     public record Delivery(UUID id, String number, DeliveryStatus status, LocalDate scheduledDate) { }
+    public record AcceptanceInput(@NotBlank @Size(max = 80) String method, @NotBlank @Size(max = 180) String acceptedBy, @NotBlank @Size(max = 4000) String note) { }
     public record Response(UUID id, String number, UUID quotationId, String quotationNumber, UUID customerId, String customerName, UUID projectId, String projectName, OrderStatus status, BigDecimal subtotal, BigDecimal taxTotal, BigDecimal transport, BigDecimal grandTotal, Instant createdAt, Instant confirmedAt, Instant cancelledAt, List<Item> items, List<Delivery> deliveries, List<Event> events) { }
     public record PageResult(List<Response> content, int page, int size, long totalElements, int totalPages) { public static PageResult from(Page<Response> page) { return new PageResult(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages()); } }
 }

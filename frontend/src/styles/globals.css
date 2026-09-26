@@ -7,11 +7,30 @@ button { cursor: pointer; }
 button:focus-visible { outline: 2px solid #110703; outline-offset: 2px; }
 ::selection { background: #ead9cc; color: #110703; }
 .font-sans { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-.workspace-nav-scroll { scrollbar-width: thin; scrollbar-color: rgba(219, 184, 130, 0.48) transparent; scroll-behavior: smooth; }
-.workspace-nav-scroll::-webkit-scrollbar { width: 6px; }
-.workspace-nav-scroll::-webkit-scrollbar-track { background: transparent; }
-.workspace-nav-scroll::-webkit-scrollbar-thumb { background: rgba(219, 184, 130, 0.35); border: 2px solid transparent; border-radius: 999px; background-clip: padding-box; }
-.workspace-nav-scroll::-webkit-scrollbar-thumb:hover { background-color: rgba(219, 184, 130, 0.62); }
+/* Shared app scrollbar: applies to page scroll, side panels, tables, and navigation. */
+* { scrollbar-width: thin; scrollbar-color: #b39a85 transparent; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #b39a85; border: 3px solid transparent; border-radius: 999px; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: #76513a; }
+*::-webkit-scrollbar-corner { background: transparent; }
+.workspace-nav-scroll { scroll-behavior: smooth; }
+/* The workshop drawer is information-dense, so give it a wider, calmer canvas. */
+aside.max-w-2xl { max-width: 64rem; border-radius: 0.75rem 0 0 0.75rem; }
+aside.max-w-2xl > header { padding: 1.5rem 2rem; background: rgba(253, 251, 249, 0.96); backdrop-filter: blur(10px); }
+aside.max-w-2xl > header p:first-child { font-size: 0.75rem; letter-spacing: 0.18em; }
+aside.max-w-2xl > header h2 { margin-top: 0.5rem; font-size: clamp(1.875rem, 3vw, 2.5rem); line-height: 1.05; letter-spacing: -0.03em; }
+aside.max-w-2xl > header h2 + p { margin-top: 0.5rem; }
+aside.max-w-2xl > .p-5 { padding: 2rem; }
+aside.max-w-2xl > .p-5 > .mt-5.grid { grid-template-columns: minmax(0, 1.25fr) minmax(20rem, 0.9fr); gap: 1.5rem; }
+aside.max-w-2xl > .p-5 > .mt-5.grid > section { border-color: #e4d8d0; box-shadow: 0 10px 28px rgba(76, 49, 35, 0.05); }
+aside.max-w-2xl select { min-height: 2.75rem; width: 100%; line-height: 1.25rem; }
+aside.max-w-2xl select[multiple] { min-height: 7rem; }
+aside.max-w-2xl section select + select { margin-top: 0.15rem; }
+@media (max-width: 1023px) {
+  aside.max-w-2xl { max-width: 42rem; border-radius: 0; }
+  aside.max-w-2xl > .p-5 > .mt-5.grid { grid-template-columns: minmax(0, 1fr); }
+}
 .catalog-page { animation: catalog-enter 260ms ease-out both; }
 .catalog-ledger { position: relative; }
 .catalog-ledger::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 88px; height: 2px; background: #110703; }

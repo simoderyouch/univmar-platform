@@ -18,11 +18,10 @@ public class StoneVariant {
     private StoneMaterial material;
     @Column(name = "thickness_mm", nullable = false, precision = 12, scale = 3)
     private BigDecimal thicknessMm;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    private Finish finish;
     @Column(name = "format_description", length = 160)
     private String format;
+    @Column(name = "variant_name", nullable = false, length = 100)
+    private String variantName;
     @Column(name = "main_image_url", length = 1000)
     private String mainImageUrl;
     @ElementCollection
@@ -40,16 +39,16 @@ public class StoneVariant {
     protected StoneVariant() {
     }
 
-    public StoneVariant(StoneMaterial material, BigDecimal thicknessMm, Finish finish, String format, String mainImageUrl, List<String> galleryImageUrls) {
+    public StoneVariant(StoneMaterial material, BigDecimal thicknessMm, String format, String mainImageUrl, List<String> galleryImageUrls, String variantName) {
         this.id = UUID.randomUUID();
         this.material = material;
-        update(thicknessMm, finish, format, mainImageUrl, galleryImageUrls);
+        update(thicknessMm, format, mainImageUrl, galleryImageUrls, variantName);
     }
 
-    public void update(BigDecimal thicknessMm, Finish finish, String format, String mainImageUrl, List<String> galleryImageUrls) {
+    public void update(BigDecimal thicknessMm, String format, String mainImageUrl, List<String> galleryImageUrls, String variantName) {
         this.thicknessMm = thicknessMm;
-        this.finish = finish;
         this.format = format;
+        this.variantName = variantName;
         this.mainImageUrl = mainImageUrl;
         this.galleryImageUrls.clear();
         if (galleryImageUrls != null) this.galleryImageUrls.addAll(galleryImageUrls);
@@ -77,12 +76,12 @@ public class StoneVariant {
         return thicknessMm;
     }
 
-    public Finish getFinish() {
-        return finish;
-    }
-
     public String getFormat() {
         return format;
+    }
+
+    public String getVariantName() {
+        return variantName;
     }
 
     public String getMainImageUrl() {

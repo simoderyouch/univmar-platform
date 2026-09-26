@@ -17,5 +17,5 @@ public class GoodsReceipt {
     @Column(columnDefinition = "text") private String note;
     protected GoodsReceipt() { }
     public GoodsReceipt(PurchaseOrderItem item, InventoryItem inventoryItem, BigDecimal quantityM2, String note) { this.id = UUID.randomUUID(); this.purchaseOrderItem = item; this.inventoryItem = inventoryItem; this.quantityM2 = quantityM2; this.note = note; this.receivedAt = Instant.now(); }
-    public UUID getId() { return id; } public BigDecimal getQuantityM2() { return quantityM2; } public Instant getReceivedAt() { return receivedAt; } public String getNote() { return note; }
+    public UUID getId() { return id; } public InventoryItem getInventoryItem() { return inventoryItem; } public BigDecimal getQuantityM2() { return quantityM2; } public Instant getReceivedAt() { return receivedAt; } public String getNote() { return note; }
 }

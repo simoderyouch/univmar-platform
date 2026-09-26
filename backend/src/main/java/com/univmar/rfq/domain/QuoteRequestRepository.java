@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface QuoteRequestRepository extends JpaRepository<QuoteRequest, UUID>, JpaSpecificationExecutor<QuoteRequest> {
     Optional<QuoteRequest> findTopByOrderByCreatedAtDesc();
+    boolean existsByProjectId(UUID projectId);
 }

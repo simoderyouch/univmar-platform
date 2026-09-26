@@ -2,7 +2,6 @@ package com.univmar.catalog.api;
 
 import com.univmar.catalog.CatalogService;
 import com.univmar.catalog.api.CatalogDtos.*;
-import com.univmar.catalog.domain.StoneType;
 import com.univmar.common.api.ApiResponse;
 import com.univmar.common.api.RequestIdFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,8 +24,8 @@ public class CatalogController {
     }
 
     @GetMapping
-    public ApiResponse<PageResult<MaterialSummary>> list(@RequestParam(required = false) String search, @RequestParam(required = false) String type, @RequestParam(required = false) String origin, @RequestParam(required = false) String color, @RequestParam(required = false) Boolean active, @PageableDefault(size = 20, sort = "name") Pageable pageable, HttpServletRequest request) {
-        return ok(catalog.list(search, type == null || type.isBlank() ? null : StoneType.from(type), origin, color, active, pageable), request);
+    public ApiResponse<PageResult<MaterialSummary>> list(@RequestParam(required = false) String search, @RequestParam(required = false) UUID categoryId, @RequestParam(required = false) String type, @RequestParam(required = false) String origin, @RequestParam(required = false) String color, @RequestParam(required = false) Boolean active, @PageableDefault(size = 20, sort = "name") Pageable pageable, HttpServletRequest request) {
+        return ok(catalog.list(search, categoryId, type, origin, color, active, pageable), request);
     }
 
     @PostMapping

@@ -1,13 +1,16 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ArrowLeft,
   Pencil,
+  ImagePlus,
   Plus,
   Search,
   SlidersHorizontal,
+  Trash2,
 } from "lucide-react";
-import { api } from "../../../shared/api/client";
-import { Button, DataTable } from "../../../shared/ui";
+import { api, resolveImageUrl, uploadImage } from "../../../shared/api/client";
+import { Button, DataTable, PaginationControls } from "../../../shared/ui";
+import { useRouter } from "../../../app/providers/router";
 
 type Customer = { id: string; name: string };
 type ProjectStatus = "LEAD" | "ACTIVE" | "ON_HOLD" | "COMPLETED" | "CANCELLED";
@@ -25,9 +28,11 @@ type Project = {
   assignedSalesAgent?: string;
   status: ProjectStatus;
   notes?: string;
+  images: ProjectImage[];
 };
-type ProjectFormData = Omit<Project, "id" | "customerName">;
-type ProjectPageResponse = { content: Project[] };
+type ProjectImage = { id: string; imageUrl: string; caption?: string; position: number; createdAt: string };
+type ProjectFormData = Omit<Project, "id" | "customerName" | "images">;
+type ProjectPageResponse = { content: Project[]; page: number; totalPages: number; totalElements: number };
 
 const field =
   "mt-1 h-10 w-full rounded-md border border-[#d8ccc4] bg-white px-3 text-sm outline-none focus:border-[#110703]";
@@ -82,6 +87,7 @@ function statusLabel(value: ProjectStatus) {
 }
 
 export function ProjectsPage() {
+  const { path, navigate } = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [screen, setScreen] = useState<"list" | "create" | "detail" | "edit">(
@@ -92,16 +98,19 @@ export function ProjectsPage() {
   const [status, setStatus] = useState<"" | ProjectStatus>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  async function load() {
-    const query = new URLSearchParams({ size: "100" });
+  const [page, setPage] = useState(0);
+  const [pageData, setPageData] = useState<ProjectPageResponse>({ content: [], page: 0, totalPages: 0, totalElements: 0 });
+  async function load(nextPage = page) {
+    const query = new URLSearchParams({ size: "20", page: String(nextPage) });
     if (search.trim()) query.set("search", search.trim());
     if (status) query.set("status", status);
     setLoading(true);
     setError("");
     try {
-      setProjects(
-        (await api<ProjectPageResponse>(`/projects?${query}`)).content,
-      );
+      const result = await api<ProjectPageResponse>(`/projects?${query}`);
+      setProjects(result.content);
+      setPageData(result);
+      setPage(result.page);
     } catch (reason) {
       setError(
         reason instanceof Error
@@ -113,17 +122,27 @@ export function ProjectsPage() {
     }
   }
   useEffect(() => {
-    void load();
+    void load(0);
   }, [search, status]);
   useEffect(() => {
-    void api<{ content: Customer[] }>("/customers?size=100").then((page) =>
+    void api<{ content: Customer[] }>("/customers?size=20").then((page) =>
       setCustomers(page.content),
     );
   }, []);
   async function openDetail(id: string) {
-    setDetail(await api<Project>(`/projects/${id}`));
+    if (path !== `/projects/${id}`) {
+      navigate(`/projects/${id}`);
+      return;
+    }
+    const project = await api<Project>(`/projects/${id}`);
+    setDetail(project);
     setScreen("detail");
   }
+  useEffect(() => {
+    const match = path.match(/^\/projects\/([^/]+)$/);
+    if (!match) return;
+    void openDetail(match[1]);
+  }, [path]);
   if (screen === "create" || (screen === "edit" && detail))
     return (
       <ProjectForm
@@ -144,9 +163,27 @@ export function ProjectsPage() {
         project={detail}
         back={() => {
           setScreen("list");
+          navigate("/projects");
           void load();
         }}
         edit={() => setScreen("edit")}
+        remove={async () => {
+          if (!window.confirm(`Delete ${detail.name}? This cannot be undone.`)) return;
+          try {
+            await api(`/projects/${detail.id}`, { method: "DELETE" });
+            setDetail(null);
+            setScreen("list");
+            navigate("/projects");
+            await load(0);
+          } catch (reason) {
+            window.alert(
+              reason instanceof Error
+                ? reason.message
+                : "The project could not be deleted.",
+            );
+          }
+        }}
+        reload={async () => setDetail(await api<Project>(`/projects/${detail.id}`))}
       />
     );
   return (
@@ -253,6 +290,7 @@ export function ProjectsPage() {
           </>
         )}
       </div>
+      <PaginationControls page={page} totalPages={pageData.totalPages} totalElements={pageData.totalElements} itemCount={projects.length} loading={loading} onPageChange={nextPage => void load(nextPage)} noun="projects" />
     </section>
   );
 }
@@ -271,12 +309,14 @@ function ProjectForm({
   saved: (project: Project) => Promise<void>;
 }) {
   const [form, setForm] = useState<ProjectFormData>(() =>
-    initial
-      ? {
-          ...initial,
+    initial ? (() => {
+          const { id: _id, customerName: _customerName, images: _images, ...project } = initial;
+          return {
+          ...project,
           startDate: dateValue(initial.startDate),
           requiredDeliveryDate: dateValue(initial.requiredDeliveryDate),
-        }
+          };
+        })()
       : emptyForm(),
   );
   const [saving, setSaving] = useState(false);
@@ -471,10 +511,14 @@ function ProjectDetail({
   project,
   back,
   edit,
+  remove,
+  reload,
 }: {
   project: Project;
   back: () => void;
   edit: () => void;
+  remove: () => void;
+  reload: () => Promise<void>;
 }) {
   const [tab, setTab] = useState("Overview");
   const tabs = [
@@ -485,6 +529,7 @@ function ProjectDetail({
     "Orders",
     "Deliveries",
     "Documents",
+    "Realization photos",
   ];
   return (
     <section className="mx-auto max-w-5xl px-4 py-7 sm:px-7">
@@ -506,10 +551,20 @@ function ProjectDetail({
             {project.location ? ` · ${project.location}` : ""}
           </p>
         </div>
-        <Button variant="outline" onClick={edit}>
-          <Pencil size={16} />
-          Edit project
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={edit}>
+            <Pencil size={16} />
+            Edit project
+          </Button>
+          <Button
+            variant="outline"
+            onClick={remove}
+            className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+          >
+            <Trash2 size={16} />
+            Delete project
+          </Button>
+        </div>
       </div>
       <div className="mt-6 flex flex-wrap gap-2 border-b border-[#e3d8d1]">
         {tabs.map((item) => (
@@ -545,6 +600,8 @@ function ProjectDetail({
             <Info label="Description" value={project.description} wide />
             <Info label="Internal notes" value={project.notes} wide />
           </dl>
+        ) : tab === "Realization photos" ? (
+          <ProjectGallery project={project} reload={reload} />
         ) : (
           <p className="py-10 text-center text-sm text-[#786961]">
             No {tab.toLowerCase()} are linked to this project yet.
@@ -553,6 +610,43 @@ function ProjectDetail({
       </section>
     </section>
   );
+}
+
+function ProjectGallery({ project, reload }: { project: Project; reload: () => Promise<void> }) {
+  const input = useRef<HTMLInputElement>(null);
+  const [caption, setCaption] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  async function add(file?: File) {
+    if (!file) return;
+    setSaving(true);
+    setError("");
+    try {
+      const imageUrl = await uploadImage(file);
+      await api(`/projects/${project.id}/images`, { method: "POST", body: JSON.stringify({ imageUrl, caption: caption || null }) });
+      setCaption("");
+      if (input.current) input.current.value = "";
+      await reload();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "The realization photo could not be saved.");
+    } finally { setSaving(false); }
+  }
+  async function remove(imageId: string) {
+    setSaving(true);
+    setError("");
+    try { await api(`/projects/${project.id}/images/${imageId}`, { method: "DELETE" }); await reload(); }
+    catch (reason) { setError(reason instanceof Error ? reason.message : "The photo could not be removed."); }
+    finally { setSaving(false); }
+  }
+  return <div>
+    <div className="flex flex-col gap-3 rounded-lg border border-dashed border-[#cdbdb2] bg-[#fcf9f7] p-4 sm:flex-row sm:items-end">
+      <label className="min-w-0 flex-1 text-sm font-medium">Photo caption (optional)<input value={caption} onChange={event => setCaption(event.target.value)} maxLength={240} className={field} placeholder="Kitchen installation, finished lobby…" /></label>
+      <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={event => void add(event.target.files?.[0])} />
+      <Button type="button" loading={saving} onClick={() => input.current?.click()}><ImagePlus size={16} />Add realization photo</Button>
+    </div>
+    {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
+    {project.images.length ? <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{project.images.map(image => <figure key={image.id} className="overflow-hidden rounded-lg border border-[#e3d8d1] bg-[#fdfbf9]"><img src={resolveImageUrl(image.imageUrl)} alt={image.caption || `Realization photo for ${project.name}`} className="h-44 w-full object-cover" /><figcaption className="flex min-h-14 items-start justify-between gap-3 p-3 text-sm"><span>{image.caption || "Realization photo"}</span><button type="button" disabled={saving} onClick={() => void remove(image.id)} className="rounded p-1 text-[#8f3c31] hover:bg-red-50 disabled:opacity-50" aria-label="Remove realization photo"><Trash2 size={16} /></button></figcaption></figure>)}</div> : <p className="py-10 text-center text-sm text-[#786961]">No realization photos have been added yet.</p>}
+  </div>;
 }
 function Info({
   label,

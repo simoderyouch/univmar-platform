@@ -1,4 +1,4 @@
-import { Boxes, ClipboardList, Factory, FileText, FolderKanban, Grid3X3, Handshake, LayoutDashboard, Package, Paperclip, QrCode, ReceiptText, Scissors, ScrollText, Truck, Users, type LucideIcon } from "lucide-react";
+import { Boxes, ClipboardList, Factory, FileText, FolderKanban, Grid3X3, Handshake, LayoutDashboard, Package, Paperclip, QrCode, ReceiptText, Scissors, ScrollText, ShieldCheck, Truck, Users, Globe2, type LucideIcon } from "lucide-react";
 
 export type NavigationEntry = {
   label: string;
@@ -31,6 +31,7 @@ export const workspaceNavigationGroups: NavigationGroup[] = [
     label: "Sales & delivery",
     items: [
       { label: "Customers", to: "/customers", icon: Users },
+      { label: "Website CMS", to: "/cms", icon: Globe2 },
       { label: "Projects", to: "/projects", icon: FolderKanban },
       { label: "RFQs", to: "/rfqs", icon: ScrollText },
       { label: "Quotations", to: "/quotations", icon: FileText },
@@ -44,6 +45,7 @@ export const workspaceNavigationGroups: NavigationGroup[] = [
       { label: "Suppliers", to: "/suppliers", icon: Handshake },
       { label: "Invoices", to: "/invoices", icon: ReceiptText },
       { label: "Documents", to: "/documents", icon: Paperclip },
+      { label: "People & access", to: "/users", icon: ShieldCheck },
     ],
   },
 ];

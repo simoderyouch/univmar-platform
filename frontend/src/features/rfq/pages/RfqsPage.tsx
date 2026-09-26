@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, Check, Filter, Plus, Search, Trash2 } from "lucide-react";
 import { api } from "../../../shared/api/client";
-import { Button, DataTable } from "../../../shared/ui";
+import { Button, DataTable, PaginationControls } from "../../../shared/ui";
 
 type Status = "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "QUOTED" | "CANCELLED";
 type Customer = { id: string; name: string };
 type Project = { id: string; customerId: string; name: string };
 type Variant = {
   id: string;
+  variantName: string;
   thicknessMm: number;
-  finish: string;
   format?: string;
 };
 type Material = {
@@ -99,19 +99,24 @@ export function RfqsPage() {
     [customers, setCustomers] = useState<Customer[]>([]),
     [projects, setProjects] = useState<Project[]>([]),
     [loading, setLoading] = useState(true),
-    [error, setError] = useState("");
-  async function load() {
+    [error, setError] = useState(""),
+    [page, setPage] = useState(0),
+    [pageData, setPageData] = useState({ page: 0, totalPages: 0, totalElements: 0 });
+  async function load(nextPage = page) {
     setLoading(true);
     setError("");
     try {
-      const q = new URLSearchParams({ size: "100" });
+      const q = new URLSearchParams({ size: "20", page: String(nextPage) });
       if (filter) q.set("status", filter);
       if (search.trim()) q.set("search", search.trim());
       if (customerFilter) q.set("customerId", customerFilter);
       if (projectFilter) q.set("projectId", projectFilter);
       if (from) q.set("from", from);
       if (to) q.set("to", to);
-      setItems((await api<{ content: Rfq[] }>(`/rfqs?${q}`)).content);
+      const result = await api<{ content: Rfq[]; page: number; totalPages: number; totalElements: number }>(`/rfqs?${q}`);
+      setItems(result.content);
+      setPageData(result);
+      setPage(result.page);
     } catch (reason) {
       setError(
         reason instanceof Error ? reason.message : "RFQs could not be loaded.",
@@ -121,7 +126,7 @@ export function RfqsPage() {
     }
   }
   useEffect(() => {
-    void load();
+    void load(0);
   }, [filter, search, customerFilter, projectFilter, from, to]);
   useEffect(() => {
     void api<{ content: Customer[] }>("/customers?size=100").then((value) =>
@@ -327,6 +332,7 @@ export function RfqsPage() {
           </>
         )}
       </div>
+      <PaginationControls page={page} totalPages={pageData.totalPages} totalElements={pageData.totalElements} itemCount={items.length} loading={loading} onPageChange={nextPage => void load(nextPage)} noun="RFQs" />
     </section>
   );
 }
@@ -405,7 +411,7 @@ function RfqForm({
         processingService: selection.processingService,
         comment: selection.comment,
         materialName: selectedMaterial.name,
-        variantLabel: `${variant.thicknessMm} mm · ${variant.finish}${variant.format ? ` · ${variant.format}` : ""}`,
+        variantLabel: `${variant.variantName} · ${variant.thicknessMm} mm${variant.format ? ` · ${variant.format}` : ""}`,
       },
     ]);
     setSelection({
@@ -554,7 +560,7 @@ function RfqForm({
                   <option value="">Select variant</option>
                   {variants.map((x) => (
                     <option key={x.id} value={x.id}>
-                      {x.thicknessMm} mm · {x.finish}
+                      {x.variantName} · {x.thicknessMm} mm
                       {x.format ? ` · ${x.format}` : ""}
                     </option>
                   ))}

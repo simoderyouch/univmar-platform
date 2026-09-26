@@ -22,7 +22,6 @@ export SPRING_DATASOURCE_USERNAME="${SPRING_DATASOURCE_USERNAME:-univmar}"
 export SPRING_DATASOURCE_PASSWORD="${SPRING_DATASOURCE_PASSWORD:-univmar_local_password}"
 export UNIVMAR_STORAGE_PROVIDER="${UNIVMAR_STORAGE_PROVIDER:-s3}"
 export UNIVMAR_STORAGE_S3_ENDPOINT="${UNIVMAR_STORAGE_S3_ENDPOINT:-http://localhost:9000}"
-export UNIVMAR_STORAGE_S3_PUBLIC_URL="${UNIVMAR_STORAGE_S3_PUBLIC_URL:-http://localhost:9000/univmar}"
 export UNIVMAR_STORAGE_S3_BUCKET="${UNIVMAR_STORAGE_S3_BUCKET:-univmar}"
 export UNIVMAR_STORAGE_S3_ACCESS_KEY="${UNIVMAR_STORAGE_S3_ACCESS_KEY:-minioadmin}"
 export UNIVMAR_STORAGE_S3_SECRET_KEY="${UNIVMAR_STORAGE_S3_SECRET_KEY:-minioadmin}"
@@ -30,7 +29,7 @@ export UNIVMAR_BASE_GALLERY_SOURCE="${UNIVMAR_BASE_GALLERY_SOURCE:-$project_root
 export UNIVMAR_INITIAL_ADMIN_EMAIL="${UNIVMAR_INITIAL_ADMIN_EMAIL:-admin@univmar.local}"
 export UNIVMAR_INITIAL_ADMIN_PASSWORD="${UNIVMAR_INITIAL_ADMIN_PASSWORD:-ChangeMe123!}"
 export UNIVMAR_JWT_SECRET="${UNIVMAR_JWT_SECRET:-local-development-secret-change-before-production-2026}"
-export VITE_ASSET_BASE_URL="${VITE_ASSET_BASE_URL:-http://localhost:9000/univmar}"
+export VITE_ASSET_BASE_URL="${VITE_ASSET_BASE_URL:-}"
 
 (cd "$project_root/backend" && mvn spring-boot:run >"$run_dir/api.log" 2>&1 & echo $! >"$run_dir/api.pid")
 (cd "$project_root/frontend" && npm run dev -- --host 0.0.0.0 >"$run_dir/web.log" 2>&1 & echo $! >"$run_dir/web.pid")

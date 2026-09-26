@@ -51,7 +51,7 @@ Use `./scripts/dev.sh container` when you want the complete Docker stack, or `./
 
 ## Media storage
 
-Storage is provider-based so the application can switch between local files and S3-compatible object storage without changing catalog code.
+Storage is provider-based so the application can switch between local files and S3-compatible object storage without changing catalog code. The object bucket is private: uploaded catalog images are delivered through the ERP's public image route, and supporting documents require a staff session.
 
 The default non-Docker profile uses local files at `backend/data/uploads/images`:
 
@@ -65,7 +65,7 @@ The Docker development stack uses MinIO automatically. Start it with:
 docker compose up --build
 ```
 
-MinIO is available at `http://localhost:9001` and the object API is at `http://localhost:9000`. The API creates the `univmar` bucket, imports the repository `base-gallery` on first startup, and stores new uploaded images in the same bucket. Existing gallery paths are served from the configured `VITE_ASSET_BASE_URL`.
+MinIO is available at `http://localhost:9001` and the object API is at `http://localhost:9000`. The API creates the `univmar` bucket, imports the repository `base-gallery` on first startup, and stores new uploaded images in the same bucket. Do not expose either MinIO port in production.
 
 To switch to AWS S3 or another S3-compatible provider, set:
 
@@ -76,6 +76,5 @@ UNIVMAR_STORAGE_S3_REGION=eu-west-1
 UNIVMAR_STORAGE_S3_BUCKET=your-bucket
 UNIVMAR_STORAGE_S3_ACCESS_KEY=...
 UNIVMAR_STORAGE_S3_SECRET_KEY=...
-UNIVMAR_STORAGE_S3_PUBLIC_URL=https://your-public-object-host/your-bucket
-VITE_ASSET_BASE_URL=https://your-public-object-host/your-bucket
+UNIVMAR_PUBLIC_API_URL=https://erp.example.com/api/v1
 ```

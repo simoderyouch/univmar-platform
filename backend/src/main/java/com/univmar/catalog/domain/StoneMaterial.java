@@ -21,6 +21,10 @@ public class StoneMaterial {
     @Enumerated(EnumType.STRING)
     @Column(name = "stone_type", nullable = false, length = 30)
     private StoneType stoneType;
+    /** Legacy technical classification retained for stock history; staff manage the dynamic category below. */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private MaterialCategory category;
     @Column(length = 100)
     private String origin;
     @Column(length = 100)
@@ -43,16 +47,17 @@ public class StoneMaterial {
     protected StoneMaterial() {
     }
 
-    public StoneMaterial(String name, String commercialName, String sku, StoneType stoneType, String origin, String color, String pattern, String description, String applications) {
+    public StoneMaterial(String name, String commercialName, String sku, StoneType stoneType, MaterialCategory category, String origin, String color, String pattern, String description, String applications) {
         this.id = UUID.randomUUID();
-        update(name, commercialName, sku, stoneType, origin, color, pattern, description, applications);
+        update(name, commercialName, sku, stoneType, category, origin, color, pattern, description, applications);
     }
 
-    public void update(String name, String commercialName, String sku, StoneType stoneType, String origin, String color, String pattern, String description, String applications) {
+    public void update(String name, String commercialName, String sku, StoneType stoneType, MaterialCategory category, String origin, String color, String pattern, String description, String applications) {
         this.name = name;
         this.commercialName = commercialName;
         this.sku = sku;
         this.stoneType = stoneType;
+        this.category = category;
         this.origin = origin;
         this.color = color;
         this.pattern = pattern;
@@ -93,6 +98,8 @@ public class StoneMaterial {
     public StoneType getStoneType() {
         return stoneType;
     }
+
+    public MaterialCategory getCategory() { return category; }
 
     public String getOrigin() {
         return origin;

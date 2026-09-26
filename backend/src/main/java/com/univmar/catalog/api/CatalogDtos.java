@@ -1,6 +1,5 @@
 package com.univmar.catalog.api;
 
-import com.univmar.catalog.domain.Finish;
 import com.univmar.catalog.domain.StoneType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +16,7 @@ public final class CatalogDtos {
     }
 
     public record MaterialInput(@NotBlank @Size(max = 160) String name, @Size(max = 160) String commercialName,
-                                @NotBlank @Size(max = 80) String sku, @NotNull StoneType stoneType,
+                                @NotBlank @Size(max = 80) String sku, UUID categoryId, @Size(max = 100) String stoneType,
                                 @Size(max = 100) String origin, @Size(max = 100) String color,
                                 @Size(max = 160) String pattern, @Size(max = 10000) String description,
                                 @Size(max = 10000) String applications) {
@@ -25,32 +24,33 @@ public final class CatalogDtos {
         public MaterialInput(String name, String commercialName, String sku, StoneType stoneType, String origin,
                              String color, String pattern, String description, String applications,
                              String ignoredMainImageUrl, List<String> ignoredGalleryImageUrls) {
-            this(name, commercialName, sku, stoneType, origin, color, pattern, description, applications);
+            this(name, commercialName, sku, legacyCategory(stoneType), stoneType.name(), origin, color, pattern, description, applications);
         }
+        private static UUID legacyCategory(StoneType type) { return switch (type) { case GRANITE -> UUID.fromString("00000000-0000-0000-0000-000000000043"); case ONYX -> UUID.fromString("00000000-0000-0000-0000-000000000045"); case QUARTZITE -> UUID.fromString("00000000-0000-0000-0000-000000000046"); default -> UUID.fromString("00000000-0000-0000-0000-000000000044"); }; }
     }
 
-    public record VariantInput(@NotNull @DecimalMin(value = "0.001") BigDecimal thicknessMm, @NotNull Finish finish,
+    public record VariantInput(@NotNull @DecimalMin(value = "0.001") BigDecimal thicknessMm, @NotBlank @Size(max = 100) String variantName,
                                @Size(max = 160) String format, @Size(max = 1000) String mainImageUrl,
                                @Size(max = 20) List<@Size(max = 1000) String> galleryImageUrls) {
-        /** Temporary source compatibility for callers that create variants without images. */
-        public VariantInput(BigDecimal thicknessMm, Finish finish, String format) {
-            this(thicknessMm, finish, format, null, List.of());
+        public VariantInput(BigDecimal thicknessMm, String variantName, String format) {
+            this(thicknessMm, variantName, format, null, List.of());
         }
+
     }
 
     public record ActiveInput(boolean active) {
     }
 
-    public record MaterialSummary(UUID id, String name, String commercialName, String sku, StoneType stoneType,
+    public record MaterialSummary(UUID id, String name, String commercialName, String sku, UUID categoryId, String categoryName, String categorySlug, String stoneType,
                                   String origin, String color, boolean active, int variantCount, String mainImageUrl) {
     }
 
-    public record MaterialDetail(UUID id, String name, String commercialName, String sku, StoneType stoneType,
+    public record MaterialDetail(UUID id, String name, String commercialName, String sku, UUID categoryId, String categoryName, String categorySlug, String stoneType,
                                  String origin, String color, String pattern, String description, String applications, boolean active,
                                  List<VariantResponse> variants) {
     }
 
-    public record VariantResponse(UUID id, BigDecimal thicknessMm, Finish finish, String format, String mainImageUrl,
+    public record VariantResponse(UUID id, BigDecimal thicknessMm, String variantName, String format, String mainImageUrl,
                                   List<String> galleryImageUrls, boolean active) {
     }
 

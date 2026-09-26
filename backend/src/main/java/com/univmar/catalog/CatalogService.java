@@ -18,21 +18,25 @@ import java.util.UUID;
 public class CatalogService {
     private final StoneMaterialRepository materials;
     private final StoneVariantRepository variants;
+    private final MaterialCategoryRepository categories;
 
-    public CatalogService(StoneMaterialRepository materials, StoneVariantRepository variants) {
+    public CatalogService(StoneMaterialRepository materials, StoneVariantRepository variants, MaterialCategoryRepository categories) {
         this.materials = materials;
         this.variants = variants;
+        this.categories = categories;
     }
 
     public MaterialDetail create(MaterialInput input) {
         ensureUniqueSku(input.sku(), null);
-        return detail(materials.save(new StoneMaterial(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), input.stoneType(), trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()))));
+        MaterialCategory category = category(input.categoryId(), input.stoneType());
+        return detail(materials.save(new StoneMaterial(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), legacyType(category), category, trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()))));
     }
 
     public MaterialDetail update(UUID id, MaterialInput input) {
         StoneMaterial material = material(id);
         ensureUniqueSku(input.sku(), id);
-        material.update(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), input.stoneType(), trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()));
+        MaterialCategory category = category(input.categoryId(), input.stoneType());
+        material.update(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), legacyType(category), category, trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()));
         return detail(material);
     }
 
@@ -42,13 +46,14 @@ public class CatalogService {
     }
 
     @Transactional(readOnly = true)
-    public PageResult<MaterialSummary> list(String search, StoneType type, String origin, String color, Boolean active, Pageable pageable) {
+    public PageResult<MaterialSummary> list(String search, UUID categoryId, String type, String origin, String color, Boolean active, Pageable pageable) {
         Specification<StoneMaterial> spec = Specification.where(null);
         if (search != null && !search.isBlank()) {
             String value = "%" + search.trim().toLowerCase(Locale.ROOT) + "%";
             spec = spec.and((root, query, cb) -> cb.or(cb.like(cb.lower(root.get("name")), value), cb.like(cb.lower(root.get("sku")), value), cb.like(cb.lower(root.get("commercialName")), value)));
         }
-        if (type != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("stoneType"), type));
+        if (categoryId != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("category").get("id"), categoryId));
+        else if (type != null && !type.isBlank()) { MaterialCategory category = category(null, type); spec = spec.and((root, query, cb) -> cb.equal(root.get("category").get("id"), category.getId())); }
         if (origin != null && !origin.isBlank())
             spec = spec.and((root, query, cb) -> cb.equal(cb.lower(root.get("origin")), origin.trim().toLowerCase(Locale.ROOT)));
         if (color != null && !color.isBlank())
@@ -67,7 +72,7 @@ public class CatalogService {
     public VariantResponse createVariant(UUID materialId, VariantInput input) {
         StoneMaterial material = material(materialId);
         ensureUniqueVariant(materialId, input, null);
-        StoneVariant variant = new StoneVariant(material, input.thicknessMm(), input.finish(), trim(input.format()), trim(input.mainImageUrl()), input.galleryImageUrls());
+        StoneVariant variant = new StoneVariant(material, input.thicknessMm(), trim(input.format()), trim(input.mainImageUrl()), input.galleryImageUrls(), required(input.variantName()));
         material.addVariant(variant);
         return variant(variant);
     }
@@ -75,7 +80,7 @@ public class CatalogService {
     public VariantResponse updateVariant(UUID materialId, UUID variantId, VariantInput input) {
         StoneVariant item = variant(materialId, variantId);
         ensureUniqueVariant(materialId, input, variantId);
-        item.update(input.thicknessMm(), input.finish(), trim(input.format()), trim(input.mainImageUrl()), input.galleryImageUrls());
+        item.update(input.thicknessMm(), trim(input.format()), trim(input.mainImageUrl()), input.galleryImageUrls(), required(input.variantName()));
         return variant(item);
     }
 
@@ -100,8 +105,8 @@ public class CatalogService {
     }
 
     private void ensureUniqueVariant(UUID materialId, VariantInput input, UUID currentId) {
-        variants.findAllByMaterialId(materialId).stream().filter(item -> item.getThicknessMm().compareTo(input.thicknessMm()) == 0 && item.getFinish() == input.finish() && java.util.Objects.equals(item.getFormat(), trim(input.format())) && !item.getId().equals(currentId)).findAny().ifPresent(item -> {
-            throw new ApiException(HttpStatus.CONFLICT, "DUPLICATE_VARIANT", "This thickness, finish, and format variant already exists.");
+        variants.findAllByMaterialId(materialId).stream().filter(item -> item.getThicknessMm().compareTo(input.thicknessMm()) == 0 && java.util.Objects.equals(item.getFormat(), trim(input.format())) && java.util.Objects.equals(item.getVariantName(), trim(input.variantName())) && !item.getId().equals(currentId)).findAny().ifPresent(item -> {
+            throw new ApiException(HttpStatus.CONFLICT, "DUPLICATE_VARIANT", "This surface variation, thickness, and format variant already exists.");
         });
     }
 
@@ -111,15 +116,15 @@ public class CatalogService {
                 .filter(url -> url != null && !url.isBlank())
                 .findFirst()
                 .orElse(null);
-        return new MaterialSummary(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getStoneType(), item.getOrigin(), item.getColor(), item.isActive(), item.getVariants().size(), mainImageUrl);
+        return new MaterialSummary(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getCategory().getId(), item.getCategory().getName(), item.getCategory().getSlug(), item.getStoneType().name(), item.getOrigin(), item.getColor(), item.isActive(), item.getVariants().size(), mainImageUrl);
     }
 
     private MaterialDetail detail(StoneMaterial item) {
-        return new MaterialDetail(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getStoneType(), item.getOrigin(), item.getColor(), item.getPattern(), item.getDescription(), item.getApplications(), item.isActive(), item.getVariants().stream().map(this::variant).toList());
+        return new MaterialDetail(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getCategory().getId(), item.getCategory().getName(), item.getCategory().getSlug(), item.getStoneType().name(), item.getOrigin(), item.getColor(), item.getPattern(), item.getDescription(), item.getApplications(), item.isActive(), item.getVariants().stream().map(this::variant).toList());
     }
 
     private VariantResponse variant(StoneVariant item) {
-        return new VariantResponse(item.getId(), item.getThicknessMm(), item.getFinish(), item.getFormat(), item.getMainImageUrl(), item.getGalleryImageUrls(), item.isActive());
+        return new VariantResponse(item.getId(), item.getThicknessMm(), item.getVariantName(), item.getFormat(), item.getMainImageUrl(), item.getGalleryImageUrls(), item.isActive());
     }
 
     private String normalizeSku(String value) {
@@ -129,4 +134,13 @@ public class CatalogService {
     private String trim(String value) {
         return value == null || value.isBlank() ? null : value.trim();
     }
+
+    private String required(String value) {
+        String result = trim(value);
+        if (result == null) throw new ApiException(HttpStatus.BAD_REQUEST, "SURFACE_VARIATION_REQUIRED", "A surface variation is required.");
+        return result;
+    }
+
+    private MaterialCategory category(UUID id, String legacyType) { if (id != null) return categories.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CATEGORY_NOT_FOUND", "The material category was not found.")); String slug = switch (legacyType == null ? "" : legacyType.trim().toUpperCase(Locale.ROOT)) { case "GRANITE" -> "granit"; case "ONYX" -> "onyx"; case "QUARTZITE" -> "quartz"; default -> "marbre"; }; return categories.findBySlugIgnoreCase(slug).orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "CATEGORY_REQUIRED", "Choose a material category.")); }
+    private StoneType legacyType(MaterialCategory category) { String slug = category.getSlug(); if (slug.equals("granit")) return StoneType.GRANITE; if (slug.equals("onyx")) return StoneType.ONYX; if (slug.equals("quartz")) return StoneType.QUARTZITE; return StoneType.MARBLE; }
 }

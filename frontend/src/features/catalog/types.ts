@@ -1,10 +1,10 @@
-export type StoneType = "MARBLE" | "GRANITE" | "TRAVERTINE" | "LIMESTONE" | "QUARTZITE" | "ONYX" | "OTHER";
-export type Finish = "POLISHED" | "HONED" | "BRUSHED" | "LEATHERED" | "FLAMED" | "SANDBLASTED" | "OTHER";
+export type MaterialCategory = { id: string; name: string; slug: string; sortOrder: number; active: boolean; websiteVisible: boolean };
+export type StoneType = string;
 
 export type MaterialVariant = {
   id: string;
+  variantName?: string;
   thicknessMm: number;
-  finish: Finish;
   format?: string;
   mainImageUrl?: string;
   galleryImageUrls: string[];
@@ -16,6 +16,9 @@ export type MaterialSummary = {
   name: string;
   commercialName?: string;
   sku: string;
+  categoryId: string;
+  categoryName: string;
+  categorySlug: string;
   stoneType: StoneType;
   origin?: string;
   color?: string;
@@ -42,6 +45,7 @@ export type MaterialFormValues = {
   name: string;
   commercialName: string;
   sku: string;
+  categoryId: string;
   stoneType: StoneType;
   origin: string;
   color: string;

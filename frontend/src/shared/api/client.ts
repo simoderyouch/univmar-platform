@@ -4,7 +4,12 @@ export const accessTokenKey = "univmar.access-token";
 /** Resolve imported local asset paths after the catalog gallery was moved. */
 export function resolveImageUrl(url?: string | null): string | undefined {
   if (!url) return undefined;
-  const normalized = url.replace(/\/images\//g, "/base-gallery/");
+  // Imported catalog media is stored in MinIO and streamed by the ERP API.
+  // This avoids exposing the private storage endpoint to browsers.
+  const localApiUrl = url.replace(/^https?:\/\/[^/]+(?=\/api\/v1\/uploads\/)/i, "");
+  const normalized = localApiUrl
+    .replace(/^\/base-gallery\//, "/api/v1/uploads/base-gallery/")
+    .replace(/^\/images\//, "/api/v1/uploads/base-gallery/");
   const assetBase = (import.meta.env.VITE_ASSET_BASE_URL as string | undefined)?.replace(/\/$/, "");
   return assetBase && normalized.startsWith("/") ? `${assetBase}${normalized}` : normalized;
 }
@@ -33,6 +38,10 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const body = await response.json().catch(() => ({}));
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem(accessTokenKey);
+      window.dispatchEvent(new Event("univmar:authentication-lost"));
+    }
     const problem = body as ApiFailure;
     throw new RequestError(problem.message ?? "The request could not be completed.", problem.fields);
   }
@@ -52,4 +61,24 @@ export async function uploadDocument(file: File): Promise<UploadedDocument> {
   const body = new FormData();
   body.append("file", file);
   return api<UploadedDocument>("/uploads/documents", { method: "POST", body });
+}
+
+export async function downloadProtectedFile(url: string, filename: string): Promise<void> {
+  const token = localStorage.getItem(accessTokenKey);
+  const apiUrl = new URL(apiBaseUrl, window.location.origin);
+  const documentPrefix = `${apiUrl.pathname.replace(/\/$/, "")}/uploads/documents/`;
+  const target = new URL(url, apiUrl);
+  if (target.origin !== apiUrl.origin || !target.pathname.startsWith(documentPrefix)) {
+    throw new RequestError("This document does not have a trusted download URL.");
+  }
+  const response = await fetch(target.toString(), { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!response.ok) throw new RequestError("The file could not be downloaded.");
+  const objectUrl = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
 }
