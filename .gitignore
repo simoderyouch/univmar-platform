@@ -5,6 +5,7 @@
 data/
 !landing/data/
 !landing/data/*.ts
+!landing/data/*.json
 backend/data/
 base-gallery/
 backend/target/
