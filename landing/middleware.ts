@@ -46,7 +46,12 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/images/")) {
-    const response = NextResponse.next();
+    // Product and application media now lives in the ERP's private object
+    // storage. Preserve legacy content URLs while serving it via the landing
+    // proxy, which never exposes a storage URL or credentials to the browser.
+    const url = request.nextUrl.clone();
+    url.pathname = `/api/erp/uploads/base-gallery/${pathname.slice("/images/".length)}`;
+    const response = NextResponse.rewrite(url);
     for (const [key, value] of Object.entries(IMAGE_SEO_HEADERS)) {
       response.headers.set(key, value);
     }
