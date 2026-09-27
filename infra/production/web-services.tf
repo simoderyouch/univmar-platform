@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "landing" {
   container_definitions = jsonencode([
     {
       name      = "landing"
-      image     = "${aws_ecr_repository.app["univmar-production-landing"].repository_url}:46bca69"
+      image     = "${aws_ecr_repository.app["univmar-production-landing"].repository_url}:${var.landing_image_tag}"
       essential = true
 
       portMappings = [
@@ -82,7 +82,7 @@ resource "aws_ecs_task_definition" "erp_web" {
   container_definitions = jsonencode([
     {
       name      = "erp-web"
-      image     = "${aws_ecr_repository.app["univmar-production-erp-web"].repository_url}:b5f072c"
+      image     = "${aws_ecr_repository.app["univmar-production-erp-web"].repository_url}:${var.erp_image_tag}"
       essential = true
 
       portMappings = [
