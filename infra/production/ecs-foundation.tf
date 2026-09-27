@@ -45,9 +45,14 @@ resource "aws_iam_role_policy" "ecs_task_execution_database_secret" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = ["secretsmanager:GetSecretValue"]
-        Resource = aws_db_instance.main.master_user_secret[0].secret_arn
+        Effect = "Allow"
+        Action = ["secretsmanager:GetSecretValue"]
+        Resource = [
+          aws_db_instance.main.master_user_secret[0].secret_arn,
+          data.aws_secretsmanager_secret.runtime_jwt.arn,
+          data.aws_secretsmanager_secret.bootstrap_admin.arn,
+          data.aws_secretsmanager_secret.smtp.arn,
+        ]
       }
     ]
   })

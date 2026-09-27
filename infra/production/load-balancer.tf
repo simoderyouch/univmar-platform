@@ -64,12 +64,12 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "fixed-response"
+    type = "redirect"
 
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Univmar service is not ready."
-      status_code  = "404"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
     }
   }
 }
@@ -80,4 +80,13 @@ output "load_balancer_dns_name" {
 
 output "load_balancer_zone_id" {
   value = aws_lb.main.zone_id
+}
+
+
+output "landing_url" {
+  value = "https://landing.universmarbre.com"
+}
+
+output "erp_url" {
+  value = "https://erp.universmarbre.com"
 }
