@@ -26,8 +26,11 @@ const HomeContactTeaser = dynamic(() =>
 
 type Product = {
   id: string;
+  materialId: string;
+  materialName: string;
   slug: string;
   name: string;
+  displayName: string;
   regularPrice: number | null;
   images: string;
   categoryId: string;

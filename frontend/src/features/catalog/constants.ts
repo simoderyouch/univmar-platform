@@ -13,6 +13,9 @@ export const emptyMaterialForm: MaterialFormValues = {
   pattern: "",
   description: "",
   applications: "",
+  publicUses: "",
+  careSummary: "",
+  indoorOutdoor: "",
 };
 
 export function formatCatalogLabel(value: string) {

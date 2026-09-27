@@ -1,4 +1,5 @@
 import "server-only";
+import { slugify } from "@/lib/slugify";
 
 type ApiResponse<T> = { data: T };
 
@@ -17,6 +18,7 @@ type ErpVariant = {
   format: string | null;
   coverImageUrl: string;
   galleryImageUrls: string[];
+  availability: { code: "AVAILABLE" | "AVAILABLE_ON_ORDER" | "SHOWROOM_SELECTION"; label: string };
 };
 
 type ErpProduct = {
@@ -33,6 +35,10 @@ type ErpProduct = {
   coverImageUrl: string;
   galleryImageUrls: string[];
   variants: ErpVariant[];
+  availability: { code: "AVAILABLE" | "AVAILABLE_ON_ORDER" | "SHOWROOM_SELECTION"; label: string };
+  recommendedUses: string[];
+  careSummary: string | null;
+  indoorOutdoor: string | null;
 };
 
 type ErpPortfolioCategory = { id: string; name: string; slug: string; sortOrder: number };
@@ -57,8 +63,11 @@ export type CategoryRecord = {
 
 export type ProductRecord = {
   id: string;
+  materialId: string;
+  materialName: string;
   slug: string;
   name: string;
+  displayName: string;
   regularPrice: null;
   images: string;
   applicationImages: string[];
@@ -70,6 +79,10 @@ export type ProductRecord = {
   description: string | null;
   applications: string | null;
   variants: ErpVariant[];
+  availability: { code: "AVAILABLE" | "AVAILABLE_ON_ORDER" | "SHOWROOM_SELECTION"; label: string };
+  recommendedUses: string[];
+  careSummary: string | null;
+  indoorOutdoor: string | null;
   published: true;
   visibility: "visible";
   inStock: true;
@@ -119,17 +132,20 @@ function fallbackFrom(id: string, choices: string[]): string {
   return choices[hash % choices.length];
 }
 
-function product(product: ErpProduct): ProductRecord {
+function product(product: ErpProduct, variant: ErpVariant): ProductRecord {
   const fallback = fallbackFrom(product.id, PRODUCT_FALLBACKS);
-  const cover = minioAsset(product.coverImageUrl, fallback);
+  const cover = minioAsset(variant.coverImageUrl, minioAsset(product.coverImageUrl, fallback));
   const gallery = Array.from(new Set([
+    ...variant.galleryImageUrls.map((image) => minioAsset(image, fallback)),
     ...product.galleryImageUrls.map((image) => minioAsset(image, fallback)),
-    ...product.variants.flatMap((variant) => variant.galleryImageUrls.map((image) => minioAsset(image, fallback))),
   ])).filter((image) => image !== cover);
   return {
-    id: product.id,
-    slug: product.slug,
-    name: product.name,
+    id: variant.id,
+    materialId: product.id,
+    materialName: product.name,
+    slug: `${product.slug}-${slugify(variant.name)}-${variant.id}`,
+    name: variant.name,
+    displayName: `${product.name} / ${variant.name}`,
     regularPrice: null,
     images: cover,
     applicationImages: gallery,
@@ -140,11 +156,15 @@ function product(product: ErpProduct): ProductRecord {
     pattern: product.pattern,
     description: product.description,
     applications: product.applications,
-    variants: product.variants.map((variant) => ({
+    variants: [{
       ...variant,
       coverImageUrl: minioAsset(variant.coverImageUrl, fallback),
       galleryImageUrls: variant.galleryImageUrls.map((image) => minioAsset(image, fallback)),
-    })),
+    }],
+    availability: variant.availability,
+    recommendedUses: product.recommendedUses ?? [],
+    careSummary: product.careSummary,
+    indoorOutdoor: product.indoorOutdoor,
     published: true,
     visibility: "visible",
     inStock: true,
@@ -164,12 +184,10 @@ export async function getCategories(): Promise<CategoryRecord[]> {
 
 export async function getProducts(category?: string): Promise<ProductRecord[]> {
   const query = category ? `?category=${encodeURIComponent(category)}` : "";
-  return (await publicApi<ErpProduct[]>(`/public/catalog/products${query}`)).map(product);
+  return (await publicApi<ErpProduct[]>(`/public/catalog/products${query}`)).flatMap((material) => material.variants.map((variant) => product(material, variant)));
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductRecord | null> {
-  const id = slug.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i)?.[1];
-  if (id) return product(await publicApi<ErpProduct>(`/public/catalog/products/${id}`));
   const products = await getProducts();
   return products.find((product) => product.slug === slug) ?? null;
 }
@@ -182,6 +200,19 @@ export async function getPortfolioCategories(): Promise<PortfolioCategory[]> {
 export async function getPortfolioProjects(featured?: boolean): Promise<PortfolioProject[]> {
   const query = featured ? "?featured=true" : "";
   const projects = await publicApi<ErpPortfolioProject[]>(`/public/portfolio/projects${query}`);
+  return projects.map((project) => ({
+    id: project.id,
+    title: project.title,
+    image: minioAsset(project.coverImageUrl, fallbackFrom(project.id, PORTFOLIO_FALLBACKS)),
+    galleryImages: project.galleryImageUrls.map((image) => minioAsset(image, fallbackFrom(project.id, PORTFOLIO_FALLBACKS))),
+    categoryId: project.categorySlug,
+    category: { id: project.categorySlug, name: project.category, slug: project.categorySlug },
+    featured: project.featured,
+  }));
+}
+
+export async function getPortfolioProjectsForVariant(variantId: string): Promise<PortfolioProject[]> {
+  const projects = await publicApi<ErpPortfolioProject[]>(`/public/portfolio/projects?variantId=${encodeURIComponent(variantId)}`);
   return projects.map((project) => ({
     id: project.id,
     title: project.title,

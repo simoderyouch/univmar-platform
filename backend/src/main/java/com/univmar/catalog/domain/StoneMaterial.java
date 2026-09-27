@@ -35,6 +35,12 @@ public class StoneMaterial {
     private String description;
     @Column(columnDefinition = "text")
     private String applications;
+    @Column(name = "public_uses", length = 500)
+    private String publicUses;
+    @Column(name = "care_summary", length = 1000)
+    private String careSummary;
+    @Column(name = "indoor_outdoor", length = 20)
+    private String indoorOutdoor;
     @Column(nullable = false)
     private boolean active = true;
     @Column(name = "created_at", nullable = false)
@@ -120,6 +126,10 @@ public class StoneMaterial {
     public String getApplications() {
         return applications;
     }
+    public String getPublicUses() { return publicUses; }
+    public String getCareSummary() { return careSummary; }
+    public String getIndoorOutdoor() { return indoorOutdoor; }
+    public void updatePublicDiscovery(String uses, String care, String setting) { this.publicUses = uses; this.careSummary = care; this.indoorOutdoor = setting; }
 
     public boolean isActive() {
         return active;

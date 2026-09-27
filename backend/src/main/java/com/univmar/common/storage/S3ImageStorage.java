@@ -75,6 +75,32 @@ public class S3ImageStorage implements ImageStorage {
         catch (RuntimeException exception) { return false; }
     }
 
+    /** Stores a private staff document. Its object key is never exposed to browsers. */
+    public void storePrivateDocument(String filename, String contentType, MultipartFile file) {
+        try {
+            client.putObject(PutObjectRequest.builder().bucket(bucket).key("uploads/documents/" + filename).contentType(contentType).build(),
+                RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        } catch (IOException exception) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "UPLOAD_FAILED", "The document could not be stored.");
+        }
+    }
+
+    public boolean privateDocumentExists(String filename) {
+        return exists("uploads/documents/" + filename);
+    }
+
+    public StoredPrivateDocument loadPrivateDocument(String filename) {
+        try (var response = client.getObject(GetObjectRequest.builder().bucket(bucket).key("uploads/documents/" + filename).build())) {
+            String contentType = response.response().contentType();
+            return new StoredPrivateDocument(response.readAllBytes(), contentType == null || contentType.isBlank() ? "application/octet-stream" : contentType);
+        } catch (S3Exception exception) {
+            if (exception.statusCode() == 404) throw new ApiException(HttpStatus.NOT_FOUND, "DOCUMENT_NOT_FOUND", "The uploaded document was not found.");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DOCUMENT_READ_FAILED", "The uploaded document could not be read.");
+        } catch (IOException exception) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DOCUMENT_READ_FAILED", "The uploaded document could not be read.");
+        }
+    }
+
     @Override
     public StoredImage load(String filename) {
         if (filename == null || !STORED_FILENAME.matcher(filename).matches()) {
@@ -112,4 +138,6 @@ public class S3ImageStorage implements ImageStorage {
         try { client.headBucket(HeadBucketRequest.builder().bucket(bucket).build()); }
         catch (NoSuchBucketException exception) { client.createBucket(CreateBucketRequest.builder().bucket(bucket).build()); }
     }
+
+    public record StoredPrivateDocument(byte[] content, String contentType) { }
 }

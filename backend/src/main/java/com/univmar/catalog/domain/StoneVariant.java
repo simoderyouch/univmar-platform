@@ -31,6 +31,9 @@ public class StoneVariant {
     private final List<String> galleryImageUrls = new ArrayList<>();
     @Column(nullable = false)
     private boolean active = true;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "public_availability_policy", nullable = false, length = 30)
+    private PublicAvailabilityPolicy publicAvailabilityPolicy = PublicAvailabilityPolicy.AUTO;
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
     @Column(name = "updated_at", nullable = false)
@@ -94,6 +97,12 @@ public class StoneVariant {
 
     public boolean isActive() {
         return active;
+    }
+
+    public PublicAvailabilityPolicy getPublicAvailabilityPolicy() { return publicAvailabilityPolicy; }
+
+    public void setPublicAvailabilityPolicy(PublicAvailabilityPolicy value) {
+        this.publicAvailabilityPolicy = value == null ? PublicAvailabilityPolicy.AUTO : value;
     }
 
     public void setActive(boolean active) {

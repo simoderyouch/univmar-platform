@@ -18,7 +18,7 @@ import {
 import { buildProductInquiryMessage, buildMultiProductInquiryMessage, quoteSubjectForLang } from "@/lib/productContact";
 import { trackEvent } from "@/lib/analytics";
 
-type FormState = { name: string; email: string; phone: string; subject: string; message: string; website: string };
+type FormState = { name: string; email: string; phone: string; subject: string; message: string; website: string; projectType: string; city: string; area: string; desiredDate: string; contactMethod: string };
 type Status = "idle" | "sending" | "success" | "error";
 type FormSettings = { enabled: boolean; title: string; description: string; submitLabel: string; requireEmail: boolean; requirePhone: boolean };
 
@@ -29,7 +29,8 @@ const SUBJECTS_AR = ["طلب عرض سعر", "استفسار عن منتج", "ز
 function ContactPageContent() {
   const { t, lang } = useLang();
   const searchParams = useSearchParams();
-  const [form, setForm] = useState<FormState>({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
+  const [form, setForm] = useState<FormState>({ name: "", email: "", phone: "", subject: "", message: "", website: "", projectType: "", city: "", area: "", desiredDate: "", contactMethod: "" });
+  const [files, setFiles] = useState<File[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [settings, setSettings] = useState<FormSettings | null>(null);
 
@@ -68,7 +69,7 @@ function ContactPageContent() {
 
     setForm((prev) => ({
       ...prev,
-      subject: intent === "quote" ? quoteSubjectForLang(lang) : prev.subject,
+      subject: intent === "quote" ? quoteSubjectForLang(lang) : intent === "project" ? (lang === "fr" ? "Demande de projet" : "Project enquiry") : prev.subject,
       message: prev.message || message,
     }));
   }, [searchParams, lang]);
@@ -84,25 +85,33 @@ function ContactPageContent() {
     try {
       const product = searchParams.get("product") ?? "";
       const attribution = new URLSearchParams(window.location.search);
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const context = [
+        form.projectType && `Project type: ${form.projectType}`,
+        form.city && `City: ${form.city}`,
+        form.area && `Approximate area / dimensions: ${form.area}`,
+        form.desiredDate && `Desired date: ${form.desiredDate}`,
+        form.contactMethod && `Preferred contact: ${form.contactMethod}`,
+        searchParams.get("finderUse") && `Finder use: ${searchParams.get("finderUse")}`,
+        searchParams.get("finderArea") && `Finder area: ${searchParams.get("finderArea")}`,
+        searchParams.get("showroom") === "true" && "Physical slab selection requested: yes",
+      ].filter(Boolean).join("\n");
+      const payload = {
           fullName: form.name,
           email: form.email,
           phone: form.phone,
           subject: form.subject,
-          message: form.message,
+          message: [form.message, context].filter(Boolean).join("\n\n"),
           language: lang,
-          selectedProducts: product,
-          sourcePage: window.location.pathname,
+          selectedProducts: JSON.stringify({ names: product.split(",").map((name) => name.trim()).filter(Boolean), productIds: (searchParams.get("productIds") ?? searchParams.get("productId") ?? "").split(",").filter(Boolean), variantIds: (searchParams.get("variantIds") ?? searchParams.get("variantId") ?? "").split(",").filter(Boolean), galleryImage: searchParams.get("galleryImage") ?? undefined }),
+          sourcePage: searchParams.get("sourcePage") ?? window.location.pathname,
           utmSource: attribution.get("utm_source") ?? "",
           utmMedium: attribution.get("utm_medium") ?? "",
           utmCampaign: attribution.get("utm_campaign") ?? "",
           referrer: document.referrer,
           website: form.website,
-        }),
-      });
+        };
+      const body = files.length ? (() => { const data = new FormData(); data.append("payload", new Blob([JSON.stringify(payload)], { type: "application/json" })); files.forEach((file) => data.append("files", file)); return data; })() : JSON.stringify(payload);
+      const res = await fetch("/api/contact", { method: "POST", headers: files.length ? undefined : { "Content-Type": "application/json" }, body });
 
       if (!res.ok) throw new Error("send failed");
 
@@ -111,7 +120,7 @@ function ContactPageContent() {
         form_subject: form.subject || "unspecified",
       });
       setStatus("success");
-      setForm({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
+      setForm({ name: "", email: "", phone: "", subject: "", message: "", website: "", projectType: "", city: "", area: "", desiredDate: "", contactMethod: "" }); setFiles([]);
       setTimeout(() => setStatus("idle"), 4000);
     } catch {
       setStatus("error");
@@ -298,6 +307,19 @@ function ContactPageContent() {
                 </div>
               </div>
 
+              <div className="project-enquiry-fields">
+                <div className="project-enquiry-fields__heading"><span>PROJECT DETAILS</span><p>Help our team prepare before the first call.</p></div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }} className="form-row">
+                  <div><label className="form-label">Project type</label><select className="form-input" value={form.projectType} onChange={update("projectType")}><option value="">Select a project type</option>{["Kitchen worktop", "Floor", "Bathroom", "Facade", "Stairs", "Wall cladding", "Outdoor space", "Fireplace", "Other"].map((item) => <option key={item}>{item}</option>)}</select></div>
+                  <div><label className="form-label">City</label><input className="form-input" value={form.city} onChange={update("city")} placeholder="Casablanca" /></div>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }} className="form-row">
+                  <div><label className="form-label">Dimensions or approximate m²</label><input className="form-input" value={form.area} onChange={update("area")} placeholder="e.g. 18 m² or 3.2 × 0.7 m" /></div>
+                  <div><label className="form-label">Desired date</label><input type="date" className="form-input" value={form.desiredDate} onChange={update("desiredDate")} /></div>
+                </div>
+                <div><label className="form-label">Preferred contact method</label><select className="form-input" value={form.contactMethod} onChange={update("contactMethod")}><option value="">No preference</option><option>Phone call</option><option>WhatsApp</option><option>Email</option></select></div>
+              </div>
+
               {/* Message */}
               <div>
                 <label className="form-label">{t.contact.form.message}</label>
@@ -310,6 +332,12 @@ function ContactPageContent() {
                   placeholder="Décrivez votre projet..."
                   style={{ resize: "vertical", minHeight: 140 }}
                 />
+              </div>
+
+              <div className="project-attachment-field">
+                <label className="form-label">Photos, plan, or drawing <small>Optional · PDF, JPEG, PNG, or WebP · 10 MB each</small></label>
+                <input type="file" multiple accept="application/pdf,image/jpeg,image/png,image/webp" onChange={(event) => { const next = Array.from(event.target.files ?? []); if (next.some((file) => file.size > 10 * 1024 * 1024) || next.length + files.length > 5) { setStatus("error"); return; } setFiles((current) => [...current, ...next]); event.currentTarget.value = ""; }} />
+                {files.length > 0 && <div className="project-attachment-field__files">{files.map((file, index) => <span key={`${file.name}-${index}`}>{file.name}<button type="button" onClick={() => setFiles((current) => current.filter((_, itemIndex) => itemIndex !== index))}>×</button></span>)}</div>}
               </div>
 
               {/* Submit */}

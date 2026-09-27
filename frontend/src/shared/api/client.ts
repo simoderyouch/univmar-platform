@@ -66,9 +66,13 @@ export async function uploadDocument(file: File): Promise<UploadedDocument> {
 export async function downloadProtectedFile(url: string, filename: string): Promise<void> {
   const token = localStorage.getItem(accessTokenKey);
   const apiUrl = new URL(apiBaseUrl, window.location.origin);
-  const documentPrefix = `${apiUrl.pathname.replace(/\/$/, "")}/uploads/documents/`;
+  const basePath = apiUrl.pathname.replace(/\/$/, "");
+  const documentPrefix = `${basePath}/uploads/documents/`;
+  const inquiryAttachmentPrefix = `${basePath}/cms/contact-submissions/`;
   const target = new URL(url, apiUrl);
-  if (target.origin !== apiUrl.origin || !target.pathname.startsWith(documentPrefix)) {
+  const isManagedDocument = target.pathname.startsWith(documentPrefix);
+  const isInquiryAttachment = /^\/api\/v1\/cms\/contact-submissions\/[^/]+\/attachments\/[^/]+$/.test(target.pathname) && target.pathname.startsWith(inquiryAttachmentPrefix);
+  if (target.origin !== apiUrl.origin || (!isManagedDocument && !isInquiryAttachment)) {
     throw new RequestError("This document does not have a trusted download URL.");
   }
   const response = await fetch(target.toString(), { headers: token ? { Authorization: `Bearer ${token}` } : {} });

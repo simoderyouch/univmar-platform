@@ -9,6 +9,7 @@ export type MaterialVariant = {
   mainImageUrl?: string;
   galleryImageUrls: string[];
   active: boolean;
+  publicAvailabilityPolicy?: "AUTO" | "AVAILABLE_ON_ORDER" | "SHOWROOM_SELECTION" | "HIDDEN";
 };
 
 export type MaterialSummary = {
@@ -31,6 +32,9 @@ export type Material = Omit<MaterialSummary, "variantCount"> & {
   pattern?: string;
   description?: string;
   applications?: string;
+  publicUses?: string;
+  careSummary?: string;
+  indoorOutdoor?: string;
   variants: MaterialVariant[];
 };
 
@@ -52,4 +56,7 @@ export type MaterialFormValues = {
   pattern: string;
   description: string;
   applications: string;
+  publicUses: string;
+  careSummary: string;
+  indoorOutdoor: string;
 };

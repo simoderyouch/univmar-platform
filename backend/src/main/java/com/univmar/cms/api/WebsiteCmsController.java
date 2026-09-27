@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
 
 @RestController
 @RequestMapping("/api/v1/cms")
@@ -24,5 +25,6 @@ public class WebsiteCmsController {
     @PostMapping("/contact-submissions/{id}/claim") public ApiResponse<InquiryResponse> claim(@PathVariable UUID id, HttpServletRequest request) { return of(cms.claim(id), requestId(request)); }
     @PatchMapping("/contact-submissions/{id}") public ApiResponse<InquiryResponse> status(@PathVariable UUID id, @Valid @RequestBody InquiryStatusInput input, HttpServletRequest request) { return of(cms.changeStatus(id, input), requestId(request)); }
     @PostMapping("/contact-submissions/{id}/qualify") public ApiResponse<QualificationResponse> qualify(@PathVariable UUID id, @Valid @RequestBody QualificationInput input, HttpServletRequest request) { return of(cms.qualify(id, input), requestId(request)); }
+    @GetMapping("/contact-submissions/{id}/attachments/{attachmentId}") public ResponseEntity<org.springframework.core.io.ByteArrayResource> attachment(@PathVariable UUID id, @PathVariable UUID attachmentId) { var file = cms.attachment(id, attachmentId); MediaType type; try { type = MediaType.parseMediaType(file.contentType()); } catch (Exception ignored) { type = MediaType.APPLICATION_OCTET_STREAM; } return ResponseEntity.ok().contentType(type).header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(file.originalFilename()).build().toString()).body(file.resource()); }
     private String requestId(HttpServletRequest request) { return (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE); }
 }

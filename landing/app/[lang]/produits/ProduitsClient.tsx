@@ -7,21 +7,32 @@ import { useLang, useLocalePath } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { publicAssetUrl } from "@/lib/publicAsset";
-import { buildMultiProductContactHref } from "@/lib/productContact";
 import { inferProductColor, PRODUCT_COLORS, countProductsByColor, type ProductColor } from "@/lib/productMeta";
 import ProductMediaSwap from "@/components/ProductMediaSwap";
 import ColorFilterDropdown from "@/components/ColorFilterDropdown";
 import ScrollReveal from "@/components/ScrollReveal";
+import CatalogueDiscoveryTools from "@/components/CatalogueDiscoveryTools";
+import { readSavedMaterials, savedMaterialEvents, toggleSavedMaterial } from "@/lib/favourites";
 
 type Product = {
   id: string;
+  materialId: string;
+  materialName: string;
   slug: string;
   name: string;
+  displayName: string;
   images: string;
   applicationImages?: string[];
   categoryId: string;
   published?: boolean;
   category: { id: string; name: string };
+  availability: { code: string; label: string };
+  origin?: string | null;
+  applications?: string | null;
+  recommendedUses?: string[];
+  careSummary?: string | null;
+  indoorOutdoor?: string | null;
+  variants: { id: string; name: string; thicknessMm: number; format: string | null; availability: { code: string; label: string } }[];
 };
 type Category = { id: string; name: string; slug: string; order: number };
 
@@ -49,11 +60,11 @@ const PRODUCT_HERO_IMAGES = [
 const COLOR_KEYS = PRODUCT_COLORS;
 
 export default function ProduitsClient({ products, categories }: Props) {
-  const { t, lang, lp } = useLang();
+  const { t, lp } = useLang();
   const filtersRef = useRef<HTMLDivElement | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeColor, setActiveColor] = useState<ProductColor | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedVariantIds, setSelectedVariantIds] = useState<string[]>([]);
 
   const [titleLine1, titleLine2] = t.products.title.split("\n");
 
@@ -67,6 +78,8 @@ export default function ProduitsClient({ products, categories }: Props) {
     mobileQuery.addEventListener("change", clearUnavailableColorFilter);
     return () => mobileQuery.removeEventListener("change", clearUnavailableColorFilter);
   }, []);
+
+  useEffect(() => { const sync = () => setSelectedVariantIds(readSavedMaterials().map((item) => item.variantId)); sync(); return savedMaterialEvents(sync); }, []);
 
   const catLabel = (name: string) => {
     const key = name as keyof typeof t.products.categories;
@@ -82,7 +95,7 @@ export default function ProduitsClient({ products, categories }: Props) {
     () =>
       products.map((product) => ({
         ...product,
-        color: inferProductColor(product.name),
+        color: inferProductColor(`${product.materialName} ${product.name}`),
         categoryLabel: catLabel(product.category?.name ?? ""),
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -131,26 +144,11 @@ export default function ProduitsClient({ products, categories }: Props) {
     filtersRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const toggleSelection = (productId: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId],
-    );
+  const toggleSelection = (product: Product) => {
+    const variant = product.variants[0];
+    toggleSavedMaterial({ productId: product.materialId, variantId: variant?.id ?? product.id, name: product.materialName, variantName: product.name, category: product.category.name, image: product.images, addedAt: new Date().toISOString() });
+    setSelectedVariantIds(readSavedMaterials().map((item) => item.variantId));
   };
-
-  const clearSelection = () => setSelectedIds([]);
-
-  const selectedProducts = useMemo(
-    () => productsWithMeta.filter((product) => selectedIds.includes(product.id)),
-    [productsWithMeta, selectedIds],
-  );
-
-  const selectionQuoteHref = buildMultiProductContactHref(
-    selectedProducts.map((product) => ({
-      name: product.name,
-      category: product.categoryLabel,
-    })),
-    lang,
-  );
 
   return (
     <>
@@ -266,7 +264,7 @@ export default function ProduitsClient({ products, categories }: Props) {
         </div>
       </section>
 
-      <div className={`catalog-body${selectedIds.length > 0 ? " catalog-body--has-selection" : ""}`}>
+      <div className="catalog-body">
         {groupedSections.length > 0 ? (
           groupedSections.map(({ category, items }, sectionIndex) => {
             const meta = sectionMeta(category.name);
@@ -308,8 +306,8 @@ export default function ProduitsClient({ products, categories }: Props) {
                         applicationLabel={t.seoContent.applications}
                         addLabel={t.products.addMaterial}
                         removeLabel={t.products.removeMaterial}
-                        inCart={selectedIds.includes(product.id)}
-                        onCartToggle={() => toggleSelection(product.id)}
+                        inCart={selectedVariantIds.includes(product.id)}
+                        onCartToggle={() => toggleSelection(product)}
                       />
                     ))}
                   </div>
@@ -327,22 +325,6 @@ export default function ProduitsClient({ products, categories }: Props) {
         )}
       </div>
 
-      {selectedIds.length > 0 ? (
-        <div className="catalog-selection-bar" role="region" aria-label={t.products.selectedMaterials}>
-          <div className="catalog-selection-bar__inner">
-            <p className="catalog-selection-bar__count">
-              <strong>{selectedIds.length}</strong> {t.products.selectedMaterials}
-            </p>
-            <button type="button" className="catalog-selection-bar__clear" onClick={clearSelection}>
-              {t.products.clearSelection}
-            </button>
-            <Link href={selectionQuoteHref} className="btn-gold catalog-selection-bar__cta">
-              {t.products.requestQuoteFree}
-            </Link>
-          </div>
-        </div>
-      ) : null}
-
       <ScrollReveal as="section" className="catalog-quote-cta">
         <div className="catalog-quote-cta__inner">
           <p className="eyebrow catalog-quote-cta__eyebrow">{t.products.customQuoteTitle}</p>
@@ -353,6 +335,8 @@ export default function ProduitsClient({ products, categories }: Props) {
           </Link>
         </div>
       </ScrollReveal>
+
+      <CatalogueDiscoveryTools products={products} />
 
       <Footer />
     </>
@@ -406,13 +390,15 @@ function CatalogTile({
       <div className="catalog-tile__meta">
         {productHref ? (
           <Link href={productHref} className="catalog-tile__name-link">
-            <h3 className="catalog-tile__name">{product.name}</h3>
+            <h3 className="catalog-tile__name">{product.displayName}</h3>
           </Link>
         ) : (
-          <h3 className="catalog-tile__name">{product.name}</h3>
+          <h3 className="catalog-tile__name">{product.displayName}</h3>
         )}
         <div className="catalog-tile__tags">
+          <span className="catalog-tile__tag catalog-tile__tag--material">{product.materialName}</span>
           <span className="catalog-tile__tag">{product.categoryLabel}</span>
+          <span className={`availability-badge availability-badge--${product.availability.code.toLowerCase()}`}>{product.availability.label}</span>
           {colorLabel ? (
             <span className={`catalog-tile__tag catalog-tile__tag--${product.color}`}>
               {colorLabel}

@@ -8,6 +8,9 @@ import com.univmar.common.api.ApiException;
 import com.univmar.customer.domain.*;
 import com.univmar.project.domain.*;
 import com.univmar.user.domain.*;
+import com.univmar.common.storage.LocalDocumentStorage;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.ByteArrayResource;
 import java.util.*;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,15 +27,17 @@ public class WebsiteCmsService {
     private final ProjectRepository projects;
     private final UserRepository users;
     private final AccessControlService access;
+    private final LocalDocumentStorage storage;
 
     public WebsiteCmsService(WebsiteContactFormSettingsRepository settings, WebsiteInquiryRepository inquiries,
-            CustomerRepository customers, ProjectRepository projects, UserRepository users, AccessControlService access) {
+            CustomerRepository customers, ProjectRepository projects, UserRepository users, AccessControlService access, LocalDocumentStorage storage) {
         this.settings = settings;
         this.inquiries = inquiries;
         this.customers = customers;
         this.projects = projects;
         this.users = users;
         this.access = access;
+        this.storage = storage;
     }
 
     @Transactional(readOnly = true)
@@ -48,15 +53,19 @@ public class WebsiteCmsService {
         return settingsResponse(setting);
     }
 
-    public void submit(PublicInquiryInput input) {
+    public WebsiteInquiry submit(PublicInquiryInput input) { return submit(input, List.of()); }
+    public WebsiteInquiry submit(PublicInquiryInput input, List<MultipartFile> files) {
         WebsiteContactFormSettings setting = settings.findAll().stream().findFirst().orElse(null);
-        if (input.website() != null && !input.website().isBlank()) return;
-        if (setting != null && !setting.isEnabled()) return;
+        if (input.website() != null && !input.website().isBlank()) return null;
+        if (setting != null && !setting.isEnabled()) return null;
         String email = trim(input.email()), phone = trim(input.phone());
         if ((setting == null || !setting.isRequireEmail()) && (setting == null || !setting.isRequirePhone()) && email == null && phone == null) throw new ApiException(HttpStatus.BAD_REQUEST, "CONTACT_REQUIRED", "Enter an email address or phone number.");
         if (setting != null && setting.isRequireEmail() && email == null) throw new ApiException(HttpStatus.BAD_REQUEST, "EMAIL_REQUIRED", "Enter an email address.");
         if (setting != null && setting.isRequirePhone() && phone == null) throw new ApiException(HttpStatus.BAD_REQUEST, "PHONE_REQUIRED", "Enter a phone number.");
-        inquiries.save(new WebsiteInquiry(required(input.fullName()), email, phone, trim(input.subject()), trim(input.message()), trim(input.language()), trim(input.selectedProducts()), trim(input.sourcePage()), trim(input.utmSource()), trim(input.utmMedium()), trim(input.utmCampaign()), trim(input.referrer())));
+        if (files != null && files.size() > 5) throw new ApiException(HttpStatus.BAD_REQUEST, "TOO_MANY_ATTACHMENTS", "Attach at most five project files.");
+        WebsiteInquiry inquiry = inquiries.save(new WebsiteInquiry(required(input.fullName()), email, phone, trim(input.subject()), trim(input.message()), trim(input.language()), trim(input.selectedProducts()), trim(input.sourcePage()), trim(input.utmSource()), trim(input.utmMedium()), trim(input.utmCampaign()), trim(input.referrer())));
+        if (files != null) for (MultipartFile file : files) if (file != null && !file.isEmpty()) { var stored = storage.storeWebsiteInquiryAttachment(file); inquiry.addAttachment(new WebsiteInquiryAttachment(inquiry, stored.url(), stored.originalFilename(), stored.contentType(), stored.size())); }
+        return inquiry;
     }
 
     @Transactional(readOnly = true)
@@ -109,6 +118,14 @@ public class WebsiteCmsService {
         inquiry.changeStatus(WebsiteInquiryStatus.READ);
         return new QualificationResponse(inquiry.getId(), customer.getId(), project.getId(), existing);
     }
+    @Transactional(readOnly = true)
+    public AttachmentDownload attachment(UUID inquiryId, UUID attachmentId) {
+        WebsiteInquiry inquiry = inquiries.findById(inquiryId).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "INQUIRY_NOT_FOUND", "Form submission was not found."));
+        requireOwner(inquiry);
+        WebsiteInquiryAttachment attachment = inquiry.getAttachments().stream().filter(file -> file.getId().equals(attachmentId)).findFirst().orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "ATTACHMENT_NOT_FOUND", "Project file was not found."));
+        LocalDocumentStorage.StoredDocument file = storage.loadManagedDocument(attachment.getDocumentUrl());
+        return new AttachmentDownload(file.resource(), attachment.getContentType(), attachment.getOriginalFilename());
+    }
 
     private WebsiteInquiry lockedInquiry(UUID id) {
         return inquiries.findByIdForUpdate(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "INQUIRY_NOT_FOUND", "Form submission was not found."));
@@ -133,7 +150,8 @@ public class WebsiteCmsService {
     }
 
     private FormSettingsResponse settingsResponse(WebsiteContactFormSettings setting) { return new FormSettingsResponse(setting.isEnabled(), setting.getTitle(), setting.getDescription(), setting.getSubmitLabel(), setting.isRequireEmail(), setting.isRequirePhone(), setting.getUpdatedAt()); }
-    private InquiryResponse response(WebsiteInquiry inquiry) { return new InquiryResponse(inquiry.getId(), inquiry.getFullName(), inquiry.getEmail(), inquiry.getPhone(), inquiry.getSubject(), inquiry.getMessage(), inquiry.getLanguage(), inquiry.getSelectedProducts(), inquiry.getSourcePage(), inquiry.getUtmSource(), inquiry.getUtmMedium(), inquiry.getUtmCampaign(), inquiry.getStatus(), inquiry.getNotificationStatus(), inquiry.getNotificationError(), inquiry.getQualifiedCustomerId(), inquiry.getQualifiedProjectId(), inquiry.getAssignedTo() == null ? null : inquiry.getAssignedTo().getId(), inquiry.getAssignedTo() == null ? null : inquiry.getAssignedTo().getEmail(), inquiry.getCallOutcome(), inquiry.getCallNotes(), inquiry.getNextFollowUpAt(), inquiry.getCreatedAt(), inquiry.getUpdatedAt()); }
+    private InquiryResponse response(WebsiteInquiry inquiry) { return new InquiryResponse(inquiry.getId(), inquiry.getFullName(), inquiry.getEmail(), inquiry.getPhone(), inquiry.getSubject(), inquiry.getMessage(), inquiry.getLanguage(), inquiry.getSelectedProducts(), inquiry.getSourcePage(), inquiry.getUtmSource(), inquiry.getUtmMedium(), inquiry.getUtmCampaign(), inquiry.getStatus(), inquiry.getNotificationStatus(), inquiry.getNotificationError(), inquiry.getQualifiedCustomerId(), inquiry.getQualifiedProjectId(), inquiry.getAssignedTo() == null ? null : inquiry.getAssignedTo().getId(), inquiry.getAssignedTo() == null ? null : inquiry.getAssignedTo().getEmail(), inquiry.getCallOutcome(), inquiry.getCallNotes(), inquiry.getNextFollowUpAt(), inquiry.getAttachments().stream().map(file -> new InquiryAttachmentResponse(file.getId(), "/api/v1/cms/contact-submissions/" + inquiry.getId() + "/attachments/" + file.getId(), file.getOriginalFilename(), file.getContentType(), file.getFileSize())).toList(), inquiry.getCreatedAt(), inquiry.getUpdatedAt()); }
+    public record AttachmentDownload(ByteArrayResource resource, String contentType, String originalFilename) { }
     private String required(String value) { String result = trim(value); if (result == null) throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Required value missing."); return result; }
     private String trim(String value) { return value == null || value.isBlank() ? null : value.trim(); }
 }

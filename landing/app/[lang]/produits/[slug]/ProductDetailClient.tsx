@@ -6,9 +6,9 @@ import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useLang, useLocalePath } from "@/lib/i18n";
 import { inferProductColor } from "@/lib/productMeta";
-import { buildProductContactHref, buildProductWhatsAppHref } from "@/lib/productContact";
-import { trackEvent } from "@/lib/analytics";
+import { buildProductWhatsAppHref } from "@/lib/productContact";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
+import ProductDiscoveryActions from "@/components/ProductDiscoveryActions";
 import type { ProductRecord } from "@/lib/products";
 import type { Lang } from "@/lib/i18n";
 import type { ProductSeoContent } from "@/lib/productSeo";
@@ -19,20 +19,21 @@ export default function ProductDetailClient({
   lang,
   seoContent,
   relatedProducts,
+  relatedProjects = [],
 }: {
   product: ProductRecord;
   categoryLabel: string;
   lang: Lang;
   seoContent: ProductSeoContent | null;
   relatedProducts: { id: string; name: string; href: string }[];
+  relatedProjects?: { id: string; title: string; image: string; category: { name: string } }[];
 }) {
   const { t } = useLang();
   const lp = useLocalePath();
-  const color = inferProductColor(product.name);
+  const color = inferProductColor(`${product.materialName} ${product.name}`);
   const colorLabel = color ? t.products.colors[color] : null;
 
-  const quoteHref = buildProductContactHref(product.name, categoryLabel, lang);
-  const whatsappHref = buildProductWhatsAppHref(product.name, categoryLabel, lang);
+  const whatsappHref = buildProductWhatsAppHref(`${product.materialName} — ${product.name}`, categoryLabel, lang);
 
   const description = t.seo.productTemplate.descriptionTemplate
     .replace("{name}", product.name)
@@ -75,8 +76,9 @@ export default function ProductDetailClient({
 
             <ScrollReveal className="product-detail__info" direction="left" delay={0.12}>
               <p className="eyebrow">{categoryLabel}</p>
-              <h1 className="product-detail__title">{product.name}</h1>
+              <h1 className="product-detail__title">{product.displayName}</h1>
               <div className="product-detail__tags">
+                <span className="catalog-tile__tag catalog-tile__tag--material">{product.materialName}</span>
                 <span className="catalog-tile__tag">{categoryLabel}</span>
                 {colorLabel ? (
                   <span className={`catalog-tile__tag catalog-tile__tag--${color}`}>
@@ -86,24 +88,7 @@ export default function ProductDetailClient({
               </div>
               <p className="product-detail__desc">{description}</p>
 
-              <div className="product-detail__actions">
-                <Link
-                  href={quoteHref}
-                  className="btn-gold"
-                  onClick={() => trackEvent("contact_click", { method: "quote", location: "product_page", product: product.name })}
-                >
-                  {t.products.requestQuote}
-                </Link>
-                <a
-                  href={whatsappHref}
-                  className="btn-outline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackEvent("contact_click", { method: "whatsapp", location: "product_page", product: product.name })}
-                >
-                  {t.cta.whatsapp}
-                </a>
-              </div>
+              <ProductDiscoveryActions productId={product.materialId} name={product.materialName} category={categoryLabel} image={product.images} variant={product.variants[0] ? { id: product.variants[0].id, name: product.variants[0].name } : undefined} availability={product.availability} whatsappHref={whatsappHref} />
 
               <Link href={lp("/produits")} className="product-detail__back">
                 ← {t.products.viewAll}
@@ -142,6 +127,16 @@ export default function ProductDetailClient({
                 <Link href={lp("/contact")} className="product-detail__related-link product-detail__related-link--cta">
                   {t.products.requestQuote}
                 </Link>
+              </div>
+            </ScrollReveal>
+          ) : null}
+
+          {relatedProjects.length ? (
+            <ScrollReveal as="section" className="product-detail__related product-detail__projects">
+              <p className="eyebrow">REALISATIONS</p>
+              <h2>Projects completed with this material</h2>
+              <div className="product-detail__project-grid">
+                {relatedProjects.map((project) => <Link key={project.id} href={lp("/projets")} className="product-detail__project-card"><img src={project.image} alt={project.title} /><span><b>{project.title}</b><small>{project.category.name}</small></span></Link>)}
               </div>
             </ScrollReveal>
           ) : null}
