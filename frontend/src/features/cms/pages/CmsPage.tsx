@@ -36,6 +36,7 @@ import { useAuth } from "../../auth/AuthProvider";
 import { useRouter } from "../../../app/providers/router";
 import {
   api,
+  downloadProtectedFile,
   RequestError,
   resolveImageUrl,
   uploadImage,
@@ -76,7 +77,9 @@ type Portfolio = {
   sortOrder: number;
   coverImageUrl: string;
   galleryImageUrls: string[];
+  variantIds?: string[];
 };
+type CatalogMaterialForPortfolio = { id: string; name: string; variants: { id: string; variantName: string; thicknessMm: number }[] };
 type Settings = {
   enabled: boolean;
   title: string;
@@ -109,6 +112,7 @@ type Submission = {
     | "INVALID";
   callNotes?: string;
   nextFollowUpAt?: string;
+  attachments?: { id: string; documentUrl: string; originalFilename: string; contentType: string; fileSize: number }[];
   createdAt: string;
   updatedAt?: string;
 };
@@ -345,6 +349,7 @@ function PortfolioManager() {
   const [categories, setCategories] = useState<PortfolioCategory[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [items, setItems] = useState<Portfolio[]>([]);
+  const [catalogMaterials, setCatalogMaterials] = useState<CatalogMaterialForPortfolio[]>([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [cover, setCover] = useState<File | null>(null);
@@ -355,6 +360,7 @@ function PortfolioManager() {
     published: true,
     featured: false,
     sortOrder: 0,
+    variantIds: [] as string[],
   });
   const coverInput = useRef<HTMLInputElement>(null);
   const load = () =>
@@ -362,11 +368,14 @@ function PortfolioManager() {
       api<PortfolioCategory[]>("/cms/portfolio/categories"),
       api<Page<Project>>("/projects?size=100"),
       api<Portfolio[]>("/cms/portfolio"),
+      api<Page<{ id: string }>>("/materials?size=100"),
     ])
-      .then(([cats, projectPage, records]) => {
+      .then(async ([cats, projectPage, records, materialPage]) => {
         setCategories(cats);
         setProjects(projectPage.content);
         setItems(records);
+        const materialDetails = await Promise.all(materialPage.content.map((material) => api<CatalogMaterialForPortfolio>(`/materials/${material.id}`)));
+        setCatalogMaterials(materialDetails);
       })
       .catch((cause: RequestError) => setError(cause.message));
   useEffect(() => {
@@ -393,6 +402,7 @@ function PortfolioManager() {
         published: true,
         featured: false,
         sortOrder: 0,
+        variantIds: [],
       });
       setCover(null);
       setGallery([]);
@@ -415,6 +425,7 @@ function PortfolioManager() {
           sortOrder: item.sortOrder,
           coverImageUrl: item.coverImageUrl,
           galleryImageUrls: item.galleryImageUrls,
+          variantIds: item.variantIds ?? [],
         }),
       });
       await load();
@@ -454,6 +465,7 @@ function PortfolioManager() {
             ))}
           </select>
         </label>
+        <label className="mt-4 grid gap-1.5 text-sm font-medium">Materials used in this project <span className="text-xs font-normal text-[#786961]">These links appear on the matching public product pages.</span><select multiple value={form.variantIds} onChange={(event) => setForm((value) => ({ ...value, variantIds: Array.from(event.currentTarget.selectedOptions, (option) => option.value) }))} className={`${field} h-32`}>{catalogMaterials.flatMap((material) => material.variants.map((variant) => <option key={variant.id} value={variant.id}>{material.name} · {variant.variantName} · {variant.thicknessMm} mm</option>))}</select></label>
         <label className="mt-4 grid gap-1.5 text-sm font-medium">
           Portfolio category
           <select
@@ -1403,6 +1415,7 @@ export function Submissions() {
                       </div>
                     </dl>
                   </div>
+                  {active.attachments?.length ? <div className="border-t border-[#eee6e1] pt-5"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9b7861]">Project files</p><div className="mt-3 space-y-2">{active.attachments.map((file) => <button type="button" key={file.id} onClick={() => void downloadProtectedFile(file.documentUrl, file.originalFilename)} className="flex w-full items-center gap-2 text-left text-xs font-semibold text-[#59483f] hover:text-[#9b6040]"><Download size={14} className="text-[#9b7861]" />{file.originalFilename}<span className="ml-auto font-normal text-[#a08e83]">{Math.ceil(file.fileSize / 1024)} KB</span></button>)}</div></div> : null}
                   <div className="border-t border-[#eee6e1] pt-5">
                     <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9b7861]">
                       Sales ownership

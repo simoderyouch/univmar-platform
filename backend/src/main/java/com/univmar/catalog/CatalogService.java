@@ -29,7 +29,9 @@ public class CatalogService {
     public MaterialDetail create(MaterialInput input) {
         ensureUniqueSku(input.sku(), null);
         MaterialCategory category = category(input.categoryId(), input.stoneType());
-        return detail(materials.save(new StoneMaterial(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), legacyType(category), category, trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()))));
+        StoneMaterial material = new StoneMaterial(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), legacyType(category), category, trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()));
+        material.updatePublicDiscovery(trim(input.publicUses()), trim(input.careSummary()), trim(input.indoorOutdoor()));
+        return detail(materials.save(material));
     }
 
     public MaterialDetail update(UUID id, MaterialInput input) {
@@ -37,6 +39,7 @@ public class CatalogService {
         ensureUniqueSku(input.sku(), id);
         MaterialCategory category = category(input.categoryId(), input.stoneType());
         material.update(input.name().trim(), trim(input.commercialName()), normalizeSku(input.sku()), legacyType(category), category, trim(input.origin()), trim(input.color()), trim(input.pattern()), trim(input.description()), trim(input.applications()));
+        material.updatePublicDiscovery(trim(input.publicUses()), trim(input.careSummary()), trim(input.indoorOutdoor()));
         return detail(material);
     }
 
@@ -73,6 +76,7 @@ public class CatalogService {
         StoneMaterial material = material(materialId);
         ensureUniqueVariant(materialId, input, null);
         StoneVariant variant = new StoneVariant(material, input.thicknessMm(), trim(input.format()), trim(input.mainImageUrl()), input.galleryImageUrls(), required(input.variantName()));
+        variant.setPublicAvailabilityPolicy(input.publicAvailabilityPolicy());
         material.addVariant(variant);
         return variant(variant);
     }
@@ -81,6 +85,7 @@ public class CatalogService {
         StoneVariant item = variant(materialId, variantId);
         ensureUniqueVariant(materialId, input, variantId);
         item.update(input.thicknessMm(), trim(input.format()), trim(input.mainImageUrl()), input.galleryImageUrls(), required(input.variantName()));
+        item.setPublicAvailabilityPolicy(input.publicAvailabilityPolicy());
         return variant(item);
     }
 
@@ -120,11 +125,11 @@ public class CatalogService {
     }
 
     private MaterialDetail detail(StoneMaterial item) {
-        return new MaterialDetail(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getCategory().getId(), item.getCategory().getName(), item.getCategory().getSlug(), item.getStoneType().name(), item.getOrigin(), item.getColor(), item.getPattern(), item.getDescription(), item.getApplications(), item.isActive(), item.getVariants().stream().map(this::variant).toList());
+        return new MaterialDetail(item.getId(), item.getName(), item.getCommercialName(), item.getSku(), item.getCategory().getId(), item.getCategory().getName(), item.getCategory().getSlug(), item.getStoneType().name(), item.getOrigin(), item.getColor(), item.getPattern(), item.getDescription(), item.getApplications(), item.getPublicUses(), item.getCareSummary(), item.getIndoorOutdoor(), item.isActive(), item.getVariants().stream().map(this::variant).toList());
     }
 
     private VariantResponse variant(StoneVariant item) {
-        return new VariantResponse(item.getId(), item.getThicknessMm(), item.getVariantName(), item.getFormat(), item.getMainImageUrl(), item.getGalleryImageUrls(), item.isActive());
+        return new VariantResponse(item.getId(), item.getThicknessMm(), item.getVariantName(), item.getFormat(), item.getMainImageUrl(), item.getGalleryImageUrls(), item.isActive(), item.getPublicAvailabilityPolicy());
     }
 
     private String normalizeSku(String value) {

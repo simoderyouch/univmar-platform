@@ -8,8 +8,10 @@ import { publicAssetUrl } from "@/lib/publicAsset";
 
 type Product = {
   id: string;
+  materialName: string;
   slug: string;
   name: string;
+  displayName: string;
   images: string;
   categoryId: string;
   category: { name: string };
@@ -117,8 +119,8 @@ export default function HomeProductsSection({ products }: Props) {
                   <div className="home-products__media">
                     <img
                       src={publicAssetUrl(product.images)}
-                      alt={`${product.name} — ${product.category.name} pour projet architectural au Maroc`}
-                      title={`${product.name} — ${product.category.name}`}
+                      alt={`${product.materialName} — ${product.name} — ${product.category.name} pour projet architectural au Maroc`}
+                      title={`${product.materialName} — ${product.name}`}
                       className="home-products__img"
                       loading="lazy"
                       onError={(e) => {
@@ -129,7 +131,8 @@ export default function HomeProductsSection({ products }: Props) {
                       <span className="home-products__quote-btn">{content.requestQuote}</span>
                     </div>
                   </div>
-                  <h3 className="home-products__name">{product.name}</h3>
+                  <p className="home-products__material">{product.materialName}</p>
+                  <h3 className="home-products__name">{product.displayName}</h3>
                 </Link>
               </motion.article>
             );

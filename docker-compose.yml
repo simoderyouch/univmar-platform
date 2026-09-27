@@ -63,6 +63,9 @@ services:
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:-true}
     ports:
       - "8080:8080"
+    volumes:
+      # Imported once into MinIO at startup; the browser only receives the API stream.
+      - ./base-gallery:/base-gallery:ro
     depends_on:
       db:
         condition: service_healthy

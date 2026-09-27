@@ -4,6 +4,7 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getDictionary } from "@/lib/i18n-server";
 import { isLocale, type Locale } from "@/lib/site";
 import { getAllProducts, getProductBySlug } from "@/lib/products";
+import { getPortfolioProjectsForVariant } from "@/lib/erpCms";
 import { absoluteUrl, localePath } from "@/lib/site";
 import { publicAssetUrl } from "@/lib/publicAsset";
 import JsonLd from "@/components/seo/JsonLd";
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const dict = getDictionary(lang);
   const catKey = product.category.name as keyof typeof dict.products.categories;
   const categoryLabel = dict.products.categories[catKey] ?? product.category.name;
-  const titleName = product.name;
+  const titleName = `${product.materialName} — ${product.name}`;
   const title =
     slug === "labrador-noir"
       ? lang === "fr"
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           : "Labrador Noir granite in Morocco | UNIVMAR"
       : `${titleName} — ${categoryLabel} ${dict.seo.productTemplate.titleSuffix}`;
   const fallbackDescription = dict.seo.productTemplate.descriptionTemplate
-    .replace("{name}", product.name)
+    .replace("{name}", titleName)
     .replace("{category}", categoryLabel);
   const seoContent = buildProductSeoContent(product, categoryLabel, lang);
   const description =
@@ -77,7 +78,7 @@ export default async function ProductDetailPage({ params }: Props) {
   const path = `/produits/${slug}`;
   const url = absoluteUrl(localePath(lang, path));
   const fallbackDescription = dict.seo.productTemplate.descriptionTemplate
-    .replace("{name}", product.name)
+    .replace("{name}", `${product.materialName} — ${product.name}`)
     .replace("{category}", categoryLabel);
   const seoContent = buildProductSeoContent(product, categoryLabel, lang);
   const description = seoContent?.paragraphs[0] ?? fallbackDescription;
@@ -90,6 +91,7 @@ export default async function ProductDetailPage({ params }: Props) {
       name: item.name,
       href: localePath(lang, `/produits/${item.slug}`),
     }));
+  const relatedProjects = product.variants[0] ? await getPortfolioProjectsForVariant(product.variants[0].id).catch(() => []) : [];
 
   return (
     <>
@@ -121,6 +123,7 @@ export default async function ProductDetailPage({ params }: Props) {
         lang={lang}
         seoContent={seoContent}
         relatedProducts={relatedProducts}
+        relatedProjects={relatedProjects}
       />
     </>
   );

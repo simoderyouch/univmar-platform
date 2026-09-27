@@ -40,6 +40,7 @@ public class SecurityConfig {
                 // Landing requests and showcase reads are intentionally public; the CMS itself is staff-only below.
                 .requestMatchers(HttpMethod.GET, "/api/v1/public/contact-form").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/public/contact-form/submissions").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/public/contact-form/submissions-with-files").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/public/showcase/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/public/catalog/**", "/api/v1/public/portfolio/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/public/quotations/**").permitAll()

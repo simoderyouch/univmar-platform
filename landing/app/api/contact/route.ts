@@ -23,6 +23,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const contentType = request.headers.get("content-type") ?? "";
+    if (contentType.includes("multipart/form-data")) {
+      const form = await request.formData();
+      return await forward("/submissions-with-files", { method: "POST", body: form });
+    }
     const body = await request.json();
     return await forward("/submissions", {
       method: "POST",

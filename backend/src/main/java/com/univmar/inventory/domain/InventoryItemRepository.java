@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.query.Param;
 
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, UUID>, JpaSpecificationExecutor<InventoryItem> {
+    List<InventoryItem> findAllByVariantId(UUID variantId);
     Optional<InventoryItem> findByVariantIdAndWarehouseIdAndLocationIdAndLotNumberAndBundleNumber(UUID variantId, UUID warehouseId, UUID locationId, String lotNumber, String bundleNumber);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select i from InventoryItem i where i.variant.id = :variantId order by i.createdAt, i.id")
