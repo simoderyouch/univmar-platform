@@ -3,6 +3,8 @@
 !.env.example
 
 data/
+!landing/data/
+!landing/data/*.ts
 backend/data/
 base-gallery/
 backend/target/
