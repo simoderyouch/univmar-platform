@@ -19,3 +19,5 @@ backend/target-old/
 /univmar_phase_by_phase_roadmap.txt
 /explations
 /docs
+infra/production/*.tfplan
+infra/production/errored.tfstate
