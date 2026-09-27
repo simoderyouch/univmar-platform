@@ -28,4 +28,5 @@ infra/production/errored.tfstate
 **/terraform.tfstate
 **/terraform.tfstate.*
 **/*.tfplan
+**/tfplan
 **/errored.tfstate

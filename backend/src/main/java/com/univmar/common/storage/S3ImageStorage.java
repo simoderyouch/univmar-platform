@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -42,8 +43,16 @@ public class S3ImageStorage implements ImageStorage {
                           @Value("${univmar.storage.public-api-url}") String publicApiUrl) {
         this.bucket = bucket;
         this.publicApiUrl = publicApiUrl.replaceAll("/$", "");
-        this.client = S3Client.builder().endpointOverride(URI.create(endpoint)).region(Region.of(region))
-                .forcePathStyle(true).credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey))).build();
+        var clientBuilder = S3Client.builder().region(Region.of(region));
+        if (endpoint != null && !endpoint.isBlank()) {
+            // Local MinIO needs its explicit endpoint and local access keys.
+            clientBuilder.endpointOverride(URI.create(endpoint)).forcePathStyle(true)
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)));
+        } else {
+            // In ECS, obtain short-lived credentials from the API task role.
+            clientBuilder.credentialsProvider(DefaultCredentialsProvider.create());
+        }
+        this.client = clientBuilder.build();
         ensureBucket();
     }
 
