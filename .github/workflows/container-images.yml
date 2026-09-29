@@ -62,3 +62,28 @@ jobs:
           context: ./landing
           push: ${{ github.event_name == 'push' }}
           tags: ${{ env.ECR_REGISTRY }}/univmar-production-landing:${{ github.sha }}
+
+  terraform-check:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
+
+      - name: Initialize Terraform without remote state
+        working-directory: infra/production
+        run: terraform init -backend=false -input=false
+
+      - name: Check Terraform formatting
+        working-directory: infra/production
+        run: terraform fmt -check -recursive
+
+      - name: Validate Terraform configuration
+        working-directory: infra/production
+        run: terraform validate

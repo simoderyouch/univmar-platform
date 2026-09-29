@@ -21,7 +21,8 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
-        "repo:simoderyouch/univmar-platform:ref:refs/heads/main"
+        "repo:simoderyouch/univmar-platform:ref:refs/heads/main",
+        "repo:simoderyouch/univmar-platform:environment:production"
       ]
     }
   }
@@ -72,4 +73,80 @@ resource "aws_iam_role_policy" "github_actions_ecr" {
 
 output "github_actions_ecr_role_arn" {
   value = aws_iam_role.github_actions_ecr.arn
+}
+
+resource "aws_iam_role" "github_actions_infra" {
+  name               = "univmar-production-github-actions-infra"
+  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role.json
+}
+
+# Terraform needs to manage the production stack and the S3 backend. The
+# resource prefixes keep this role scoped to Univmar resources.
+resource "aws_iam_role_policy" "github_actions_infra" {
+  name = "manage-production-infrastructure"
+  role = aws_iam_role.github_actions_infra.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "acm:*",
+          "ec2:*",
+          "ecs:*",
+          "ecr:*",
+          "elasticloadbalancing:*",
+          "logs:*",
+          "rds:*",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:ListSecrets",
+          "sts:GetCallerIdentity"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:CreateOpenIDConnectProvider",
+          "iam:DeleteOpenIDConnectProvider",
+          "iam:GetOpenIDConnectProvider",
+          "iam:ListOpenIDConnectProviders",
+          "iam:TagOpenIDConnectProvider",
+          "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:GetRole",
+          "iam:ListRolePolicies",
+          "iam:ListRoles",
+          "iam:ListAttachedRolePolicies",
+          "iam:ListRoleTags",
+          "iam:PassRole",
+          "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:GetRolePolicy",
+          "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:TagRole",
+          "iam:UntagRole",
+          "iam:CreateServiceLinkedRole",
+          "iam:UpdateOpenIDConnectProviderThumbprint",
+          "iam:UpdateAssumeRolePolicy"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = ["s3:*"]
+        Resource = [
+          "arn:aws:s3:::univmar-*",
+          "arn:aws:s3:::univmar-*/*"
+        ]
+      }
+    ]
+  })
+}
+
+output "github_actions_infra_role_arn" {
+  value = aws_iam_role.github_actions_infra.arn
 }
