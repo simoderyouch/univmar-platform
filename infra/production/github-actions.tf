@@ -99,6 +99,7 @@ resource "aws_iam_role_policy" "github_actions_infra" {
           "elasticloadbalancing:*",
           "logs:*",
           "rds:*",
+          "servicediscovery:*",
           "secretsmanager:DescribeSecret",
           "secretsmanager:GetResourcePolicy",
           "secretsmanager:GetSecretValue",

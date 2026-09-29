@@ -27,7 +27,7 @@ resource "aws_ecs_task_definition" "landing" {
       ]
 
       environment = [
-        { name = "ERP_PUBLIC_API_URL", value = "https://api.universmarbre.com/api/v1" },
+        { name = "ERP_PUBLIC_API_URL", value = "http://${aws_service_discovery_service.api.name}.${aws_service_discovery_private_dns_namespace.main.name}:8080/api/v1" },
         { name = "NEXT_PUBLIC_SITE_URL", value = "https://landing.universmarbre.com" }
       ]
 
