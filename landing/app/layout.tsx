@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
-import { Libre_Baskerville, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "@/lib/theme";
 import ThemeScript from "@/components/ThemeScript";
 import Analytics from "@/components/Analytics";
@@ -10,23 +9,6 @@ import ScrollRestoration from "@/components/ScrollRestoration";
 import ScrollRestorationScript from "@/components/ScrollRestorationScript";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-sans",
-  display: "swap",
-  weight: ["400", "600", "700"],
-  preload: true,
-});
-
-const libreBaskerville = Libre_Baskerville({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-serif",
-  display: "swap",
-  weight: ["400"],
-  style: ["normal", "italic"],
-  preload: true,
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -47,10 +29,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      className={`${plusJakarta.variable} ${libreBaskerville.variable}`}
-      suppressHydrationWarning
-    >
+    <html suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta
@@ -60,9 +39,7 @@ export default function RootLayout({
         <ThemeScript />
         <ScrollRestorationScript />
       </head>
-      <body
-        className={`${plusJakarta.variable} ${libreBaskerville.variable}`}
-      >
+      <body>
         <ThemeProvider>
           {children}
           <Suspense fallback={null}>

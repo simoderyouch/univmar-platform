@@ -37,6 +37,8 @@
 /* ── THEME TOKENS (runtime overrides) ─────────── */
 :root {
   color-scheme: light;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: "Libre Baskerville", Georgia, "Times New Roman", serif;
   /* Safari before 15.4 does not support svh/dvh. Keep a valid viewport
   fallback, then progressively use the stable/dynamic units where present. */
   --viewport-height: 100vh;
