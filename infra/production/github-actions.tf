@@ -21,8 +21,8 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
-        "repo:simoderyouch/univmar-platform:ref:refs/heads/main",
-        "repo:simoderyouch/univmar-platform:environment:production"
+        "repo:simoderyouch@88974539/univmar-platform@1372900540:ref:refs/heads/main",
+        "repo:simoderyouch@88974539/univmar-platform@1372900540:environment:production"
       ]
     }
   }
