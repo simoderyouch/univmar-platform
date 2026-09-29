@@ -100,6 +100,7 @@ resource "aws_iam_role_policy" "github_actions_infra" {
           "logs:*",
           "rds:*",
           "secretsmanager:DescribeSecret",
+          "secretsmanager:GetResourcePolicy",
           "secretsmanager:GetSecretValue",
           "secretsmanager:ListSecrets",
           "sts:GetCallerIdentity"
