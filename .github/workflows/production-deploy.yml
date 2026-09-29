@@ -1,0 +1,138 @@
+name: Deploy production
+
+on:
+  workflow_run:
+    workflows: ["Build container images"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: eu-west-3
+  TF_WORKING_DIR: infra/production
+
+jobs:
+  plan:
+    name: Plan infrastructure
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.release.outputs.image_tag }}
+
+    steps:
+      - name: Select release commit
+        id: release
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "image_tag=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          else
+            echo "image_tag=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout release commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.image_tag }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_INFRA_ROLE_ARN }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
+
+      - name: Terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -input=false
+
+      - name: Terraform format and validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform fmt -check -recursive
+          terraform validate
+
+      - name: Terraform plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          IMAGE_TAG: ${{ steps.release.outputs.image_tag }}
+        run: |
+          terraform plan -input=false -out=production.tfplan \
+            -var="api_image_tag=${IMAGE_TAG}" \
+            -var="erp_image_tag=${IMAGE_TAG}" \
+            -var="landing_image_tag=${IMAGE_TAG}"
+
+      - name: Upload Terraform plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-terraform-plan-${{ steps.release.outputs.image_tag }}
+          path: ${{ env.TF_WORKING_DIR }}/production.tfplan
+          if-no-files-found: error
+          retention-days: 7
+
+  apply:
+    name: Apply infrastructure and deploy ECS
+    needs: plan
+    environment: production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.image_tag }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_INFRA_ROLE_ARN }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
+
+      - name: Terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -input=false
+
+      - name: Download reviewed Terraform plan
+        uses: actions/download-artifact@v4
+        with:
+          name: production-terraform-plan-${{ needs.plan.outputs.image_tag }}
+          path: ${{ env.TF_WORKING_DIR }}
+
+      - name: Apply reviewed Terraform plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -input=false production.tfplan
+
+      - name: Wait for ECS services
+        run: |
+          aws ecs wait services-stable \
+            --cluster univmar-production \
+            --services \
+              univmar-production-api \
+              univmar-production-erp-web \
+              univmar-production-landing
+
+      - name: Smoke test public endpoints
+        run: |
+          curl --fail --retry 10 --retry-delay 15 --retry-connrefused \
+            https://landing.universmarbre.com/fr
+          curl --fail --retry 10 --retry-delay 15 --retry-connrefused \
+            https://api.universmarbre.com/api/v1/public/catalog/categories

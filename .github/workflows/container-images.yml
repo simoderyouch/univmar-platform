@@ -1,0 +1,89 @@
+name: Build container images
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: container-images-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: eu-west-3
+  ECR_REGISTRY: 089496390808.dkr.ecr.eu-west-3.amazonaws.com
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+
+      - name: Login to ECR
+        if: github.event_name == 'push'
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ env.ECR_REGISTRY }}/univmar-production-api:${{ github.sha }}
+
+      - name: Build ERP image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: ${{ github.event_name == 'push' }}
+          build-args: |
+            NGINX_CONFIG=nginx.production.conf
+          tags: ${{ env.ECR_REGISTRY }}/univmar-production-erp-web:${{ github.sha }}
+
+      - name: Build landing image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./landing
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ env.ECR_REGISTRY }}/univmar-production-landing:${{ github.sha }}
+
+  terraform-check:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
+
+      - name: Initialize Terraform without remote state
+        working-directory: infra/production
+        run: terraform init -backend=false -input=false
+
+      - name: Check Terraform formatting
+        working-directory: infra/production
+        run: terraform fmt -check -recursive
+
+      - name: Validate Terraform configuration
+        working-directory: infra/production
+        run: terraform validate
