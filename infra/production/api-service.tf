@@ -106,6 +106,10 @@ resource "aws_ecs_service" "api" {
     container_name   = "api"
     container_port   = 8080
   }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.api.arn
+  }
 }
 
 output "public_api_catalog_url" {
