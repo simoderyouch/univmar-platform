@@ -1,9 +1,6 @@
-import { Noto_Sans_Arabic } from "next/font/google";
-
-export const notoSansArabic = Noto_Sans_Arabic({
-  subsets: ["arabic"],
-  variable: "--font-arabic",
-  display: "swap",
-  weight: ["400", "600", "700"],
-  preload: false,
-});
+// Keep the container build independent from Google Fonts. The browser uses its
+// installed Arabic font, with the CSS fallback stack defined in globals.css.
+export const notoSansArabic = {
+  className: "font-arabic",
+  variable: "font-arabic",
+} as const;
