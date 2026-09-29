@@ -130,9 +130,26 @@ jobs:
               univmar-production-erp-web \
               univmar-production-landing
 
-      - name: Smoke test public endpoints
+      - name: Smoke test services through the load balancer
+        shell: bash
         run: |
+          alb_dns="$(aws elbv2 describe-load-balancers \
+            --names univmar-production \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text)"
+
           curl --fail --retry 10 --retry-delay 15 --retry-connrefused \
+            --connect-to "landing.universmarbre.com:443:${alb_dns}:443" \
             https://landing.universmarbre.com/fr
           curl --fail --retry 10 --retry-delay 15 --retry-connrefused \
+            --connect-to "api.universmarbre.com:443:${alb_dns}:443" \
             https://api.universmarbre.com/api/v1/public/catalog/categories
+
+      - name: Check external DNS records
+        shell: bash
+        run: |
+          for hostname in landing.universmarbre.com erp.universmarbre.com api.universmarbre.com; do
+            if ! getent hosts "$hostname" >/dev/null; then
+              echo "::warning title=DNS record unavailable::${hostname} does not resolve. Update its Hostinger CNAME to the current ALB DNS name."
+            fi
+          done
