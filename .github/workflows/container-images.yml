@@ -26,6 +26,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Inspect OIDC claims
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          token=$(curl --fail --silent --show-error \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com" | jq -r '.value')
+          node -e 'const claims = JSON.parse(Buffer.from(process.argv[1].split(".")[1], "base64url").toString()); console.log(JSON.stringify({aud: claims.aud, sub: claims.sub, repository: claims.repository, ref: claims.ref, event_name: claims.event_name, environment: claims.environment}, null, 2));' "$token"
+
       - name: Configure AWS credentials (ECR role)
         if: github.event_name == 'push'
         uses: aws-actions/configure-aws-credentials@v4
