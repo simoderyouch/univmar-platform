@@ -27,12 +27,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (ECR role)
         if: github.event_name == 'push'
+        id: aws_credentials_ecr
+        continue-on-error: true
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+
+      - name: Configure AWS credentials (infra role fallback)
+        if: github.event_name == 'push' && steps.aws_credentials_ecr.outcome == 'failure'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_INFRA_ROLE_ARN }}
 
       - name: Login to ECR
         if: github.event_name == 'push'
