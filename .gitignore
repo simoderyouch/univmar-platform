@@ -24,7 +24,6 @@ backend/target-old/
 /docs
 infra/production/*.tfplan
 infra/production/errored.tfstate
-
 # Terraform keeps state, saved plans, and provider downloads on each machine.
 # Commit only .tf configuration and .terraform.lock.hcl.
 **/.terraform/
