@@ -9,7 +9,8 @@ resource "aws_db_instance" "main" {
   port     = 5432
 
   # AWS creates and stores the password in Secrets Manager.
-  manage_master_user_password = true
+  manage_master_user_password   = true
+  master_user_secret_kms_key_id = "alias/aws/secretsmanager"
 
   allocated_storage     = 20
   max_allocated_storage = 20

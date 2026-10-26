@@ -108,6 +108,39 @@ resource "aws_iam_role_policy" "github_actions_infra" {
         ]
         Resource = "*"
       },
+      # RDS creates grants for encrypted storage and for its managed
+      # Secrets Manager credential. Restrict KMS use to those AWS services.
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:CreateGrant",
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+        Condition = {
+          "ForAnyValue:StringEquals" = {
+            "kms:ViaService" = [
+              "rds.eu-west-3.amazonaws.com",
+              "secretsmanager.eu-west-3.amazonaws.com"
+            ]
+          }
+        }
+      },
+      # Cloud Map creates a private Route 53 hosted zone for service discovery.
+      {
+        Effect = "Allow"
+        Action = [
+          "route53:ChangeTagsForResource",
+          "route53:CreateHostedZone",
+          "route53:DeleteHostedZone",
+          "route53:GetHostedZone",
+          "route53:ListHostedZonesByName",
+          "route53:ListTagsForResource"
+        ]
+        Resource = "*"
+      },
       {
         Effect = "Allow"
         Action = [
