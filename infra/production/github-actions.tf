@@ -101,6 +101,7 @@ resource "aws_iam_role_policy" "github_actions_infra" {
           "rds:*",
           "servicediscovery:*",
           "secretsmanager:DescribeSecret",
+          "secretsmanager:CreateSecret",
           "secretsmanager:GetResourcePolicy",
           "secretsmanager:GetSecretValue",
           "secretsmanager:ListSecrets",
