@@ -105,6 +105,8 @@ resource "aws_iam_role_policy" "github_actions_infra" {
           "secretsmanager:GetResourcePolicy",
           "secretsmanager:GetSecretValue",
           "secretsmanager:ListSecrets",
+          "secretsmanager:TagResource",
+          "kms:DescribeKey",
           "sts:GetCallerIdentity"
         ]
         Resource = "*"
@@ -116,7 +118,6 @@ resource "aws_iam_role_policy" "github_actions_infra" {
         Action = [
           "kms:CreateGrant",
           "kms:Decrypt",
-          "kms:DescribeKey",
           "kms:GenerateDataKey"
         ]
         Resource = "*"
