@@ -13,32 +13,58 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PublicAvailabilityService {
+
     private final InventoryItemRepository inventory;
 
-    public PublicAvailabilityService(InventoryItemRepository inventory) { this.inventory = inventory; }
+    public PublicAvailabilityService(InventoryItemRepository inventory) {
+        this.inventory = inventory;
+    }
 
     public boolean visible(StoneVariant variant) {
-        return variant.isActive() && variant.getPublicAvailabilityPolicy() != PublicAvailabilityPolicy.HIDDEN;
+        return (
+            variant.isActive() &&
+            variant.getPublicAvailabilityPolicy() !=
+                PublicAvailabilityPolicy.HIDDEN
+        );
     }
 
     public PublicAvailability response(StoneVariant variant) {
-        PublicAvailabilityCode code = switch (variant.getPublicAvailabilityPolicy()) {
+        PublicAvailabilityCode code = switch (
+            variant.getPublicAvailabilityPolicy()
+        ) {
             case AVAILABLE_ON_ORDER -> PublicAvailabilityCode.AVAILABLE_ON_ORDER;
             case SHOWROOM_SELECTION -> PublicAvailabilityCode.SHOWROOM_SELECTION;
-            case AUTO -> hasSellableStock(variant) ? PublicAvailabilityCode.AVAILABLE : PublicAvailabilityCode.AVAILABLE_ON_ORDER;
-            case HIDDEN -> throw new IllegalArgumentException("Hidden variants have no public availability.");
+            case AUTO -> hasSellableStock(variant)
+                ? PublicAvailabilityCode.AVAILABLE
+                : PublicAvailabilityCode.AVAILABLE_ON_ORDER;
+            case HIDDEN -> throw new IllegalArgumentException(
+                "Hidden variants have no public availability."
+            );
         };
         return switch (code) {
-            case AVAILABLE -> new PublicAvailability(code.name(), "Available — confirm quantity with our team");
-            case AVAILABLE_ON_ORDER -> new PublicAvailability(code.name(), "Available on order");
-            case SHOWROOM_SELECTION -> new PublicAvailability(code.name(), "Select your slab at our showroom");
+            case AVAILABLE -> new PublicAvailability(
+                code.name(),
+                "Available — confirm quantity with our team"
+            );
+            case AVAILABLE_ON_ORDER -> new PublicAvailability(
+                code.name(),
+                "Available on order"
+            );
+            case SHOWROOM_SELECTION -> new PublicAvailability(
+                code.name(),
+                "Select your slab at our showroom"
+            );
         };
     }
 
     private boolean hasSellableStock(StoneVariant variant) {
-        return inventory.findAllByVariantId(variant.getId()).stream()
-            .map(item -> item.getAvailableM2())
-            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            .compareTo(BigDecimal.ZERO) > 0;
+        return (
+            inventory
+                .findAllByVariantId(variant.getId())
+                .stream()
+                .map(item -> item.getAvailableM2())
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .compareTo(BigDecimal.ZERO) > 0
+        );
     }
 }

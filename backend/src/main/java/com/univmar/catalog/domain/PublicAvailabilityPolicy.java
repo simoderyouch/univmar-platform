@@ -5,5 +5,5 @@ public enum PublicAvailabilityPolicy {
     AUTO,
     AVAILABLE_ON_ORDER,
     SHOWROOM_SELECTION,
-    HIDDEN
+    HIDDEN,
 }

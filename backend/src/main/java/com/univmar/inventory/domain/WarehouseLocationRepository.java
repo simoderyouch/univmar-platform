@@ -5,8 +5,18 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface WarehouseLocationRepository extends JpaRepository<WarehouseLocation, UUID> {
+public interface WarehouseLocationRepository
+    extends JpaRepository<WarehouseLocation, UUID>
+{
     List<WarehouseLocation> findAllByWarehouseIdOrderByCode(UUID warehouseId);
-    Optional<WarehouseLocation> findByIdAndWarehouseId(UUID id, UUID warehouseId);
-    Optional<WarehouseLocation> findByWarehouseIdAndCodeIgnoreCase(UUID warehouseId, String code);
+
+    Optional<WarehouseLocation> findByIdAndWarehouseId(
+        UUID id,
+        UUID warehouseId
+    );
+
+    Optional<WarehouseLocation> findByWarehouseIdAndCodeIgnoreCase(
+        UUID warehouseId,
+        String code
+    );
 }

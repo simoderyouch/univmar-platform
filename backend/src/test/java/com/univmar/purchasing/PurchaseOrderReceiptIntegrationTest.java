@@ -31,32 +31,123 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class PurchaseOrderReceiptIntegrationTest {
-    @Autowired private CatalogService catalog;
-    @Autowired private InventoryService inventory;
-    @Autowired private SupplierService suppliers;
-    @Autowired private PurchaseOrderService purchaseOrders;
-    @Autowired private GoodsReceiptRepository receipts;
+
+    @Autowired
+    private CatalogService catalog;
+
+    @Autowired
+    private InventoryService inventory;
+
+    @Autowired
+    private SupplierService suppliers;
+
+    @Autowired
+    private PurchaseOrderService purchaseOrders;
+
+    @Autowired
+    private GoodsReceiptRepository receipts;
 
     @Test
     void receiving_a_purchase_order_keeps_the_exact_inventory_record_on_the_goods_receipt() {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
-        MaterialDetail material = catalog.create(new MaterialInput("Receipt stone " + suffix, null, "REC-" + suffix, StoneType.MARBLE, null, null, null, null, null, null, List.of()));
-        VariantResponse variant = catalog.createVariant(material.id(), new VariantInput(new BigDecimal("20.000"), "Polished", "Slab"));
-        SupplierResponse supplier = suppliers.create(new SupplierInput("Receipt supplier " + suffix, null, null, null, null, null, null, null, null, null));
-        WarehouseResponse warehouse = inventory.createWarehouse(new WarehouseInput("R" + suffix, "Receiving warehouse"));
-        LocationResponse location = inventory.createLocation(warehouse.id(), new LocationInput("R-01", "Receiving bay"));
-        PurchaseOrderDetail created = purchaseOrders.create(new PurchaseOrderInput(supplier.id(), null, null, List.of(new PurchaseItemInput(variant.id(), new BigDecimal("3.000"), new BigDecimal("350.00"), null))));
-        PurchaseOrderDetail nextCreated = purchaseOrders.create(new PurchaseOrderInput(supplier.id(), null, null, List.of(new PurchaseItemInput(variant.id(), new BigDecimal("1.000"), new BigDecimal("350.00"), null))));
+        MaterialDetail material = catalog.create(
+            new MaterialInput(
+                "Receipt stone " + suffix,
+                null,
+                "REC-" + suffix,
+                StoneType.MARBLE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                List.of()
+            )
+        );
+        VariantResponse variant = catalog.createVariant(
+            material.id(),
+            new VariantInput(new BigDecimal("20.000"), "Polished", "Slab")
+        );
+        SupplierResponse supplier = suppliers.create(
+            new SupplierInput(
+                "Receipt supplier " + suffix,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            )
+        );
+        WarehouseResponse warehouse = inventory.createWarehouse(
+            new WarehouseInput("R" + suffix, "Receiving warehouse")
+        );
+        LocationResponse location = inventory.createLocation(
+            warehouse.id(),
+            new LocationInput("R-01", "Receiving bay")
+        );
+        PurchaseOrderDetail created = purchaseOrders.create(
+            new PurchaseOrderInput(
+                supplier.id(),
+                null,
+                null,
+                List.of(
+                    new PurchaseItemInput(
+                        variant.id(),
+                        new BigDecimal("3.000"),
+                        new BigDecimal("350.00"),
+                        null
+                    )
+                )
+            )
+        );
+        PurchaseOrderDetail nextCreated = purchaseOrders.create(
+            new PurchaseOrderInput(
+                supplier.id(),
+                null,
+                null,
+                List.of(
+                    new PurchaseItemInput(
+                        variant.id(),
+                        new BigDecimal("1.000"),
+                        new BigDecimal("350.00"),
+                        null
+                    )
+                )
+            )
+        );
         assertThat(created.number()).matches("PO-\\d{4}-\\d{6}");
-        assertThat(nextCreated.number()).matches("PO-\\d{4}-\\d{6}").isNotEqualTo(created.number());
+        assertThat(nextCreated.number())
+            .matches("PO-\\d{4}-\\d{6}")
+            .isNotEqualTo(created.number());
         PurchaseOrderDetail confirmed = purchaseOrders.confirm(created.id());
 
-        PurchaseOrderDetail received = purchaseOrders.receive(confirmed.id(), new ReceiveGoodsInput(created.items().get(0).id(), warehouse.id(), location.id(), "LOT-RECEIPT", "BUNDLE-1", new BigDecimal("3.000"), null, "Verified at receiving"));
+        PurchaseOrderDetail received = purchaseOrders.receive(
+            confirmed.id(),
+            new ReceiveGoodsInput(
+                created.items().get(0).id(),
+                warehouse.id(),
+                location.id(),
+                "LOT-RECEIPT",
+                "BUNDLE-1",
+                new BigDecimal("3.000"),
+                null,
+                "Verified at receiving"
+            )
+        );
 
         var receiptResponse = received.items().get(0).receipts().get(0);
-        GoodsReceipt storedReceipt = receipts.findById(receiptResponse.id()).orElseThrow();
+        GoodsReceipt storedReceipt = receipts
+            .findById(receiptResponse.id())
+            .orElseThrow();
         assertThat(receiptResponse.inventoryItemId()).isNotNull();
         assertThat(storedReceipt.getInventoryItem()).isNotNull();
-        assertThat(storedReceipt.getInventoryItem().getId()).isEqualTo(receiptResponse.inventoryItemId());
+        assertThat(storedReceipt.getInventoryItem().getId()).isEqualTo(
+            receiptResponse.inventoryItemId()
+        );
     }
 }

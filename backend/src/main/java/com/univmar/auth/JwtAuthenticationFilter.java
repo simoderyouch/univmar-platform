@@ -17,26 +17,54 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final JwtService jwtService;
     private final UserRepository users;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserRepository users) { this.jwtService = jwtService; this.users = users; }
+    public JwtAuthenticationFilter(
+        JwtService jwtService,
+        UserRepository users
+    ) {
+        this.jwtService = jwtService;
+        this.users = users;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain chain
+    ) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             try {
                 Claims claims = jwtService.parse(header.substring(7));
-                Integer tokenCredentialsVersion = claims.get("credentialsVersion", Integer.class);
-                users.findById(java.util.UUID.fromString(claims.getSubject()))
-                    .filter(user -> user.isActive() && (tokenCredentialsVersion == null ? user.getCredentialsVersion() == 0 : tokenCredentialsVersion == user.getCredentialsVersion()))
+                Integer tokenCredentialsVersion = claims.get(
+                    "credentialsVersion",
+                    Integer.class
+                );
+                users
+                    .findById(java.util.UUID.fromString(claims.getSubject()))
+                    .filter(
+                        user ->
+                            user.isActive() &&
+                            (tokenCredentialsVersion == null
+                                ? user.getCredentialsVersion() == 0
+                                : tokenCredentialsVersion ==
+                                  user.getCredentialsVersion())
+                    )
                     .ifPresent(user -> {
-                    var authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
-                    SecurityContextHolder.getContext().setAuthentication(
-                        new UsernamePasswordAuthenticationToken(user.getId().toString(), null, List.of(authority)));
-                });
+                        var authority = new SimpleGrantedAuthority(
+                            "ROLE_" + user.getRole().name()
+                        );
+                        SecurityContextHolder.getContext().setAuthentication(
+                            new UsernamePasswordAuthenticationToken(
+                                user.getId().toString(),
+                                null,
+                                List.of(authority)
+                            )
+                        );
+                    });
             } catch (JwtException | IllegalArgumentException ignored) {
                 SecurityContextHolder.clearContext();
             }

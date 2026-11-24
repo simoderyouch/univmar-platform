@@ -1,0 +1,26 @@
+[
+  {
+    "id": 15,
+    "name": "Salles de Bain"
+  },
+  {
+    "id": 16,
+    "name": "Escaliers"
+  },
+  {
+    "id": 18,
+    "name": "Cuisines"
+  },
+  {
+    "id": 22,
+    "name": "Piscines"
+  },
+  {
+    "id": 24,
+    "name": "Extérieur"
+  },
+  {
+    "id": 25,
+    "name": "Intérieurs"
+  }
+]

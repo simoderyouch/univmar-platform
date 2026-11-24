@@ -6,7 +6,12 @@ type TextFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
 };
 
-export function TextField({ label, error, className, ...props }: TextFieldProps) {
+export function TextField({
+  label,
+  error,
+  className,
+  ...props
+}: TextFieldProps) {
   return (
     <label className="grid gap-1.5 text-sm font-medium text-[#33251f]">
       <span>{label}</span>
@@ -18,7 +23,9 @@ export function TextField({ label, error, className, ...props }: TextFieldProps)
           className,
         )}
       />
-      {error && <span className="text-xs font-normal text-red-700">{error}</span>}
+      {error && (
+        <span className="text-xs font-normal text-red-700">{error}</span>
+      )}
     </label>
   );
 }

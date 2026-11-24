@@ -13,12 +13,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 class InitialAdminBootstrap {
 
     @Bean
-    CommandLineRunner createInitialAdmin(UserRepository users, PasswordEncoder encoder,
-            @Value("${univmar.bootstrap-admin.email:}") String email,
-            @Value("${univmar.bootstrap-admin.password:}") String password) {
+    CommandLineRunner createInitialAdmin(
+        UserRepository users,
+        PasswordEncoder encoder,
+        @Value("${univmar.bootstrap-admin.email:}") String email,
+        @Value("${univmar.bootstrap-admin.password:}") String password
+    ) {
         return args -> {
-            if (!email.isBlank() && !password.isBlank() && users.findByEmailIgnoreCase(email).isEmpty()) {
-                users.save(new User(email.trim().toLowerCase(), encoder.encode(password), Role.ADMIN));
+            if (
+                !email.isBlank() &&
+                !password.isBlank() &&
+                users.findByEmailIgnoreCase(email).isEmpty()
+            ) {
+                users.save(
+                    new User(
+                        email.trim().toLowerCase(),
+                        encoder.encode(password),
+                        Role.ADMIN
+                    )
+                );
             }
         };
     }

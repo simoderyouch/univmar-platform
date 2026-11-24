@@ -1,5 +1,15 @@
+variable "allow_assets_bucket_destroy" {
+  description = "Allow Terraform to remove all versioned production media when destroying the stack. Keep false for normal operations."
+  type        = bool
+  default     = false
+}
+
 resource "aws_s3_bucket" "assets" {
   bucket = "univmar-089496390808-production-assets"
+
+  # Enabled only by the guarded destroy script. This removes all versions of
+  # uploaded assets when the production stack is intentionally torn down.
+  force_destroy = var.allow_assets_bucket_destroy
 
   tags = {
     Name = "univmar-production-assets"

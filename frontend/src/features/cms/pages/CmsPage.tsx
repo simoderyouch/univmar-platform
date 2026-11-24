@@ -79,7 +79,11 @@ type Portfolio = {
   galleryImageUrls: string[];
   variantIds?: string[];
 };
-type CatalogMaterialForPortfolio = { id: string; name: string; variants: { id: string; variantName: string; thicknessMm: number }[] };
+type CatalogMaterialForPortfolio = {
+  id: string;
+  name: string;
+  variants: { id: string; variantName: string; thicknessMm: number }[];
+};
 type Settings = {
   enabled: boolean;
   title: string;
@@ -105,14 +109,16 @@ type Submission = {
   assignedToUserId?: string;
   assignedToEmail?: string;
   callOutcome?:
-    | "UNCONTACTED"
-    | "QUALIFIED"
-    | "FOLLOW_UP"
-    | "NOT_INTERESTED"
-    | "INVALID";
+    "UNCONTACTED" | "QUALIFIED" | "FOLLOW_UP" | "NOT_INTERESTED" | "INVALID";
   callNotes?: string;
   nextFollowUpAt?: string;
-  attachments?: { id: string; documentUrl: string; originalFilename: string; contentType: string; fileSize: number }[];
+  attachments?: {
+    id: string;
+    documentUrl: string;
+    originalFilename: string;
+    contentType: string;
+    fileSize: number;
+  }[];
   createdAt: string;
   updatedAt?: string;
 };
@@ -349,7 +355,9 @@ function PortfolioManager() {
   const [categories, setCategories] = useState<PortfolioCategory[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [items, setItems] = useState<Portfolio[]>([]);
-  const [catalogMaterials, setCatalogMaterials] = useState<CatalogMaterialForPortfolio[]>([]);
+  const [catalogMaterials, setCatalogMaterials] = useState<
+    CatalogMaterialForPortfolio[]
+  >([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [cover, setCover] = useState<File | null>(null);
@@ -374,7 +382,11 @@ function PortfolioManager() {
         setCategories(cats);
         setProjects(projectPage.content);
         setItems(records);
-        const materialDetails = await Promise.all(materialPage.content.map((material) => api<CatalogMaterialForPortfolio>(`/materials/${material.id}`)));
+        const materialDetails = await Promise.all(
+          materialPage.content.map((material) =>
+            api<CatalogMaterialForPortfolio>(`/materials/${material.id}`),
+          ),
+        );
         setCatalogMaterials(materialDetails);
       })
       .catch((cause: RequestError) => setError(cause.message));
@@ -465,7 +477,35 @@ function PortfolioManager() {
             ))}
           </select>
         </label>
-        <label className="mt-4 grid gap-1.5 text-sm font-medium">Materials used in this project <span className="text-xs font-normal text-[#786961]">These links appear on the matching public product pages.</span><select multiple value={form.variantIds} onChange={(event) => setForm((value) => ({ ...value, variantIds: Array.from(event.currentTarget.selectedOptions, (option) => option.value) }))} className={`${field} h-32`}>{catalogMaterials.flatMap((material) => material.variants.map((variant) => <option key={variant.id} value={variant.id}>{material.name} · {variant.variantName} · {variant.thicknessMm} mm</option>))}</select></label>
+        <label className="mt-4 grid gap-1.5 text-sm font-medium">
+          Materials used in this project{" "}
+          <span className="text-xs font-normal text-[#786961]">
+            These links appear on the matching public product pages.
+          </span>
+          <select
+            multiple
+            value={form.variantIds}
+            onChange={(event) =>
+              setForm((value) => ({
+                ...value,
+                variantIds: Array.from(
+                  event.currentTarget.selectedOptions,
+                  (option) => option.value,
+                ),
+              }))
+            }
+            className={`${field} h-32`}
+          >
+            {catalogMaterials.flatMap((material) =>
+              material.variants.map((variant) => (
+                <option key={variant.id} value={variant.id}>
+                  {material.name} · {variant.variantName} ·{" "}
+                  {variant.thicknessMm} mm
+                </option>
+              )),
+            )}
+          </select>
+        </label>
         <label className="mt-4 grid gap-1.5 text-sm font-medium">
           Portfolio category
           <select
@@ -718,7 +758,8 @@ function ContactForm() {
 export function Submissions() {
   const { user } = useAuth();
   const { navigate } = useRouter();
-  const canAssignSalesperson = user?.role === "ADMIN" || user?.role === "MANAGER";
+  const canAssignSalesperson =
+    user?.role === "ADMIN" || user?.role === "MANAGER";
   const isSalesAgent = user?.role === "SALES_AGENT";
   const [page, setPage] = useState<Page<Submission>>({
     content: [],
@@ -829,7 +870,9 @@ export function Submissions() {
     setBusy(true);
     setError("");
     try {
-      await api(`/cms/contact-submissions/${active.id}/claim`, { method: "POST" });
+      await api(`/cms/contact-submissions/${active.id}/claim`, {
+        method: "POST",
+      });
       await load();
     } catch (cause) {
       setError((cause as RequestError).message);
@@ -1326,7 +1369,9 @@ export function Submissions() {
                     {active.qualifiedProjectId ? (
                       <button
                         type="button"
-                        onClick={() => navigate(`/projects/${active.qualifiedProjectId}`)}
+                        onClick={() =>
+                          navigate(`/projects/${active.qualifiedProjectId}`)
+                        }
                         className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-800"
                       >
                         <CheckCircle2 size={14} />
@@ -1415,7 +1460,34 @@ export function Submissions() {
                       </div>
                     </dl>
                   </div>
-                  {active.attachments?.length ? <div className="border-t border-[#eee6e1] pt-5"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9b7861]">Project files</p><div className="mt-3 space-y-2">{active.attachments.map((file) => <button type="button" key={file.id} onClick={() => void downloadProtectedFile(file.documentUrl, file.originalFilename)} className="flex w-full items-center gap-2 text-left text-xs font-semibold text-[#59483f] hover:text-[#9b6040]"><Download size={14} className="text-[#9b7861]" />{file.originalFilename}<span className="ml-auto font-normal text-[#a08e83]">{Math.ceil(file.fileSize / 1024)} KB</span></button>)}</div></div> : null}
+                  {active.attachments?.length ? (
+                    <div className="border-t border-[#eee6e1] pt-5">
+                      <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9b7861]">
+                        Project files
+                      </p>
+                      <div className="mt-3 space-y-2">
+                        {active.attachments.map((file) => (
+                          <button
+                            type="button"
+                            key={file.id}
+                            onClick={() =>
+                              void downloadProtectedFile(
+                                file.documentUrl,
+                                file.originalFilename,
+                              )
+                            }
+                            className="flex w-full items-center gap-2 text-left text-xs font-semibold text-[#59483f] hover:text-[#9b6040]"
+                          >
+                            <Download size={14} className="text-[#9b7861]" />
+                            {file.originalFilename}
+                            <span className="ml-auto font-normal text-[#a08e83]">
+                              {Math.ceil(file.fileSize / 1024)} KB
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                   <div className="border-t border-[#eee6e1] pt-5">
                     <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9b7861]">
                       Sales ownership
@@ -1443,12 +1515,16 @@ export function Submissions() {
                       </label>
                     ) : (
                       <p className="mt-3 text-xs text-[#786961]">
-                        Owner: <span className="font-semibold text-[#59483f]">{active.assignedToEmail ?? "Unassigned"}</span>
+                        Owner:{" "}
+                        <span className="font-semibold text-[#59483f]">
+                          {active.assignedToEmail ?? "Unassigned"}
+                        </span>
                       </p>
                     )}
                     {trackingLocked && (
                       <p className="mt-3 rounded-lg bg-[#fff6e9] px-3 py-2 text-xs leading-5 text-[#875d26]">
-                        Claim this lead to become its owner before recording a call or qualifying it.
+                        Claim this lead to become its owner before recording a
+                        call or qualifying it.
                       </p>
                     )}
                     <label className="mt-4 block text-xs font-semibold text-[#67564c]">

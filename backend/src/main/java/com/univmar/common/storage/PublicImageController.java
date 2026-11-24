@@ -19,18 +19,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/uploads/images")
 public class PublicImageController {
+
     private final ImageStorage images;
 
-    public PublicImageController(ImageStorage images) { this.images = images; }
+    public PublicImageController(ImageStorage images) {
+        this.images = images;
+    }
 
     @GetMapping(value = "/{filename:.+}")
-    public ResponseEntity<InputStreamResource> image(@PathVariable String filename) {
+    public ResponseEntity<InputStreamResource> image(
+        @PathVariable String filename
+    ) {
         ImageStorage.StoredImage stored = images.load(filename);
         MediaType contentType;
-        try { contentType = MediaType.parseMediaType(stored.contentType()); }
-        catch (IllegalArgumentException exception) { throw new ApiException(HttpStatus.NOT_FOUND, "IMAGE_NOT_FOUND", "The image was not found."); }
+        try {
+            contentType = MediaType.parseMediaType(stored.contentType());
+        } catch (IllegalArgumentException exception) {
+            throw new ApiException(
+                HttpStatus.NOT_FOUND,
+                "IMAGE_NOT_FOUND",
+                "The image was not found."
+            );
+        }
         return ResponseEntity.ok()
-            .cacheControl(CacheControl.maxAge(Duration.ofDays(30)).cachePublic())
+            .cacheControl(
+                CacheControl.maxAge(Duration.ofDays(30)).cachePublic()
+            )
             .header("X-Content-Type-Options", "nosniff")
             .contentType(contentType)
             .body(new InputStreamResource(stored.content()));

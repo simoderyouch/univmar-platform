@@ -6,9 +6,19 @@ import { ToastProvider } from "./providers/toast-provider";
 
 function RoutedApp() {
   const { path } = useRouter();
-  return <AuthProvider><ToastProvider>{path === "/login" ? <LoginPage /> : <WorkspaceShell />}</ToastProvider></AuthProvider>;
+  return (
+    <AuthProvider>
+      <ToastProvider>
+        {path === "/login" ? <LoginPage /> : <WorkspaceShell />}
+      </ToastProvider>
+    </AuthProvider>
+  );
 }
 
 export function App() {
-  return <RouterProvider><RoutedApp /></RouterProvider>;
+  return (
+    <RouterProvider>
+      <RoutedApp />
+    </RouterProvider>
+  );
 }

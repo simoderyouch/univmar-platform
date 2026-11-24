@@ -30,9 +30,20 @@ type Project = {
   notes?: string;
   images: ProjectImage[];
 };
-type ProjectImage = { id: string; imageUrl: string; caption?: string; position: number; createdAt: string };
+type ProjectImage = {
+  id: string;
+  imageUrl: string;
+  caption?: string;
+  position: number;
+  createdAt: string;
+};
 type ProjectFormData = Omit<Project, "id" | "customerName" | "images">;
-type ProjectPageResponse = { content: Project[]; page: number; totalPages: number; totalElements: number };
+type ProjectPageResponse = {
+  content: Project[];
+  page: number;
+  totalPages: number;
+  totalElements: number;
+};
 
 const field =
   "mt-1 h-10 w-full rounded-md border border-[#d8ccc4] bg-white px-3 text-sm outline-none focus:border-[#110703]";
@@ -99,7 +110,12 @@ export function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
-  const [pageData, setPageData] = useState<ProjectPageResponse>({ content: [], page: 0, totalPages: 0, totalElements: 0 });
+  const [pageData, setPageData] = useState<ProjectPageResponse>({
+    content: [],
+    page: 0,
+    totalPages: 0,
+    totalElements: 0,
+  });
   async function load(nextPage = page) {
     const query = new URLSearchParams({ size: "20", page: String(nextPage) });
     if (search.trim()) query.set("search", search.trim());
@@ -168,7 +184,8 @@ export function ProjectsPage() {
         }}
         edit={() => setScreen("edit")}
         remove={async () => {
-          if (!window.confirm(`Delete ${detail.name}? This cannot be undone.`)) return;
+          if (!window.confirm(`Delete ${detail.name}? This cannot be undone.`))
+            return;
           try {
             await api(`/projects/${detail.id}`, { method: "DELETE" });
             setDetail(null);
@@ -183,7 +200,9 @@ export function ProjectsPage() {
             );
           }
         }}
-        reload={async () => setDetail(await api<Project>(`/projects/${detail.id}`))}
+        reload={async () =>
+          setDetail(await api<Project>(`/projects/${detail.id}`))
+        }
       />
     );
   return (
@@ -201,36 +220,36 @@ export function ProjectsPage() {
         </Button>
       </header>
 
-        <div className="flex mt-5 flex-col gap-2 sm:flex-row">
-          <label className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-md border border-[#d8ccc4] px-3 text-[#75665d] transition ">
-            <Search size={16} />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#a6988f]"
-              placeholder="Search projects"
-              aria-label="Search projects"
-            />
-          </label>
-          <label className="flex h-11 items-center gap-2 rounded-md border border-[#d8ccc4] px-3 text-[#75665d] transition focus-within:border-[#110703] sm:w-52">
-            <SlidersHorizontal size={16} />
-            <select
-              value={status}
-              onChange={(event) =>
-                setStatus(event.target.value as "" | ProjectStatus)
-              }
-              className="min-w-0 flex-1 bg-transparent text-sm text-[#21140f] outline-none"
-              aria-label="Filter by status"
-            >
-              <option value="">All statuses</option>
-              {statuses.map((item) => (
-                <option key={item} value={item}>
-                  {statusLabel(item)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+      <div className="flex mt-5 flex-col gap-2 sm:flex-row">
+        <label className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-md border border-[#d8ccc4] px-3 text-[#75665d] transition ">
+          <Search size={16} />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#a6988f]"
+            placeholder="Search projects"
+            aria-label="Search projects"
+          />
+        </label>
+        <label className="flex h-11 items-center gap-2 rounded-md border border-[#d8ccc4] px-3 text-[#75665d] transition focus-within:border-[#110703] sm:w-52">
+          <SlidersHorizontal size={16} />
+          <select
+            value={status}
+            onChange={(event) =>
+              setStatus(event.target.value as "" | ProjectStatus)
+            }
+            className="min-w-0 flex-1 bg-transparent text-sm text-[#21140f] outline-none"
+            aria-label="Filter by status"
+          >
+            <option value="">All statuses</option>
+            {statuses.map((item) => (
+              <option key={item} value={item}>
+                {statusLabel(item)}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <div className="mt-5 overflow-hidden rounded-xl border border-[#e3d8d1] bg-white">
         {error ? (
           <div className="px-5 py-10 text-center text-sm text-red-700">
@@ -290,7 +309,15 @@ export function ProjectsPage() {
           </>
         )}
       </div>
-      <PaginationControls page={page} totalPages={pageData.totalPages} totalElements={pageData.totalElements} itemCount={projects.length} loading={loading} onPageChange={nextPage => void load(nextPage)} noun="projects" />
+      <PaginationControls
+        page={page}
+        totalPages={pageData.totalPages}
+        totalElements={pageData.totalElements}
+        itemCount={projects.length}
+        loading={loading}
+        onPageChange={(nextPage) => void load(nextPage)}
+        noun="projects"
+      />
     </section>
   );
 }
@@ -309,12 +336,18 @@ function ProjectForm({
   saved: (project: Project) => Promise<void>;
 }) {
   const [form, setForm] = useState<ProjectFormData>(() =>
-    initial ? (() => {
-          const { id: _id, customerName: _customerName, images: _images, ...project } = initial;
+    initial
+      ? (() => {
+          const {
+            id: _id,
+            customerName: _customerName,
+            images: _images,
+            ...project
+          } = initial;
           return {
-          ...project,
-          startDate: dateValue(initial.startDate),
-          requiredDeliveryDate: dateValue(initial.requiredDeliveryDate),
+            ...project,
+            startDate: dateValue(initial.startDate),
+            requiredDeliveryDate: dateValue(initial.requiredDeliveryDate),
           };
         })()
       : emptyForm(),
@@ -612,7 +645,13 @@ function ProjectDetail({
   );
 }
 
-function ProjectGallery({ project, reload }: { project: Project; reload: () => Promise<void> }) {
+function ProjectGallery({
+  project,
+  reload,
+}: {
+  project: Project;
+  reload: () => Promise<void>;
+}) {
   const input = useRef<HTMLInputElement>(null);
   const [caption, setCaption] = useState("");
   const [saving, setSaving] = useState(false);
@@ -623,30 +662,109 @@ function ProjectGallery({ project, reload }: { project: Project; reload: () => P
     setError("");
     try {
       const imageUrl = await uploadImage(file);
-      await api(`/projects/${project.id}/images`, { method: "POST", body: JSON.stringify({ imageUrl, caption: caption || null }) });
+      await api(`/projects/${project.id}/images`, {
+        method: "POST",
+        body: JSON.stringify({ imageUrl, caption: caption || null }),
+      });
       setCaption("");
       if (input.current) input.current.value = "";
       await reload();
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "The realization photo could not be saved.");
-    } finally { setSaving(false); }
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "The realization photo could not be saved.",
+      );
+    } finally {
+      setSaving(false);
+    }
   }
   async function remove(imageId: string) {
     setSaving(true);
     setError("");
-    try { await api(`/projects/${project.id}/images/${imageId}`, { method: "DELETE" }); await reload(); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "The photo could not be removed."); }
-    finally { setSaving(false); }
+    try {
+      await api(`/projects/${project.id}/images/${imageId}`, {
+        method: "DELETE",
+      });
+      await reload();
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "The photo could not be removed.",
+      );
+    } finally {
+      setSaving(false);
+    }
   }
-  return <div>
-    <div className="flex flex-col gap-3 rounded-lg border border-dashed border-[#cdbdb2] bg-[#fcf9f7] p-4 sm:flex-row sm:items-end">
-      <label className="min-w-0 flex-1 text-sm font-medium">Photo caption (optional)<input value={caption} onChange={event => setCaption(event.target.value)} maxLength={240} className={field} placeholder="Kitchen installation, finished lobby…" /></label>
-      <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={event => void add(event.target.files?.[0])} />
-      <Button type="button" loading={saving} onClick={() => input.current?.click()}><ImagePlus size={16} />Add realization photo</Button>
+  return (
+    <div>
+      <div className="flex flex-col gap-3 rounded-lg border border-dashed border-[#cdbdb2] bg-[#fcf9f7] p-4 sm:flex-row sm:items-end">
+        <label className="min-w-0 flex-1 text-sm font-medium">
+          Photo caption (optional)
+          <input
+            value={caption}
+            onChange={(event) => setCaption(event.target.value)}
+            maxLength={240}
+            className={field}
+            placeholder="Kitchen installation, finished lobby…"
+          />
+        </label>
+        <input
+          ref={input}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="sr-only"
+          onChange={(event) => void add(event.target.files?.[0])}
+        />
+        <Button
+          type="button"
+          loading={saving}
+          onClick={() => input.current?.click()}
+        >
+          <ImagePlus size={16} />
+          Add realization photo
+        </Button>
+      </div>
+      {error && (
+        <p role="alert" className="mt-3 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+      {project.images.length ? (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {project.images.map((image) => (
+            <figure
+              key={image.id}
+              className="overflow-hidden rounded-lg border border-[#e3d8d1] bg-[#fdfbf9]"
+            >
+              <img
+                src={resolveImageUrl(image.imageUrl)}
+                alt={image.caption || `Realization photo for ${project.name}`}
+                className="h-44 w-full object-cover"
+              />
+              <figcaption className="flex min-h-14 items-start justify-between gap-3 p-3 text-sm">
+                <span>{image.caption || "Realization photo"}</span>
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => void remove(image.id)}
+                  className="rounded p-1 text-[#8f3c31] hover:bg-red-50 disabled:opacity-50"
+                  aria-label="Remove realization photo"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      ) : (
+        <p className="py-10 text-center text-sm text-[#786961]">
+          No realization photos have been added yet.
+        </p>
+      )}
     </div>
-    {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
-    {project.images.length ? <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{project.images.map(image => <figure key={image.id} className="overflow-hidden rounded-lg border border-[#e3d8d1] bg-[#fdfbf9]"><img src={resolveImageUrl(image.imageUrl)} alt={image.caption || `Realization photo for ${project.name}`} className="h-44 w-full object-cover" /><figcaption className="flex min-h-14 items-start justify-between gap-3 p-3 text-sm"><span>{image.caption || "Realization photo"}</span><button type="button" disabled={saving} onClick={() => void remove(image.id)} className="rounded p-1 text-[#8f3c31] hover:bg-red-50 disabled:opacity-50" aria-label="Remove realization photo"><Trash2 size={16} /></button></figcaption></figure>)}</div> : <p className="py-10 text-center text-sm text-[#786961]">No realization photos have been added yet.</p>}
-  </div>;
+  );
 }
 function Info({
   label,

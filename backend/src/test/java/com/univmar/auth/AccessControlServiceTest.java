@@ -15,19 +15,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
 class AccessControlServiceTest {
-    @Mock private UserRepository users;
-    @Mock private Environment environment;
+
+    @Mock
+    private UserRepository users;
+
+    @Mock
+    private Environment environment;
 
     @AfterEach
-    void clearAuthentication() { SecurityContextHolder.clearContext(); }
+    void clearAuthentication() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void salesAgentCannotChangeAnotherAgentsQuotation() {
@@ -35,7 +41,12 @@ class AccessControlServiceTest {
         when(users.findById(user.getId())).thenReturn(Optional.of(user));
         signInAs(user, Role.SALES_AGENT);
 
-        assertThatThrownBy(() -> new AccessControlService(users).requireSalesOwnership("other@univmar.test", "quotation"))
+        assertThatThrownBy(() ->
+            new AccessControlService(users).requireSalesOwnership(
+                "other@univmar.test",
+                "quotation"
+            )
+        )
             .isInstanceOf(ApiException.class)
             .extracting(error -> ((ApiException) error).getStatus())
             .isEqualTo(HttpStatus.FORBIDDEN);
@@ -47,21 +58,40 @@ class AccessControlServiceTest {
         when(users.findById(user.getId())).thenReturn(Optional.of(user));
         signInAs(user, Role.SALES_AGENT);
 
-        assertThatCode(() -> new AccessControlService(users).requireSalesOwnership("sara@univmar.test", "quotation"))
-            .doesNotThrowAnyException();
+        assertThatCode(() ->
+            new AccessControlService(users).requireSalesOwnership(
+                "sara@univmar.test",
+                "quotation"
+            )
+        ).doesNotThrowAnyException();
     }
 
     @Test
     void productionRefusesTheBuiltInDevelopmentJwtSecret() {
-        when(environment.getActiveProfiles()).thenReturn(new String[]{"production"});
+        when(environment.getActiveProfiles()).thenReturn(new String[] {
+            "production",
+        });
 
-        assertThatThrownBy(() -> new JwtService("change-this-development-secret-to-a-32-byte-minimum-value", 30, environment))
+        assertThatThrownBy(() ->
+            new JwtService(
+                "change-this-development-secret-to-a-32-byte-minimum-value",
+                30,
+                environment
+            )
+        )
             .isInstanceOf(IllegalStateException.class)
-            .hasMessage("UNIVMAR_JWT_SECRET must be explicitly configured in production.");
+            .hasMessage(
+                "UNIVMAR_JWT_SECRET must be explicitly configured in production."
+            );
     }
 
     private void signInAs(User user, Role role) {
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-            user.getId().toString(), null, List.of(new SimpleGrantedAuthority("ROLE_" + role.name()))));
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                user.getId().toString(),
+                null,
+                List.of(new SimpleGrantedAuthority("ROLE_" + role.name()))
+            )
+        );
     }
 }

@@ -221,7 +221,8 @@ class DeliveryWorkflowIntegrationTest {
             )
         );
         deliveries.dispatch(finalDelivery.id());
-        // Both deliveries have consumed the order reservations, but the second handover is still unconfirmed.
+        // Both deliveries have consumed the order reservations, but the second handover is still
+        // unconfirmed.
         assertThat(deliveries.confirmDelivered(first.id()).status()).isEqualTo(
             DeliveryStatus.DELIVERED
         );

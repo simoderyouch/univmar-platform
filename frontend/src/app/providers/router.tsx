@@ -1,4 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 
 type RouterState = {
   path: string;
@@ -21,7 +28,11 @@ export function RouterProvider({ children }: { children: ReactNode }) {
     setPath(to);
   }, []);
 
-  return <RouterContext.Provider value={{ path, navigate }}>{children}</RouterContext.Provider>;
+  return (
+    <RouterContext.Provider value={{ path, navigate }}>
+      {children}
+    </RouterContext.Provider>
+  );
 }
 
 export function useRouter() {
