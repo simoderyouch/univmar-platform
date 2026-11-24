@@ -9,6 +9,18 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/dashboard")
 public class DashboardController {
-    private final DashboardService dashboard; public DashboardController(DashboardService dashboard) { this.dashboard = dashboard; }
-    @GetMapping("/overview") public ApiResponse<Overview> overview(HttpServletRequest request) { return ApiResponse.of(dashboard.overview(), (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)); }
+
+    private final DashboardService dashboard;
+
+    public DashboardController(DashboardService dashboard) {
+        this.dashboard = dashboard;
+    }
+
+    @GetMapping("/overview")
+    public ApiResponse<Overview> overview(HttpServletRequest request) {
+        return ApiResponse.of(
+            dashboard.overview(),
+            (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)
+        );
+    }
 }

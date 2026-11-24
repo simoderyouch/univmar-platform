@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { accessTokenKey, api } from "../../shared/api/client";
 import type { LoginResult, WorkspaceUser } from "./types";
 
@@ -20,17 +26,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem(accessTokenKey);
       setUser(null);
     };
-    window.addEventListener("univmar:authentication-lost", handleAuthenticationLost);
+    window.addEventListener(
+      "univmar:authentication-lost",
+      handleAuthenticationLost,
+    );
     if (!localStorage.getItem(accessTokenKey)) {
       setLoading(false);
-      return () => window.removeEventListener("univmar:authentication-lost", handleAuthenticationLost);
+      return () =>
+        window.removeEventListener(
+          "univmar:authentication-lost",
+          handleAuthenticationLost,
+        );
     }
 
     api<WorkspaceUser>("/auth/me")
       .then(setUser)
       .catch(handleAuthenticationLost)
       .finally(() => setLoading(false));
-    return () => window.removeEventListener("univmar:authentication-lost", handleAuthenticationLost);
+    return () =>
+      window.removeEventListener(
+        "univmar:authentication-lost",
+        handleAuthenticationLost,
+      );
   }, []);
 
   async function login(email: string, password: string) {
@@ -47,7 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
-  return <AuthContext.Provider value={{ user, loading, login, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

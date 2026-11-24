@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class HealthController {
+
     @GetMapping("/health")
     ApiResponse<Map<String, String>> health(HttpServletRequest request) {
-        return ApiResponse.of(Map.of("status", "UP"), (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE));
+        return ApiResponse.of(
+            Map.of("status", "UP"),
+            (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)
+        );
     }
 }

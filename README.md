@@ -78,3 +78,25 @@ UNIVMAR_STORAGE_S3_ACCESS_KEY=...
 UNIVMAR_STORAGE_S3_SECRET_KEY=...
 UNIVMAR_PUBLIC_API_URL=https://erp.example.com/api/v1
 ```
+
+### Sync local media to production S3
+
+After adding or changing files in `base-gallery/` or `backend/data/uploads/images/`, upload them to the production bucket with:
+
+```sh
+./scripts/sync-production-media.sh --dry-run
+./scripts/sync-production-media.sh
+```
+
+The script only uploads new or changed files; it never deletes objects. Set `UNIVMAR_PRODUCTION_MEDIA_BUCKET` if the bucket name differs from the production default.
+
+### Destroy production infrastructure
+
+The following command permanently removes the Terraform-managed production application stack, including the RDS database, ECR images, ECS services, networking, and all versioned media in the production asset bucket. Always review the plan first:
+
+```sh
+./scripts/destroy-production-infrastructure.sh --plan
+./scripts/destroy-production-infrastructure.sh --apply --confirm DESTROY_UNIVMAR_PRODUCTION
+```
+
+The script intentionally keeps the separate Terraform state bucket and manually managed Secrets Manager credentials. Do not run the apply command unless the production environment is meant to be permanently removed.

@@ -101,7 +101,11 @@ export function RfqsPage() {
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
     [page, setPage] = useState(0),
-    [pageData, setPageData] = useState({ page: 0, totalPages: 0, totalElements: 0 });
+    [pageData, setPageData] = useState({
+      page: 0,
+      totalPages: 0,
+      totalElements: 0,
+    });
   async function load(nextPage = page) {
     setLoading(true);
     setError("");
@@ -113,7 +117,12 @@ export function RfqsPage() {
       if (projectFilter) q.set("projectId", projectFilter);
       if (from) q.set("from", from);
       if (to) q.set("to", to);
-      const result = await api<{ content: Rfq[]; page: number; totalPages: number; totalElements: number }>(`/rfqs?${q}`);
+      const result = await api<{
+        content: Rfq[];
+        page: number;
+        totalPages: number;
+        totalElements: number;
+      }>(`/rfqs?${q}`);
       setItems(result.content);
       setPageData(result);
       setPage(result.page);
@@ -332,7 +341,15 @@ export function RfqsPage() {
           </>
         )}
       </div>
-      <PaginationControls page={page} totalPages={pageData.totalPages} totalElements={pageData.totalElements} itemCount={items.length} loading={loading} onPageChange={nextPage => void load(nextPage)} noun="RFQs" />
+      <PaginationControls
+        page={page}
+        totalPages={pageData.totalPages}
+        totalElements={pageData.totalElements}
+        itemCount={items.length}
+        loading={loading}
+        onPageChange={(nextPage) => void load(nextPage)}
+        noun="RFQs"
+      />
     </section>
   );
 }

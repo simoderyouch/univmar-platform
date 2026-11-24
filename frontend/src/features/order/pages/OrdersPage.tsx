@@ -60,14 +60,26 @@ export function OrdersPage() {
     [error, setError] = useState(""),
     [query, setQuery] = useState(""),
     [view, setView] = useState<"board" | "list">("board"),
-    [pageData, setPageData] = useState({ page: 0, totalPages: 0, totalElements: 0 }),
+    [pageData, setPageData] = useState({
+      page: 0,
+      totalPages: 0,
+      totalElements: 0,
+    }),
     [loading, setLoading] = useState(false);
   async function load(nextPage = pageData.page) {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(nextPage), size: "20" });
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        size: "20",
+      });
       if (query.trim()) params.set("search", query.trim());
-      const result = await api<{ content: Order[]; page: number; totalPages: number; totalElements: number }>(`/orders?${params}`);
+      const result = await api<{
+        content: Order[];
+        page: number;
+        totalPages: number;
+        totalElements: number;
+      }>(`/orders?${params}`);
       setList(result.content);
       setPageData(result);
     } catch (cause) {
@@ -212,7 +224,15 @@ export function OrdersPage() {
         ) : (
           <OrderRegister orders={filtered} open={open} />
         )}
-        <PaginationControls page={pageData.page} totalPages={pageData.totalPages} totalElements={pageData.totalElements} itemCount={list.length} loading={loading} onPageChange={nextPage => void load(nextPage)} noun="orders" />
+        <PaginationControls
+          page={pageData.page}
+          totalPages={pageData.totalPages}
+          totalElements={pageData.totalElements}
+          itemCount={list.length}
+          loading={loading}
+          onPageChange={(nextPage) => void load(nextPage)}
+          noun="orders"
+        />
       </section>
     </section>
   );
@@ -280,7 +300,9 @@ function OrderBoard({
                     className="rounded-lg border border-[#e3d8d1] bg-white p-3 text-left transition hover:-translate-y-0.5 hover:border-[#aa7756] hover:shadow-sm"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <p className="font-mono text-sm font-semibold">{order.number}</p>
+                      <p className="font-mono text-sm font-semibold">
+                        {order.number}
+                      </p>
                       <span className="text-xs font-semibold">
                         {Number(order.grandTotal).toLocaleString()} MAD
                       </span>

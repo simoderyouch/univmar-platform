@@ -338,7 +338,8 @@ public class QuotationService {
         String publicUrl
     ) {
         if (!emailEnabled) throw new IllegalStateException(
-            "Quotation email sending is disabled. Set UNIVMAR_QUOTATION_EMAIL_ENABLED=true after SMTP is configured."
+            "Quotation email sending is disabled. Set UNIVMAR_QUOTATION_EMAIL_ENABLED=true" +
+                " after SMTP is configured."
         );
         JavaMailSender sender = mailer.getIfAvailable();
         if (sender == null) throw new IllegalStateException(

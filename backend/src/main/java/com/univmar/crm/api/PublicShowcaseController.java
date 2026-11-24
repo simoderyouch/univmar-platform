@@ -14,9 +14,36 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/public/showcase")
 public class PublicShowcaseController {
+
     private final ShowcaseService showcase;
-    public PublicShowcaseController(ShowcaseService showcase) { this.showcase = showcase; }
-    @GetMapping("/products") public ApiResponse<List<PublicResponse>> products(HttpServletRequest request) { return of(showcase.publicList(ShowcaseKind.PRODUCT), requestId(request)); }
-    @GetMapping("/projects") public ApiResponse<List<PublicResponse>> projects(HttpServletRequest request) { return of(showcase.publicList(ShowcaseKind.PROJECT), requestId(request)); }
-    private String requestId(HttpServletRequest request) { return (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE); }
+
+    public PublicShowcaseController(ShowcaseService showcase) {
+        this.showcase = showcase;
+    }
+
+    @GetMapping("/products")
+    public ApiResponse<List<PublicResponse>> products(
+        HttpServletRequest request
+    ) {
+        return of(
+            showcase.publicList(ShowcaseKind.PRODUCT),
+            requestId(request)
+        );
+    }
+
+    @GetMapping("/projects")
+    public ApiResponse<List<PublicResponse>> projects(
+        HttpServletRequest request
+    ) {
+        return of(
+            showcase.publicList(ShowcaseKind.PROJECT),
+            requestId(request)
+        );
+    }
+
+    private String requestId(HttpServletRequest request) {
+        return (String) request.getAttribute(
+            RequestIdFilter.REQUEST_ID_ATTRIBUTE
+        );
+    }
 }

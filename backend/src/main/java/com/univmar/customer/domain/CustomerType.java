@@ -1,2 +1,6 @@
 package com.univmar.customer.domain;
-public enum CustomerType { INDIVIDUAL, COMPANY }
+
+public enum CustomerType {
+    INDIVIDUAL,
+    COMPANY,
+}

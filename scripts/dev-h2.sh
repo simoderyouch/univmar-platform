@@ -3,6 +3,8 @@
 set -euo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Load quotation mail configuration for the native API process.
+source "$project_root/scripts/dev-mail-env.sh"
 run_dir="$project_root/.run"
 command -v mvn >/dev/null 2>&1 || { echo "Maven is required." >&2; exit 1; }
 command -v npm >/dev/null 2>&1 || { echo "Node.js and npm are required." >&2; exit 1; }

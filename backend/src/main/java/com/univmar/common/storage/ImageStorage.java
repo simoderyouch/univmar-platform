@@ -12,7 +12,7 @@ public interface ImageStorage {
      */
     StoredImage load(String filename);
 
-    record UploadedImage(String url, String originalFilename) { }
+    record UploadedImage(String url, String originalFilename) {}
 
-    record StoredImage(InputStream content, String contentType) { }
+    record StoredImage(InputStream content, String contentType) {}
 }

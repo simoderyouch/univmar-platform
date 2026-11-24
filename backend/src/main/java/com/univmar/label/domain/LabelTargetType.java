@@ -1,3 +1,6 @@
 package com.univmar.label.domain;
 
-public enum LabelTargetType { INVENTORY_ITEM, SLAB }
+public enum LabelTargetType {
+    INVENTORY_ITEM,
+    SLAB,
+}

@@ -17,18 +17,47 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ApiAccessDeniedHandler implements AccessDeniedHandler {
+
     private final AuditService audit;
     private final ObjectMapper objectMapper;
 
-    public ApiAccessDeniedHandler(AuditService audit, ObjectMapper objectMapper) { this.audit = audit; this.objectMapper = objectMapper; }
+    public ApiAccessDeniedHandler(
+        AuditService audit,
+        ObjectMapper objectMapper
+    ) {
+        this.audit = audit;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) throws IOException {
-        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        String principal = authentication == null ? null : authentication.getName();
-        try { audit.recordAccessDenied(principal, request.getMethod() + " " + request.getRequestURI()); } catch (RuntimeException ignored) { }
+    public void handle(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        AccessDeniedException exception
+    ) throws IOException {
+        Authentication authentication =
+            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String principal =
+            authentication == null ? null : authentication.getName();
+        try {
+            audit.recordAccessDenied(
+                principal,
+                request.getMethod() + " " + request.getRequestURI()
+            );
+        } catch (RuntimeException ignored) {}
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        objectMapper.writeValue(response.getOutputStream(), new ErrorResponse("FORBIDDEN", "You do not have permission to perform this action.", Map.of(), Instant.now(), (String) request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)));
+        objectMapper.writeValue(
+            response.getOutputStream(),
+            new ErrorResponse(
+                "FORBIDDEN",
+                "You do not have permission to perform this action.",
+                Map.of(),
+                Instant.now(),
+                (String) request.getAttribute(
+                    RequestIdFilter.REQUEST_ID_ATTRIBUTE
+                )
+            )
+        );
     }
 }

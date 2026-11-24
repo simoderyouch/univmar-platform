@@ -1,6 +1,15 @@
 import type { MaterialFormValues, StoneType } from "./types";
 
-export const stoneTypes: StoneType[] = ["MARBLE", "GRANITE", "TRAVERTINE", "LIMESTONE", "QUARTZITE", "ONYX", "STONE", "OTHER"];
+export const stoneTypes: StoneType[] = [
+  "MARBLE",
+  "GRANITE",
+  "TRAVERTINE",
+  "LIMESTONE",
+  "QUARTZITE",
+  "ONYX",
+  "STONE",
+  "OTHER",
+];
 
 export const emptyMaterialForm: MaterialFormValues = {
   name: "",
@@ -19,5 +28,8 @@ export const emptyMaterialForm: MaterialFormValues = {
 };
 
 export function formatCatalogLabel(value: string) {
-  return value.replaceAll("_", " ").toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return value
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }

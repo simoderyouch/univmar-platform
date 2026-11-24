@@ -1,3 +1,8 @@
 package com.univmar.fabrication.domain;
 
-public enum FabricationPriority { LOW, NORMAL, HIGH, URGENT }
+public enum FabricationPriority {
+    LOW,
+    NORMAL,
+    HIGH,
+    URGENT,
+}

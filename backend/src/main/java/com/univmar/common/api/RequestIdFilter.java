@@ -14,17 +14,26 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @Order(1)
 public class RequestIdFilter extends OncePerRequestFilter {
+
     public static final String REQUEST_ID_ATTRIBUTE = "requestId";
     private static final String HEADER = "X-Request-Id";
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain chain
+    ) throws ServletException, IOException {
         String id = request.getHeader(HEADER);
-        if (id == null || id.isBlank() || id.length() > 100) id = UUID.randomUUID().toString();
+        if (id == null || id.isBlank() || id.length() > 100) id =
+            UUID.randomUUID().toString();
         request.setAttribute(REQUEST_ID_ATTRIBUTE, id);
         response.setHeader(HEADER, id);
         MDC.put("requestId", id);
-        try { chain.doFilter(request, response); } finally { MDC.remove("requestId"); }
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            MDC.remove("requestId");
+        }
     }
 }

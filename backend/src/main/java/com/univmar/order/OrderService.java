@@ -1,14 +1,14 @@
 package com.univmar.order;
 
-import com.univmar.common.api.ApiException;
 import com.univmar.auth.AccessControlService;
+import com.univmar.common.api.ApiException;
 import com.univmar.delivery.domain.DeliveryRepository;
 import com.univmar.inventory.domain.*;
 import com.univmar.order.api.OrderDtos.*;
 import com.univmar.order.domain.*;
 import com.univmar.quotation.domain.*;
-import com.univmar.slab.SlabService;
 import com.univmar.remnant.RemnantService;
+import com.univmar.slab.SlabService;
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
@@ -20,51 +20,424 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class OrderService {
-    private final SalesOrderRepository orders; private final QuotationRepository quotations; private final InventoryItemRepository inventory; private final InventoryReservationRepository reservations; private final StockMovementRepository movements; private final DeliveryRepository deliveries; private final SlabService slabs; private final RemnantService remnants; private final AccessControlService access;
-    public OrderService(SalesOrderRepository orders, QuotationRepository quotations, InventoryItemRepository inventory, InventoryReservationRepository reservations, StockMovementRepository movements, DeliveryRepository deliveries, SlabService slabs, RemnantService remnants, AccessControlService access) { this.orders = orders; this.quotations = quotations; this.inventory = inventory; this.reservations = reservations; this.movements = movements; this.deliveries = deliveries; this.slabs = slabs; this.remnants = remnants; this.access = access; }
 
-    public Response acceptQuotation(UUID quotationId, AcceptanceInput acceptance) {
-        Quotation quote = quotations.findByIdForUpdate(quotationId).orElseThrow(() -> notFound("QUOTATION_NOT_FOUND", "Quotation was not found."));
+    private final SalesOrderRepository orders;
+    private final QuotationRepository quotations;
+    private final InventoryItemRepository inventory;
+    private final InventoryReservationRepository reservations;
+    private final StockMovementRepository movements;
+    private final DeliveryRepository deliveries;
+    private final SlabService slabs;
+    private final RemnantService remnants;
+    private final AccessControlService access;
+
+    public OrderService(
+        SalesOrderRepository orders,
+        QuotationRepository quotations,
+        InventoryItemRepository inventory,
+        InventoryReservationRepository reservations,
+        StockMovementRepository movements,
+        DeliveryRepository deliveries,
+        SlabService slabs,
+        RemnantService remnants,
+        AccessControlService access
+    ) {
+        this.orders = orders;
+        this.quotations = quotations;
+        this.inventory = inventory;
+        this.reservations = reservations;
+        this.movements = movements;
+        this.deliveries = deliveries;
+        this.slabs = slabs;
+        this.remnants = remnants;
+        this.access = access;
+    }
+
+    public Response acceptQuotation(
+        UUID quotationId,
+        AcceptanceInput acceptance
+    ) {
+        Quotation quote = quotations
+            .findByIdForUpdate(quotationId)
+            .orElseThrow(() ->
+                notFound("QUOTATION_NOT_FOUND", "Quotation was not found.")
+            );
         access.requireSalesOwnership(quote.getSalesAgent(), "quotation");
-        if (quote.getStatus() != QuotationStatus.SENT) throw conflict("QUOTATION_NOT_ACCEPTABLE", "Only a sent quotation can be accepted.");
-        if (quote.getExpiryDate() == null || quote.getExpiryDate().isBefore(LocalDate.now())) throw conflict("QUOTATION_EXPIRED", "An expired quotation cannot be accepted.");
-        if (orders.findByQuotationId(quotationId).isPresent()) throw conflict("QUOTATION_ALREADY_CONVERTED", "This quotation already has an order.");
-        if (quote.getItems().isEmpty()) throw conflict("QUOTATION_ITEMS_REQUIRED", "The quotation has no items to reserve.");
-        for (QuotationItem item : quote.getItems()) if (item.getVariantId() == null) throw conflict("QUOTE_ITEM_VARIANT_REQUIRED", "Every quotation item must have a material variant before acceptance.");
+        if (quote.getStatus() != QuotationStatus.SENT) throw conflict(
+            "QUOTATION_NOT_ACCEPTABLE",
+            "Only a sent quotation can be accepted."
+        );
+        if (
+            quote.getExpiryDate() == null ||
+            quote.getExpiryDate().isBefore(LocalDate.now())
+        ) throw conflict(
+            "QUOTATION_EXPIRED",
+            "An expired quotation cannot be accepted."
+        );
+        if (orders.findByQuotationId(quotationId).isPresent()) throw conflict(
+            "QUOTATION_ALREADY_CONVERTED",
+            "This quotation already has an order."
+        );
+        if (quote.getItems().isEmpty()) throw conflict(
+            "QUOTATION_ITEMS_REQUIRED",
+            "The quotation has no items to reserve."
+        );
+        for (QuotationItem item : quote.getItems())
+            if (item.getVariantId() == null) throw conflict(
+                "QUOTE_ITEM_VARIANT_REQUIRED",
+                "Every quotation item must have a material variant before acceptance."
+            );
         SalesOrder order = new SalesOrder(nextNumber(), quote);
-        quote.getItems().forEach(item -> order.addItem(new SalesOrderItem(order, item)));
-        order.event("ORDER_CREATED", "Order created from quotation " + quote.getNumber());
+        quote
+            .getItems()
+            .forEach(item -> order.addItem(new SalesOrderItem(order, item)));
+        order.event(
+            "ORDER_CREATED",
+            "Order created from quotation " + quote.getNumber()
+        );
         reserve(order);
         quote.status(QuotationStatus.ACCEPTED);
-        order.event("CUSTOMER_ACCEPTANCE_RECORDED", "Accepted by " + acceptance.acceptedBy().trim() + " via " + acceptance.method().trim() + ". " + acceptance.note().trim());
-        order.event("QUOTATION_ACCEPTED", "Quotation accepted and inventory reserved");
+        order.event(
+            "CUSTOMER_ACCEPTANCE_RECORDED",
+            "Accepted by " +
+                acceptance.acceptedBy().trim() +
+                " via " +
+                acceptance.method().trim() +
+                ". " +
+                acceptance.note().trim()
+        );
+        order.event(
+            "QUOTATION_ACCEPTED",
+            "Quotation accepted and inventory reserved"
+        );
         return response(orders.save(order));
     }
 
     /** Compatibility path used by existing internal workflow tests and imports. */
-    public Response acceptQuotation(UUID quotationId) { return acceptQuotation(quotationId, new AcceptanceInput("SYSTEM", "System", "Acceptance recorded by an internal workflow.")); }
+    public Response acceptQuotation(UUID quotationId) {
+        return acceptQuotation(
+            quotationId,
+            new AcceptanceInput(
+                "SYSTEM",
+                "System",
+                "Acceptance recorded by an internal workflow."
+            )
+        );
+    }
 
-    public Response confirm(UUID id) { SalesOrder order = entity(id); access.requireSalesOwnership(order.getQuotation().getSalesAgent(), "order"); if (order.getStatus() != OrderStatus.PENDING) throw conflict("ORDER_NOT_PENDING", "Only a pending order can be confirmed."); order.confirm(); return response(order); }
-    public Response cancel(UUID id) { SalesOrder order = entity(id); access.requireSalesOwnership(order.getQuotation().getSalesAgent(), "order"); if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw conflict("ORDER_NOT_CANCELLABLE", "This order cannot be cancelled."); List<com.univmar.delivery.domain.Delivery> orderDeliveries = deliveries.findAllByOrderId(order.getId()); if (orderDeliveries.stream().anyMatch(delivery -> delivery.getStatus() == com.univmar.delivery.domain.DeliveryStatus.DISPATCHED || delivery.getStatus() == com.univmar.delivery.domain.DeliveryStatus.DELIVERED)) throw conflict("ORDER_HAS_DISPATCHED_DELIVERY", "This order has stock already dispatched. Cancel the remaining fulfilment through an order amendment instead."); orderDeliveries.stream().filter(delivery -> delivery.getStatus() == com.univmar.delivery.domain.DeliveryStatus.PLANNED || delivery.getStatus() == com.univmar.delivery.domain.DeliveryStatus.PREPARING).forEach(delivery -> { delivery.cancel(); order.event("DELIVERY_CANCELLED", "Delivery " + delivery.getNumber() + " cancelled because the order was cancelled"); }); for (SalesOrderItem line : order.getItems()) for (InventoryReservation reservation : line.getReservations()) if (reservation.getStatus() == ReservationStatus.ACTIVE) { BigDecimal remaining = reservation.getRemainingM2(); InventoryItem item = reservation.getInventoryItem(); item.releaseReservation(remaining); reservation.release(); movements.save(new StockMovement(item, MovementType.ORDER_RESERVATION_RELEASE, remaining, "Order reservation released", null, Instant.now(), order.getNumber(), null)); } slabs.releaseForOrder(order.getId()); remnants.releaseForOrder(order.getId()); order.cancel(); return response(order); }
-    @Transactional(readOnly = true) public Response detail(UUID id) { return response(entity(id)); }
-    @Transactional(readOnly = true) public PageResult list(OrderStatus status, String search, Pageable pageable) { Page<SalesOrder> page = orders.findAll((root, query, cb) -> { List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>(); if (status != null) predicates.add(cb.equal(root.get("status"), status)); if (search != null && !search.isBlank()) { String term = "%" + search.trim().toLowerCase(Locale.ROOT) + "%"; predicates.add(cb.or(cb.like(cb.lower(root.get("number")), term), cb.like(cb.lower(root.join("customer").get("name")), term), cb.like(cb.lower(root.join("project").get("name")), term))); } return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0])); }, pageable); return PageResult.from(page.map(this::response)); }
+    public Response confirm(UUID id) {
+        SalesOrder order = entity(id);
+        access.requireSalesOwnership(
+            order.getQuotation().getSalesAgent(),
+            "order"
+        );
+        if (order.getStatus() != OrderStatus.PENDING) throw conflict(
+            "ORDER_NOT_PENDING",
+            "Only a pending order can be confirmed."
+        );
+        order.confirm();
+        return response(order);
+    }
+
+    public Response cancel(UUID id) {
+        SalesOrder order = entity(id);
+        access.requireSalesOwnership(
+            order.getQuotation().getSalesAgent(),
+            "order"
+        );
+        if (
+            order.getStatus() == OrderStatus.CANCELLED ||
+            order.getStatus() == OrderStatus.DELIVERED
+        ) throw conflict(
+            "ORDER_NOT_CANCELLABLE",
+            "This order cannot be cancelled."
+        );
+        List<com.univmar.delivery.domain.Delivery> orderDeliveries =
+            deliveries.findAllByOrderId(order.getId());
+        if (
+            orderDeliveries
+                .stream()
+                .anyMatch(
+                    delivery ->
+                        delivery.getStatus() ==
+                            com.univmar.delivery.domain.DeliveryStatus.DISPATCHED ||
+                        delivery.getStatus() ==
+                            com.univmar.delivery.domain.DeliveryStatus.DELIVERED
+                )
+        ) throw conflict(
+            "ORDER_HAS_DISPATCHED_DELIVERY",
+            "This order has stock already dispatched. Cancel the remaining fulfilment" +
+                " through an order amendment instead."
+        );
+        orderDeliveries
+            .stream()
+            .filter(
+                delivery ->
+                    delivery.getStatus() ==
+                        com.univmar.delivery.domain.DeliveryStatus.PLANNED ||
+                    delivery.getStatus() ==
+                        com.univmar.delivery.domain.DeliveryStatus.PREPARING
+            )
+            .forEach(delivery -> {
+                delivery.cancel();
+                order.event(
+                    "DELIVERY_CANCELLED",
+                    "Delivery " +
+                        delivery.getNumber() +
+                        " cancelled because the order was cancelled"
+                );
+            });
+        for (SalesOrderItem line : order.getItems())
+            for (InventoryReservation reservation : line.getReservations())
+                if (reservation.getStatus() == ReservationStatus.ACTIVE) {
+                    BigDecimal remaining = reservation.getRemainingM2();
+                    InventoryItem item = reservation.getInventoryItem();
+                    item.releaseReservation(remaining);
+                    reservation.release();
+                    movements.save(
+                        new StockMovement(
+                            item,
+                            MovementType.ORDER_RESERVATION_RELEASE,
+                            remaining,
+                            "Order reservation released",
+                            null,
+                            Instant.now(),
+                            order.getNumber(),
+                            null
+                        )
+                    );
+                }
+        slabs.releaseForOrder(order.getId());
+        remnants.releaseForOrder(order.getId());
+        order.cancel();
+        return response(order);
+    }
+
+    @Transactional(readOnly = true)
+    public Response detail(UUID id) {
+        return response(entity(id));
+    }
+
+    @Transactional(readOnly = true)
+    public PageResult list(
+        OrderStatus status,
+        String search,
+        Pageable pageable
+    ) {
+        Page<SalesOrder> page = orders.findAll((root, query, cb) -> {
+            List<jakarta.persistence.criteria.Predicate> predicates =
+                new ArrayList<>();
+            if (status != null) predicates.add(
+                cb.equal(root.get("status"), status)
+            );
+            if (search != null && !search.isBlank()) {
+                String term =
+                    "%" + search.trim().toLowerCase(Locale.ROOT) + "%";
+                predicates.add(
+                    cb.or(
+                        cb.like(cb.lower(root.get("number")), term),
+                        cb.like(
+                            cb.lower(root.join("customer").get("name")),
+                            term
+                        ),
+                        cb.like(
+                            cb.lower(root.join("project").get("name")),
+                            term
+                        )
+                    )
+                );
+            }
+            return cb.and(
+                predicates.toArray(
+                    new jakarta.persistence.criteria.Predicate[0]
+                )
+            );
+        }, pageable);
+        return PageResult.from(page.map(this::response));
+    }
 
     private void reserve(SalesOrder order) {
-        Map<UUID, List<SalesOrderItem>> grouped = new TreeMap<>(Comparator.comparing(UUID::toString));
-        for (SalesOrderItem item : order.getItems()) grouped.computeIfAbsent(item.getVariantId(), ignored -> new ArrayList<>()).add(item);
+        Map<UUID, List<SalesOrderItem>> grouped = new TreeMap<>(
+            Comparator.comparing(UUID::toString)
+        );
+        for (SalesOrderItem item : order.getItems())
+            grouped
+                .computeIfAbsent(item.getVariantId(), ignored ->
+                    new ArrayList<>()
+                )
+                .add(item);
         for (List<SalesOrderItem> lines : grouped.values()) {
-            BigDecimal required = lines.stream().map(SalesOrderItem::getQuantityM2).reduce(BigDecimal.ZERO, BigDecimal::add);
-            List<InventoryItem> stock = inventory.findAllByVariantIdForUpdate(lines.get(0).getVariantId());
-            BigDecimal available = stock.stream().map(InventoryItem::getAvailableM2).reduce(BigDecimal.ZERO, BigDecimal::add);
-            if (available.compareTo(required) < 0) throw conflict("INSUFFICIENT_AVAILABLE_STOCK", "Insufficient available stock for " + lines.get(0).getMaterialName() + ". Required " + required + " m²; available " + available + " m².");
-            Iterator<InventoryItem> rows = stock.iterator(); InventoryItem current = rows.hasNext() ? rows.next() : null; BigDecimal leftAtRow = current == null ? BigDecimal.ZERO : current.getAvailableM2();
-            for (SalesOrderItem line : lines) { BigDecimal remaining = line.getQuantityM2(); while (remaining.signum() > 0) { while (leftAtRow.signum() == 0 && rows.hasNext()) { current = rows.next(); leftAtRow = current.getAvailableM2(); } if (current == null || leftAtRow.signum() == 0) throw conflict("INSUFFICIENT_AVAILABLE_STOCK", "Stock changed while reserving this order."); BigDecimal allocation = remaining.min(leftAtRow); current.reserve(allocation); InventoryReservation reservation = new InventoryReservation(line, current, allocation); line.addReservation(reservation); movements.save(new StockMovement(current, MovementType.ORDER_RESERVATION, allocation, "Order stock reserved", null, Instant.now(), order.getNumber(), null)); remaining = remaining.subtract(allocation); leftAtRow = leftAtRow.subtract(allocation); } }
+            BigDecimal required = lines
+                .stream()
+                .map(SalesOrderItem::getQuantityM2)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            List<InventoryItem> stock = inventory.findAllByVariantIdForUpdate(
+                lines.get(0).getVariantId()
+            );
+            BigDecimal available = stock
+                .stream()
+                .map(InventoryItem::getAvailableM2)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (available.compareTo(required) < 0) throw conflict(
+                "INSUFFICIENT_AVAILABLE_STOCK",
+                "Insufficient available stock for " +
+                    lines.get(0).getMaterialName() +
+                    ". Required " +
+                    required +
+                    " m²; available " +
+                    available +
+                    " m²."
+            );
+            Iterator<InventoryItem> rows = stock.iterator();
+            InventoryItem current = rows.hasNext() ? rows.next() : null;
+            BigDecimal leftAtRow =
+                current == null ? BigDecimal.ZERO : current.getAvailableM2();
+            for (SalesOrderItem line : lines) {
+                BigDecimal remaining = line.getQuantityM2();
+                while (remaining.signum() > 0) {
+                    while (leftAtRow.signum() == 0 && rows.hasNext()) {
+                        current = rows.next();
+                        leftAtRow = current.getAvailableM2();
+                    }
+                    if (
+                        current == null || leftAtRow.signum() == 0
+                    ) throw conflict(
+                        "INSUFFICIENT_AVAILABLE_STOCK",
+                        "Stock changed while reserving this order."
+                    );
+                    BigDecimal allocation = remaining.min(leftAtRow);
+                    current.reserve(allocation);
+                    InventoryReservation reservation = new InventoryReservation(
+                        line,
+                        current,
+                        allocation
+                    );
+                    line.addReservation(reservation);
+                    movements.save(
+                        new StockMovement(
+                            current,
+                            MovementType.ORDER_RESERVATION,
+                            allocation,
+                            "Order stock reserved",
+                            null,
+                            Instant.now(),
+                            order.getNumber(),
+                            null
+                        )
+                    );
+                    remaining = remaining.subtract(allocation);
+                    leftAtRow = leftAtRow.subtract(allocation);
+                }
+            }
         }
     }
-    private SalesOrder entity(UUID id) { return orders.findById(id).orElseThrow(() -> notFound("ORDER_NOT_FOUND", "Order was not found.")); }
-    private Response response(SalesOrder order) { return new Response(order.getId(), order.getNumber(), order.getQuotation().getId(), order.getQuotation().getNumber(), order.getCustomer().getId(), order.getCustomer().getName(), order.getProject().getId(), order.getProject().getName(), order.getStatus(), order.getSubtotal(), order.getTaxTotal(), order.getTransport(), order.getGrandTotal(), order.getCreatedAt(), order.getConfirmedAt(), order.getCancelledAt(), order.getItems().stream().map(line -> new Item(line.getId(), line.getVariantId(), line.getMaterialName(), line.getVariantLabel(), line.getQuantityM2(), line.getUnitPrice(), line.getLineTotal(), line.getReservations().stream().map(this::reservation).toList())).toList(), deliveries.findAllByOrderId(order.getId()).stream().map(delivery -> new Delivery(delivery.getId(), delivery.getNumber(), delivery.getStatus(), delivery.getScheduledDate())).toList(), order.getEvents().stream().sorted(Comparator.comparing(OrderEvent::getOccurredAt)).map(event -> new Event(event.getId(), event.getType(), event.getMessage(), event.getOccurredAt())).toList()); }
-    private Reservation reservation(InventoryReservation item) { InventoryItem stock = item.getInventoryItem(); return new Reservation(item.getId(), stock.getId(), stock.getVariant().getMaterial().getName(), stock.getWarehouse().getName(), stock.getLocation().getCode(), stock.getLotNumber(), stock.getBundleNumber(), item.getQuantityM2(), item.getStatus()); }
-    private String nextNumber() { return "ORD-" + LocalDate.now().toString().replace("-", "") + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase(Locale.ROOT); }
-    private ApiException notFound(String code, String message) { return new ApiException(HttpStatus.NOT_FOUND, code, message); }
-    private ApiException conflict(String code, String message) { return new ApiException(HttpStatus.CONFLICT, code, message); }
+
+    private SalesOrder entity(UUID id) {
+        return orders
+            .findById(id)
+            .orElseThrow(() ->
+                notFound("ORDER_NOT_FOUND", "Order was not found.")
+            );
+    }
+
+    private Response response(SalesOrder order) {
+        return new Response(
+            order.getId(),
+            order.getNumber(),
+            order.getQuotation().getId(),
+            order.getQuotation().getNumber(),
+            order.getCustomer().getId(),
+            order.getCustomer().getName(),
+            order.getProject().getId(),
+            order.getProject().getName(),
+            order.getStatus(),
+            order.getSubtotal(),
+            order.getTaxTotal(),
+            order.getTransport(),
+            order.getGrandTotal(),
+            order.getCreatedAt(),
+            order.getConfirmedAt(),
+            order.getCancelledAt(),
+            order
+                .getItems()
+                .stream()
+                .map(line ->
+                    new Item(
+                        line.getId(),
+                        line.getVariantId(),
+                        line.getMaterialName(),
+                        line.getVariantLabel(),
+                        line.getQuantityM2(),
+                        line.getUnitPrice(),
+                        line.getLineTotal(),
+                        line
+                            .getReservations()
+                            .stream()
+                            .map(this::reservation)
+                            .toList()
+                    )
+                )
+                .toList(),
+            deliveries
+                .findAllByOrderId(order.getId())
+                .stream()
+                .map(delivery ->
+                    new Delivery(
+                        delivery.getId(),
+                        delivery.getNumber(),
+                        delivery.getStatus(),
+                        delivery.getScheduledDate()
+                    )
+                )
+                .toList(),
+            order
+                .getEvents()
+                .stream()
+                .sorted(Comparator.comparing(OrderEvent::getOccurredAt))
+                .map(event ->
+                    new Event(
+                        event.getId(),
+                        event.getType(),
+                        event.getMessage(),
+                        event.getOccurredAt()
+                    )
+                )
+                .toList()
+        );
+    }
+
+    private Reservation reservation(InventoryReservation item) {
+        InventoryItem stock = item.getInventoryItem();
+        return new Reservation(
+            item.getId(),
+            stock.getId(),
+            stock.getVariant().getMaterial().getName(),
+            stock.getWarehouse().getName(),
+            stock.getLocation().getCode(),
+            stock.getLotNumber(),
+            stock.getBundleNumber(),
+            item.getQuantityM2(),
+            item.getStatus()
+        );
+    }
+
+    private String nextNumber() {
+        return (
+            "ORD-" +
+            LocalDate.now().toString().replace("-", "") +
+            "-" +
+            UUID.randomUUID()
+                .toString()
+                .substring(0, 6)
+                .toUpperCase(Locale.ROOT)
+        );
+    }
+
+    private ApiException notFound(String code, String message) {
+        return new ApiException(HttpStatus.NOT_FOUND, code, message);
+    }
+
+    private ApiException conflict(String code, String message) {
+        return new ApiException(HttpStatus.CONFLICT, code, message);
+    }
 }

@@ -16,7 +16,8 @@ services:
       retries: 10
 
   minio:
-    image: quay.io/minio/minio:latest
+    # The original public Quay image is unavailable; override to use your own mirror.
+    image: ${MINIO_IMAGE:-dappros/minio:RELEASE.2025-09-07T16-13-09Z}
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}

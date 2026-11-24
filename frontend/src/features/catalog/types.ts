@@ -1,4 +1,11 @@
-export type MaterialCategory = { id: string; name: string; slug: string; sortOrder: number; active: boolean; websiteVisible: boolean };
+export type MaterialCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  sortOrder: number;
+  active: boolean;
+  websiteVisible: boolean;
+};
 export type StoneType = string;
 
 export type MaterialVariant = {
@@ -9,7 +16,8 @@ export type MaterialVariant = {
   mainImageUrl?: string;
   galleryImageUrls: string[];
   active: boolean;
-  publicAvailabilityPolicy?: "AUTO" | "AVAILABLE_ON_ORDER" | "SHOWROOM_SELECTION" | "HIDDEN";
+  publicAvailabilityPolicy?:
+    "AUTO" | "AVAILABLE_ON_ORDER" | "SHOWROOM_SELECTION" | "HIDDEN";
 };
 
 export type MaterialSummary = {

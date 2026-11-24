@@ -5,6 +5,13 @@ import java.util.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AuditEventRepository extends JpaRepository<AuditEvent, UUID> {
-    List<AuditEvent> findAllByTargetTypeAndTargetIdOrderByOccurredAtDesc(DocumentTargetType targetType, UUID targetId);
-    List<AuditEvent> findTop100ByTargetTypeAndEventTypeOrderByOccurredAtDesc(DocumentTargetType targetType, String eventType);
+    List<AuditEvent> findAllByTargetTypeAndTargetIdOrderByOccurredAtDesc(
+        DocumentTargetType targetType,
+        UUID targetId
+    );
+
+    List<AuditEvent> findTop100ByTargetTypeAndEventTypeOrderByOccurredAtDesc(
+        DocumentTargetType targetType,
+        String eventType
+    );
 }

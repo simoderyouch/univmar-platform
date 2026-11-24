@@ -12,7 +12,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   function notify(message: string, kind: ToastKind = "success") {
     const id = Date.now();
     setToasts((items) => [...items, { id, message, kind }]);
-    window.setTimeout(() => setToasts((items) => items.filter((item) => item.id !== id)), 4500);
+    window.setTimeout(
+      () => setToasts((items) => items.filter((item) => item.id !== id)),
+      4500,
+    );
   }
 
   return (

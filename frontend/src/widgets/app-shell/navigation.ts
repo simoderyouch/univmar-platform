@@ -1,4 +1,24 @@
-import { Boxes, ClipboardList, Factory, FileText, FolderKanban, Grid3X3, Handshake, LayoutDashboard, Package, Paperclip, QrCode, ReceiptText, Scissors, ScrollText, ShieldCheck, Truck, Users, Globe2, type LucideIcon } from "lucide-react";
+import {
+  Boxes,
+  ClipboardList,
+  Factory,
+  FileText,
+  FolderKanban,
+  Grid3X3,
+  Handshake,
+  LayoutDashboard,
+  Package,
+  Paperclip,
+  QrCode,
+  ReceiptText,
+  Scissors,
+  ScrollText,
+  ShieldCheck,
+  Truck,
+  Users,
+  Globe2,
+  type LucideIcon,
+} from "lucide-react";
 
 export type NavigationEntry = {
   label: string;
@@ -50,4 +70,6 @@ export const workspaceNavigationGroups: NavigationGroup[] = [
   },
 ];
 
-export const workspaceNavigation = workspaceNavigationGroups.flatMap((group) => group.items);
+export const workspaceNavigation = workspaceNavigationGroups.flatMap(
+  (group) => group.items,
+);
